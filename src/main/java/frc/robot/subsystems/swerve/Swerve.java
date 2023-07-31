@@ -12,9 +12,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Swerve {
+public class Swerve extends SubsystemBase {
     private SwerveDriveOdometry swerveOdometry;
     private SwerveModule[] mSwerveMods;
     private Pigeon2 gyro;
@@ -78,7 +80,7 @@ public class Swerve {
         for (SwerveModule module : mSwerveMods) {
             modulePositions[module.moduleNumber] = module.getPosition();
         }
-        return getModulePositions();
+        return modulePositions;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -89,6 +91,14 @@ public class Swerve {
         }
     } 
 
+    public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] states = new SwerveModuleState[4];
+        for (SwerveModule module : mSwerveMods) {
+            states[module.moduleNumber] = module.getState();
+        }
+        return states;
+    }
+
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
     }
@@ -97,5 +107,12 @@ public class Swerve {
         swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
     }
 
-    
+    @Override
+    public void periodic() {
+        for (SwerveModule module : mSwerveMods) {
+            SmartDashboard.putNumber("Module " + module.moduleNumber + " Cancoder", module.getCanCoder().getDegrees());
+            SmartDashboard.putNumber("Module " + module.moduleNumber + " Angle", module.getPosition().angle.getDegrees());
+            SmartDashboard.putNumber("Module " + module.moduleNumber + " Velocity", module.getState().speedMetersPerSecond);
+        }
+    }
 }

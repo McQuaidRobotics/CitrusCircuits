@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import java.io.Console;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.CTREConfigs;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.util.CTREModuleState;
 import frc.robot.util.SwerveModuleConstants;
 
@@ -28,19 +31,18 @@ public class SwerveModule {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
 
+        angleEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Swerve.canBus);
+        configureCANcoder();
+
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Swerve.canBus);
         configureDriveMotor();
 
         mAngleMotor = new TalonFX(moduleConstants.angleMotorID, Constants.Swerve.canBus);
         configureAngleMotor();
-
-        angleEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Swerve.canBus);
-        configureCANcoder();
-
     }
 
     public void configureDriveMotor() {
-        mDriveMotor.getConfigurator().apply(CTREConfigs.swerveDriveFXConfig);
+        mDriveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
         var mDriveConfig = new MotorOutputConfigs();
         mDriveConfig.Inverted = Constants.Swerve.driveMotorInvert;
         mDriveConfig.NeutralMode = Constants.Swerve.driveNeutralMode;
@@ -48,7 +50,7 @@ public class SwerveModule {
     }
 
     public void configureAngleMotor() {
-        mAngleMotor.getConfigurator().apply(CTREConfigs.swerveAngleFXConfig);
+        mAngleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
         var mAngleConfig = new MotorOutputConfigs();
         mAngleConfig.Inverted = Constants.Swerve.angleMotorInvert;
         mAngleConfig.NeutralMode = Constants.Swerve.angleNeutralMode;
@@ -57,7 +59,7 @@ public class SwerveModule {
     }
 
     public void configureCANcoder() {
-        angleEncoder.getConfigurator().apply(CTREConfigs.swerveCanCoderConfig);
+        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
     public Rotation2d getCanCoder(){
@@ -70,9 +72,9 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getPosition() {
+        //TODO {Maddox} May need to fix conversion, needs to convert motor rotations to a distance in meters, 
+        //and motor rotation to an angle in degrees inside a rotation2d object
         return new SwerveModulePosition(
-            //TODO {Maddox} May need to fix conversion, needs to convert motor rotations to a distance in meters, 
-            //and motor rotation to an angle in degrees inside a rotation2d object
             mDriveMotor.getRotorPosition().getValue() * (Constants.Swerve.wheelCircumference / Constants.Swerve.driveGearRatio),
             Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Constants.Swerve.angleGearRatio)
         );
@@ -113,6 +115,7 @@ public class SwerveModule {
     }
 
     private double driveRotationsToMeters(double rotations) {
+        //TODO {Maddox} Double check conversions
         return (rotations / Constants.Swerve.driveGearRatio) * (Constants.Swerve.wheelDiameter * Math.PI);
     }
 

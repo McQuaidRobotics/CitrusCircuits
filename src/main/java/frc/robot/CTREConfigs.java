@@ -8,9 +8,9 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import frc.robot.Constants.Swerve;
 
 public final class CTREConfigs {
-    public static TalonFXConfiguration swerveAngleFXConfig;
-    public static TalonFXConfiguration swerveDriveFXConfig;
-    public static CANcoderConfiguration swerveCanCoderConfig;
+    public TalonFXConfiguration swerveAngleFXConfig;
+    public TalonFXConfiguration swerveDriveFXConfig;
+    public CANcoderConfiguration swerveCanCoderConfig;
 
     public CTREConfigs(){
         swerveAngleFXConfig = new TalonFXConfiguration();

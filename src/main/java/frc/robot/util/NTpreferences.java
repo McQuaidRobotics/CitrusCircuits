@@ -1,6 +1,8 @@
 package frc.robot.util;
 
 import java.util.HashMap;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.Robot;
 
@@ -27,6 +29,9 @@ public class NTpreferences {
         for (Double angle : universalOffsets.values()) {
             if ((angle <= 0 || angle >= 360) && Robot.isReal()) loadedCorrectly = false;
         }
+
+        var mod1Offset = Rotation2d.fromDegrees(universalOffsets.get("1U"));
+        System.out.println("Module 1 Offeset: " + mod1Offset.getRotations());
     }
 
     public static boolean isOk() {

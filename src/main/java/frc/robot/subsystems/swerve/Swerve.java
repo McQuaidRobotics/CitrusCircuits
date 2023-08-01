@@ -28,9 +28,9 @@ public class Swerve extends SubsystemBase {
         zeroGyro();
 
         mSwerveMods = new SwerveModule[] {
-            new SwerveModule(Constants.Swerve.Mod0.constants, 0),
-            new SwerveModule(Constants.Swerve.Mod1.constants, 1),
-            new SwerveModule(Constants.Swerve.Mod2.constants, 2),
+            new SwerveModule(Constants.Swerve.Mod1.constants, 0),
+            new SwerveModule(Constants.Swerve.Mod2.constants, 1),
+            new SwerveModule(Constants.Swerve.Mod0.constants, 2),
             new SwerveModule(Constants.Swerve.Mod3.constants, 3)
         };
 

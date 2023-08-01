@@ -1,7 +1,5 @@
 package frc.robot.subsystems.swerve;
 
-import java.io.Console;
-
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -12,7 +10,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.CTREConfigs;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.util.CTREModuleState;
@@ -68,7 +65,7 @@ public class SwerveModule {
 
     public void resetToAbsolute() {
         double absolutePosition = getCanCoder().getRotations() - angleOffset.getRotations();
-        mAngleMotor.setRotorPosition(absolutePosition);
+        mAngleMotor.setRotorPosition(absolutePosition * Constants.Swerve.angleGearRatio);
     }
 
     public SwerveModulePosition getPosition() {
@@ -96,6 +93,11 @@ public class SwerveModule {
 
         //TODO {Maddox} Double check conversion
         var controlRequest = new PositionDutyCycle(desiredState.angle.getRotations() * Constants.Swerve.angleGearRatio);
+        var slot0Config = new Slot0Configs();
+        slot0Config.kP = Constants.Swerve.angleKP;
+        slot0Config.kI = Constants.Swerve.angleKI;
+        slot0Config.kD = Constants.Swerve.angleKD;
+        mAngleMotor.getConfigurator().apply(slot0Config);
         mAngleMotor.setControl(controlRequest);
         lastAngle = angle;
     }

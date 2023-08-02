@@ -35,11 +35,11 @@ public class NTpreferences {
         return loadedCorrectly;
     }
 
-    public static Double getAngleOffset(Module module) {
-        if (module == Module.u3) return findCoterminalAngle(universalOffsets.get("3U") + 225);
-        else if (module == Module.u0) return findCoterminalAngle(universalOffsets.get("0U") + 315);
-        else if (module == Module.u2) return findCoterminalAngle(universalOffsets.get("2U") + 125);
-        else if (module == Module.u1) return findCoterminalAngle(universalOffsets.get("1U") + 45);
+    public static Double getRotationOffset(Module module) {
+        if (module == Module.u3) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("3U") + 225)).getRotations();
+        else if (module == Module.u0) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("0U") + 315)).getRotations();
+        else if (module == Module.u2) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("2U") + 125)).getRotations();
+        else if (module == Module.u1) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("1U") + 45)).getRotations();
         return 0.0;
     }
 

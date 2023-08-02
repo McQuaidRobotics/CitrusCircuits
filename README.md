@@ -13,7 +13,7 @@ The following things must be adjusted to your robot and module's specific consta
 
 3. ```wheelBase```: Center to Center distance of front and rear module wheels in meters.
 
-4. ```wheelCircumference```: Cirumference of the wheel (including tread) in meters. <br><b>If you are using a supported module, this value will be automatically set.</b>
+4. ```wheelCircumference```: Cirumference of the wheel (including tread) in meters. <br>
 
 5. ```driveGearRatio```: Total gear ratio for the drive motor. <br>
 

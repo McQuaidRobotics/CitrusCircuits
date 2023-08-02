@@ -10,7 +10,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import frc.robot.Constants.Swerve;
 import frc.robot.Robot;
 import frc.robot.util.CTREModuleState;
 import frc.robot.util.SwerveModuleConstants;
@@ -28,29 +28,29 @@ public class SwerveModule {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
 
-        angleEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Swerve.canBus);
+        angleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
         configureCANcoder();
 
-        mDriveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Swerve.canBus);
+        mDriveMotor = new TalonFX(moduleConstants.driveMotorID, Swerve.CANBUS);
         configureDriveMotor();
 
-        mAngleMotor = new TalonFX(moduleConstants.angleMotorID, Constants.Swerve.canBus);
+        mAngleMotor = new TalonFX(moduleConstants.angleMotorID, Swerve.CANBUS);
         configureAngleMotor();
     }
 
     public void configureDriveMotor() {
         mDriveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
         var mDriveConfig = new MotorOutputConfigs();
-        mDriveConfig.Inverted = Constants.Swerve.driveMotorInvert;
-        mDriveConfig.NeutralMode = Constants.Swerve.driveNeutralMode;
+        mDriveConfig.Inverted = Swerve.DRIVE_MOTOR_INVERT;
+        mDriveConfig.NeutralMode = Swerve.DRIVE_NEUTRAL_MODE;
         mDriveMotor.getConfigurator().apply(mDriveConfig);
     }
 
     public void configureAngleMotor() {
         mAngleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
         var mAngleConfig = new MotorOutputConfigs();
-        mAngleConfig.Inverted = Constants.Swerve.angleMotorInvert;
-        mAngleConfig.NeutralMode = Constants.Swerve.angleNeutralMode;
+        mAngleConfig.Inverted = Swerve.ANGLE_MOTOR_INVERT;
+        mAngleConfig.NeutralMode = Swerve.ANGLE_NEUTRAL_MODE;
         resetToAbsolute();
         mAngleMotor.getConfigurator().apply(mAngleConfig);
     }
@@ -65,15 +65,15 @@ public class SwerveModule {
 
     public void resetToAbsolute() {
         double absolutePosition = getCanCoder().getRotations() - angleOffset.getRotations();
-        mAngleMotor.setRotorPosition(absolutePosition * Constants.Swerve.angleGearRatio);
+        mAngleMotor.setRotorPosition(absolutePosition * Swerve.ANGLE_GEAR_RATIO);
     }
 
     public SwerveModulePosition getPosition() {
         //TODO {Maddox} May need to fix conversion, needs to convert motor rotations to a distance in meters, 
         //and motor rotation to an angle in degrees inside a rotation2d object
         return new SwerveModulePosition(
-            mDriveMotor.getRotorPosition().getValue() * (Constants.Swerve.wheelCircumference / Constants.Swerve.driveGearRatio),
-            Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Constants.Swerve.angleGearRatio)
+            mDriveMotor.getRotorPosition().getValue() * (Swerve.WHEEL_CIRCUMFERENCE / Swerve.DRIVE_GEAR_RATIO),
+            Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Swerve.ANGLE_GEAR_RATIO)
         );
     }
 
@@ -85,18 +85,18 @@ public class SwerveModule {
 
     public Rotation2d getAngle() {
         //TODO {Maddox} Double check conversion
-        return Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Constants.Swerve.angleGearRatio);
+        return Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Swerve.ANGLE_GEAR_RATIO);
     }
 
     public void setAngle(SwerveModuleState desiredState) {
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01)) ? lastAngle : desiredState.angle;
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.MAX_SPEED * 0.01)) ? lastAngle : desiredState.angle;
 
         //TODO {Maddox} Double check conversion
-        var controlRequest = new PositionDutyCycle(desiredState.angle.getRotations() * Constants.Swerve.angleGearRatio);
+        var controlRequest = new PositionDutyCycle(desiredState.angle.getRotations() * Swerve.ANGLE_GEAR_RATIO);
         var slot0Config = new Slot0Configs();
-        slot0Config.kP = Constants.Swerve.angleKP;
-        slot0Config.kI = Constants.Swerve.angleKI;
-        slot0Config.kD = Constants.Swerve.angleKD;
+        slot0Config.kP = Swerve.ANGLE_KP;
+        slot0Config.kI = Swerve.ANGLE_KI;
+        slot0Config.kD = Swerve.ANGLE_KD;
         mAngleMotor.getConfigurator().apply(slot0Config);
         mAngleMotor.setControl(controlRequest);
         lastAngle = angle;
@@ -104,13 +104,13 @@ public class SwerveModule {
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         //TODO {Maddox} Don't really understand the math behind how this percent output is calculated
-        double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
+        double percentOutput = desiredState.speedMetersPerSecond / Swerve.MAX_SPEED;
         var controlRequest = new DutyCycleOut(percentOutput);
         if (!isOpenLoop) {
             var slot0Config = new Slot0Configs();
-            slot0Config.kP = Constants.Swerve.driveKP;
-            slot0Config.kI = Constants.Swerve.driveKI;
-            slot0Config.kD = Constants.Swerve.driveKD;
+            slot0Config.kP = Swerve.DRIVE_KP;
+            slot0Config.kI = Swerve.DRIVE_KI;
+            slot0Config.kD = Swerve.DRIVE_KD;
             mDriveMotor.getConfigurator().apply(slot0Config);
         }
         mDriveMotor.setControl(controlRequest);
@@ -118,7 +118,7 @@ public class SwerveModule {
 
     private double driveRotationsToMeters(double rotations) {
         //TODO {Maddox} Double check conversions
-        return (rotations / Constants.Swerve.driveGearRatio) * (Constants.Swerve.wheelDiameter * Math.PI);
+        return (rotations / Swerve.DRIVE_GEAR_RATIO) * (Swerve.WHEEL_DIAMETER * Math.PI);
     }
 
     public SwerveModuleState getState() {

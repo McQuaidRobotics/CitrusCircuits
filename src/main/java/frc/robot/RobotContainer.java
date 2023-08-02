@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
-  private final XboxController driveController = new XboxController(Constants.OperatorConstants.kDriverControllerPort);
+  private final XboxController driveController = new XboxController(Constants.OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;

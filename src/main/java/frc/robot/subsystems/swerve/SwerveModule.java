@@ -5,6 +5,9 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,15 +22,17 @@ public class SwerveModule {
     private TalonFX mDriveMotor;
     private TalonFX mAngleMotor;
     private CANcoder angleEncoder;
-
+    
     public int moduleNumber;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
-
+    
     public SwerveModule(SwerveModuleConstants moduleConstants, int moduleNumber) {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
-
+        
+        //TODO {Maddox} For FUSED-CANCoder info check out - https://v5.docs.ctr-electronics.com/en/stable/ch14a_BringUpRemoteSensors.html
+        
         angleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
         configureCANcoder();
 
@@ -48,24 +53,27 @@ public class SwerveModule {
 
     public void configureAngleMotor() {
         mAngleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
-        var mAngleConfig = new MotorOutputConfigs();
-        mAngleConfig.Inverted = Swerve.ANGLE_MOTOR_INVERT;
-        mAngleConfig.NeutralMode = Swerve.ANGLE_NEUTRAL_MODE;
-        resetToAbsolute();
+        var mAngleConfig = new TalonFXConfiguration();
+        mAngleConfig.MotorOutput.Inverted = Swerve.ANGLE_MOTOR_INVERT;
+        mAngleConfig.MotorOutput.NeutralMode = Swerve.ANGLE_NEUTRAL_MODE;
+        //TODO {Maddox} If the fused encoder settings does not work, try using the CANCoder ID passed
+        //in through the moduleConstants. Also try changing the sensor source from
+        //FusedCANcoder to RemoteCANcoder
+        mAngleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
+        mAngleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        mAngleConfig.Feedback.RotorToSensorRatio = Swerve.ANGLE_GEAR_RATIO;
         mAngleMotor.getConfigurator().apply(mAngleConfig);
     }
 
     public void configureCANcoder() {
         angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
+        var CANCoderConfig = new CANcoderConfiguration();
+        CANCoderConfig.MagnetSensor.MagnetOffset = angleOffset.getRotations();
+        angleEncoder.getConfigurator().apply(CANCoderConfig);
     }
 
     public Rotation2d getCanCoder(){
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
-    }
-
-    public void resetToAbsolute() {
-        double absolutePosition = getCanCoder().getRotations() - angleOffset.getRotations();
-        mAngleMotor.setRotorPosition(absolutePosition * Swerve.ANGLE_GEAR_RATIO);
     }
 
     public SwerveModulePosition getPosition() {

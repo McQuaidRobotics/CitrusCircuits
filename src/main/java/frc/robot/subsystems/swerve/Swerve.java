@@ -35,7 +35,6 @@ public class Swerve extends SubsystemBase {
         };
 
         Timer.delay(1.0);
-        resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.SWERVE_KINEMATICS, getYaw(), getModulePositions());
     }
@@ -63,12 +62,6 @@ public class Swerve extends SubsystemBase {
 
     public void zeroGyro() {
         gyro.setYaw(0.0);
-    }
-
-    public void resetModulesToAbsolute() {
-        for (SwerveModule module : mSwerveMods) {
-            module.resetToAbsolute();
-        }
     }
 
     public Rotation2d getYaw() {

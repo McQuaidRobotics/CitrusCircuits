@@ -56,12 +56,14 @@ public class SwerveModule {
         var mAngleConfig = new TalonFXConfiguration();
         mAngleConfig.MotorOutput.Inverted = Swerve.ANGLE_MOTOR_INVERT;
         mAngleConfig.MotorOutput.NeutralMode = Swerve.ANGLE_NEUTRAL_MODE;
-        //TODO {Maddox} If the fused encoder settings does not work, try using the CANCoder ID passed
-        //in through the moduleConstants. Also try changing the sensor source from
-        //FusedCANcoder to RemoteCANcoder
+        mAngleConfig.Slot0.kP = Swerve.ANGLE_KP;
+        mAngleConfig.Slot0.kI = Swerve.ANGLE_KI;
+        mAngleConfig.Slot0.kD = Swerve.ANGLE_KD;
         mAngleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
         mAngleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         mAngleConfig.Feedback.RotorToSensorRatio = Swerve.ANGLE_GEAR_RATIO;
+        mAngleConfig.Feedback.SensorToMechanismRatio = Swerve.ANGLE_GEAR_RATIO;
+        mAngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
         mAngleMotor.getConfigurator().apply(mAngleConfig);
     }
 
@@ -101,11 +103,6 @@ public class SwerveModule {
 
         //TODO {Maddox} Double check conversion
         var controlRequest = new PositionDutyCycle(desiredState.angle.getRotations() * Swerve.ANGLE_GEAR_RATIO);
-        var slot0Config = new Slot0Configs();
-        slot0Config.kP = Swerve.ANGLE_KP;
-        slot0Config.kI = Swerve.ANGLE_KI;
-        slot0Config.kD = Swerve.ANGLE_KD;
-        mAngleMotor.getConfigurator().apply(slot0Config);
         mAngleMotor.setControl(controlRequest);
         lastAngle = angle;
     }

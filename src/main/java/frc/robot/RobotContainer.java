@@ -15,7 +15,6 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   private final JoystickButton zeroGyro = new JoystickButton(driveController, XboxController.Button.kStart.value);
-  private final JoystickButton robotCentric = new JoystickButton(driveController, XboxController.Button.kLeftBumper.value);
 
   private final Swerve swerve = new Swerve();
 
@@ -27,8 +26,8 @@ public class RobotContainer {
         swerve,
         () -> -driveController.getRawAxis(translationAxis),
         () -> -driveController.getRawAxis(strafeAxis),
-        () -> -driveController.getRawAxis(rotationAxis),
-        () -> robotCentric.getAsBoolean()));
+        () -> -driveController.getRawAxis(rotationAxis)
+        ));
   }
 
   private void configureDriverBindings() {

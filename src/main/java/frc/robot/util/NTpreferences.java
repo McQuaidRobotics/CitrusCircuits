@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import java.util.HashMap;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.Robot;
 

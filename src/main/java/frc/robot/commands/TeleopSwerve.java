@@ -3,7 +3,6 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -18,28 +17,26 @@ public class TeleopSwerve extends CommandBase {
   private DoubleSupplier translationAxisSup;
   private DoubleSupplier strafeAxisSup;
   private DoubleSupplier rotationAxisSup;
-  private BooleanSupplier robotCentricSup;
 
-  public TeleopSwerve(Swerve swerve, DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier rotation, BooleanSupplier robotCentric) {
+  public TeleopSwerve(Swerve swerve, DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier rotation) {
     this.swerve = swerve;
     addRequirements(swerve);
 
     this.translationAxisSup = translation;
     this.strafeAxisSup = strafe;
     this.rotationAxisSup = rotation;
-    this.robotCentricSup = robotCentric;
   }
 
   @Override
   public void execute() {
-    double translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(), Constants.OperatorConstants.leftStickDeadband);
-    double strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(), Constants.OperatorConstants.leftStickDeadband);
-    double rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), Constants.OperatorConstants.rightStickDeadband);
+    double translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(), Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
+    double strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(), Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
+    double rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), Constants.OperatorConstants.RIGHT_JOYSTICK_DEADBAND);
 
     swerve.Drive(
-        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed), 
-        rotationVal * Constants.Swerve.maxAngularVelocity, 
-        robotCentricSup.getAsBoolean(), 
+        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.MAX_SPEED), 
+        rotationVal * Constants.Swerve.MAX_ANGULAR_VELOCITY, 
+        true, 
         false);
   }
 }

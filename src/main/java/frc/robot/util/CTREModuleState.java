@@ -14,43 +14,17 @@ public class CTREModuleState {
    * @param currentAngle The current module angle.
    */
   public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
+    double targetAngle = desiredState.angle.getDegrees() + 180;
     double targetSpeed = desiredState.speedMetersPerSecond;
-    double delta = targetAngle - currentAngle.getDegrees();
-    if (Math.abs(delta) > 90){
+    double targetAngleDelta = targetAngle - currentAngle.getDegrees();
+    if (Math.abs(targetAngleDelta) > 90){
         targetSpeed = -targetSpeed;
-        targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
-    }        
+        targetAngle = targetAngleDelta > 90 ? targetAngle - 180 : targetAngle + 180;
+    }
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-  }
+  } 
 
-  /**
-     * @param scopeReference Current Angle
-     * @param newAngle Target Angle
-     * @return Closest angle within scope
-     */
-    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-      double lowerBound;
-      double upperBound;
-      double lowerOffset = scopeReference % 360;
-      if (lowerOffset >= 0) {
-          lowerBound = scopeReference - lowerOffset;
-          upperBound = scopeReference + (360 - lowerOffset);
-      } else {
-          upperBound = scopeReference - lowerOffset;
-          lowerBound = scopeReference - (360 + lowerOffset);
-      }
-      while (newAngle < lowerBound) {
-          newAngle += 360;
-      }
-      while (newAngle > upperBound) {
-          newAngle -= 360;
-      }
-      if (newAngle - scopeReference > 180) {
-          newAngle -= 360;
-      } else if (newAngle - scopeReference < -180) {
-          newAngle += 360;
-      }
-      return newAngle;
+  public static double findCoterminalAngle(double angleOffset) {
+    return Math.abs((Math.abs(angleOffset) > 360) ? angleOffset % 360 : angleOffset);
   }
 }

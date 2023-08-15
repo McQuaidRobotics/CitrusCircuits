@@ -21,12 +21,12 @@ public class SwerveModule {
     private CANcoder angleEncoder;
 
     public int moduleNumber;
-    private Rotation2d angleOffset;
+    private Rotation2d rotationOffset;
     private Rotation2d lastAngle;
 
     public SwerveModule(SwerveModuleConstants moduleConstants, int moduleNumber) {
         this.moduleNumber = moduleNumber;
-        this.angleOffset = moduleConstants.angleOffset;
+        this.rotationOffset = moduleConstants.angleOffset;
 
         angleEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Swerve.canBus);
         configureCANcoder();
@@ -64,7 +64,7 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        double absolutePosition = getCanCoder().getRotations() - angleOffset.getRotations();
+        double absolutePosition = getCanCoder().getRotations() - rotationOffset.getRotations();
         mAngleMotor.setRotorPosition(absolutePosition * Constants.Swerve.angleGearRatio);
     }
 

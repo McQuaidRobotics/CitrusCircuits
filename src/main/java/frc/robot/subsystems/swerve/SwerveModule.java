@@ -23,19 +23,20 @@ public class SwerveModule {
     private TalonFX mDriveMotor;
     private TalonFX mAngleMotor;
     private CANcoder angleEncoder;
-    
+
     public int moduleNumber;
     private Rotation2d rotationOffset;
     private Rotation2d lastAngle = new Rotation2d();
-    
+
     public SwerveModule(SwerveModuleConstants moduleConstants, int moduleNumber) {
         this.moduleNumber = moduleNumber;
         this.rotationOffset = moduleConstants.angleOffset;
 
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Rotation Offset", rotationOffset.getDegrees());
-        
-        //TODO {Maddox} For FUSED-CANCoder info check out - https://v5.docs.ctr-electronics.com/en/stable/ch14a_BringUpRemoteSensors.html
-        
+
+        // TODO {Maddox} For FUSED-CANCoder info check out -
+        // https://v5.docs.ctr-electronics.com/en/stable/ch14a_BringUpRemoteSensors.html
+
         angleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
         configureCANcoder();
 
@@ -73,21 +74,22 @@ public class SwerveModule {
     public void configureCANcoder() {
         angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
         var CANCoderConfig = new CANcoderConfiguration();
+        SmartDashboard.putNumber("bleh" + this.moduleNumber, rotationOffset.getDegrees());
         CANCoderConfig.MagnetSensor.MagnetOffset = -rotationOffset.getRotations();
         angleEncoder.getConfigurator().apply(CANCoderConfig);
     }
 
-    public Rotation2d getCanCoder(){
+    public Rotation2d getCanCoder() {
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }
 
     public SwerveModulePosition getPosition() {
-        //TODO {Maddox} May need to fix conversion, needs to convert motor rotations to a distance in meters, 
-        //and motor rotation to an angle in degrees inside a rotation2d object
+        // TODO {Maddox} May need to fix conversion, needs to convert motor rotations to
+        // a distance in meters,
+        // and motor rotation to an angle in degrees inside a rotation2d object
         return new SwerveModulePosition(
-            mDriveMotor.getRotorPosition().getValue() * (Swerve.WHEEL_CIRCUMFERENCE / Swerve.DRIVE_GEAR_RATIO),
-            Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Swerve.ANGLE_GEAR_RATIO)
-        );
+                mDriveMotor.getRotorPosition().getValue() * (Swerve.WHEEL_CIRCUMFERENCE / Swerve.DRIVE_GEAR_RATIO),
+                Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue() / Swerve.ANGLE_GEAR_RATIO));
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -98,21 +100,23 @@ public class SwerveModule {
     }
 
     public Rotation2d getAngle() {
-        //TODO {Maddox} Double check conversion
+        // TODO {Maddox} Double check conversion
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }
 
     public void setAngle(SwerveModuleState desiredState) {
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.MAX_SPEED * 0.01)) ? lastAngle : desiredState.angle;
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.MAX_SPEED * 0.01)) ? lastAngle
+                : desiredState.angle;
 
-        //TODO {Maddox} Double check conversion
+        // TODO {Maddox} Double check conversion
         var controlRequest = new PositionDutyCycle(angle.getRotations());
         mAngleMotor.setControl(controlRequest);
         lastAngle = angle;
     }
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        //TODO {Maddox} Don't really understand the math behind how this percent output is calculated
+        // TODO {Maddox} Don't really understand the math behind how this percent output
+        // is calculated
         double percentOutput = desiredState.speedMetersPerSecond / Swerve.MAX_SPEED;
         var controlRequest = new DutyCycleOut(percentOutput);
         if (!isOpenLoop) {
@@ -126,15 +130,14 @@ public class SwerveModule {
     }
 
     private double driveRotationsToMeters(double rotations) {
-        //TODO {Maddox} Double check conversions
+        // TODO {Maddox} Double check conversions
         return (rotations / Swerve.DRIVE_GEAR_RATIO) * (Swerve.WHEEL_DIAMETER * Math.PI);
     }
 
     public SwerveModuleState getState() {
-        //TODO {Maddox} Double check conversions
+        // TODO {Maddox} Double check conversions
         return new SwerveModuleState(
-            driveRotationsToMeters(mDriveMotor.getVelocity().getValue()),
-            getAngle()
-        );
+                driveRotationsToMeters(mDriveMotor.getVelocity().getValue()),
+                getAngle());
     }
 }

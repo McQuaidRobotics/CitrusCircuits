@@ -14,7 +14,7 @@ public class CTREModuleState {
    * @param currentAngle The current module angle.
    */
   public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    double targetAngle = desiredState.angle.getDegrees() + 180;
+    double targetAngle = desiredState.angle.getDegrees();
     double targetSpeed = desiredState.speedMetersPerSecond;
     double targetAngleDelta = targetAngle - currentAngle.getDegrees();
     if (Math.abs(targetAngleDelta) > 90){

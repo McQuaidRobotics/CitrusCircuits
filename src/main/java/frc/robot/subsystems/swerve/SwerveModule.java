@@ -22,7 +22,7 @@ import frc.robot.util.SwerveModuleConstants;
 public class SwerveModule {
     private TalonFX mDriveMotor;
     private TalonFX mAngleMotor;
-    private CANcoder angleEncoder;
+    private CANcoder mAngleEncoder;
 
     public int moduleNumber;
     private Rotation2d rotationOffset;
@@ -34,7 +34,7 @@ public class SwerveModule {
 
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Rotation Offset", rotationOffset.getDegrees());
 
-        angleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
+        mAngleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
         configureCANcoder();
 
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID, Swerve.CANBUS);
@@ -60,7 +60,7 @@ public class SwerveModule {
         mAngleConfig.Slot0.kP = Swerve.ANGLE_KP;
         mAngleConfig.Slot0.kI = Swerve.ANGLE_KI;
         mAngleConfig.Slot0.kD = Swerve.ANGLE_KD;
-        mAngleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
+        mAngleConfig.Feedback.FeedbackRemoteSensorID = mAngleEncoder.getDeviceID();
         mAngleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         mAngleConfig.Feedback.RotorToSensorRatio = Swerve.ANGLE_GEAR_RATIO;
         mAngleConfig.Feedback.SensorToMechanismRatio = 1.0;
@@ -69,15 +69,14 @@ public class SwerveModule {
     }
 
     public void configureCANcoder() {
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
+        mAngleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
         var CANCoderConfig = new CANcoderConfiguration();
-        SmartDashboard.putNumber("bleh" + this.moduleNumber, rotationOffset.getDegrees());
         CANCoderConfig.MagnetSensor.MagnetOffset = -rotationOffset.getRotations();
-        angleEncoder.getConfigurator().apply(CANCoderConfig);
+        mAngleEncoder.getConfigurator().apply(CANCoderConfig);
     }
 
     public Rotation2d getCanCoder() {
-        return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
+        return Rotation2d.fromRotations(mAngleEncoder.getAbsolutePosition().getValue());
     }
 
     public SwerveModulePosition getPosition() {
@@ -87,14 +86,14 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = CTREModuleState.optimize(desiredState, getAngle());
+        desiredState = CTREModuleState.optimize(desiredState, getAbsoluteAngle());
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Desired State", desiredState.angle.getDegrees());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
 
-    public Rotation2d getAngle() {
-        return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
+    public Rotation2d getAbsoluteAngle() {
+        return Rotation2d.fromRotations(mAngleMotor.getRotorPosition().getValue());
     }
 
     public void setAngle(SwerveModuleState desiredState) {
@@ -125,6 +124,6 @@ public class SwerveModule {
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 driveRotationsToMeters(mDriveMotor.getVelocity().getValue()),
-                getAngle());
+                getAbsoluteAngle());
     }
 }

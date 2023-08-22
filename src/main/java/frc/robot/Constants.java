@@ -20,10 +20,8 @@ public final class Constants {
   }
 
   public static class Swerve {
-
-    //TODO {Maddox} Double check all physical constants and CAN ID's
     public static final int PIGEON_ID = 33;
-    public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
+    public static final boolean INVERT_GYRO = false;
     public static final String CANBUS = "McQDriveBus";
 
     /* Drivetrain Constants */
@@ -41,17 +39,14 @@ public final class Constants {
         new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0));
 
     /* Module Gear Ratios */
-    //TODO {Maddox} Double check ratios
     public static final double DRIVE_GEAR_RATIO = (6.75 / 1.0);
     public static final double ANGLE_GEAR_RATIO = ((150.0 / 7.0) / 1.0);
 
     /* Motor Inverts */
-    //TODO {Maddox} Double check, may not be inverted correctly
     public static final InvertedValue ANGLE_MOTOR_INVERT = InvertedValue.Clockwise_Positive;
     public static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;
 
     /* Angle Encoder Invert */
-    //TODO {Maddox} Double check, may not be inverted correctly
     public static final SensorDirectionValue CANCODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;
 
     /* Swerve Current Limiting */

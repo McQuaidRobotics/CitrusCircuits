@@ -23,8 +23,4 @@ public class CTREModuleState {
     }
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
   } 
-
-  public static double findCoterminalAngle(double angleOffset) {
-    return Math.abs((Math.abs(angleOffset) > 360) ? angleOffset % 360 : angleOffset);
-  }
 }

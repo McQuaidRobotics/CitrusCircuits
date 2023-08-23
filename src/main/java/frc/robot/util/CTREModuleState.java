@@ -17,10 +17,18 @@ public class CTREModuleState {
     double targetAngle = desiredState.angle.getDegrees();
     double targetSpeed = desiredState.speedMetersPerSecond;
     double targetAngleDelta = targetAngle - currentAngle.getDegrees();
-    if (Math.abs(targetAngleDelta) > 90){
-        targetSpeed = -targetSpeed;
-        targetAngle = targetAngleDelta > 90 ? targetAngle - 180 : targetAngle + 180;
+    if (targetAngleDelta > 90) {
+      targetSpeed = -targetSpeed;
+      targetAngle = targetAngle - 180;
+      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
     }
-    return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-  } 
+    else if (targetAngleDelta <-90) {
+      targetSpeed = -targetSpeed;
+      targetAngle = targetAngle + 180;
+      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    }
+    else {
+      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    }
+  }  
 }

@@ -26,6 +26,7 @@ public class CTREModuleState {
   } 
 
   public static double scope0To360(double angle) {
+    //passing 360 returnss 0
     if (angle < 0) {
       angle = 360-(Math.abs(angle)%360);
     } 

@@ -14,21 +14,24 @@ public class CTREModuleState {
    * @param currentAngle The current module angle.
    */
   public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    double targetAngle = desiredState.angle.getDegrees();
+    double currAngle = scope0To360(currentAngle.getDegrees());
+    double targetAngle = desiredState.angle.getDegrees() + 180;
     double targetSpeed = desiredState.speedMetersPerSecond;
-    double targetAngleDelta = targetAngle - currentAngle.getDegrees();
-    if (targetAngleDelta > 90) {
-      targetSpeed = -targetSpeed;
-      targetAngle = targetAngle - 180;
-      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    double targetAngleDelta = targetAngle - currAngle;
+    if (Math.abs(targetAngleDelta) > 90){
+        targetSpeed = -targetSpeed;
+        targetAngle = targetAngleDelta > 90 ? targetAngle - 180 : targetAngle + 180;
     }
-    else if (targetAngleDelta <-90) {
-      targetSpeed = -targetSpeed;
-      targetAngle = targetAngle + 180;
-      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-    }
+    return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+  } 
+
+  public static double scope0To360(double angle) {
+    if (angle < 0) {
+      angle = 360-(Math.abs(angle)%360);
+    } 
     else {
-      return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+      angle %= 360;
     }
-  }  
+    return angle;
+  }
 }

@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.super_structure.States.StateValues;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.NTpreferences.Module;
@@ -21,10 +20,6 @@ public final class Constants {
   }
 
   public static class SuperStructure {
-
-    public static class StateConsts {
-        public static final StateValues HOME = new StateValues(10.0, 10.0);
-    }
 
 
   }

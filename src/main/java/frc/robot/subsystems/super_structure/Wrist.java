@@ -5,6 +5,10 @@ public class Wrist {
 
     private void configureMotors() {}
 
+    /**
+     * Abstract from motors, will set the pivots degrees
+     * parallel to the elevator as 0 degrees
+     */
     public void setMechanismDegrees(Double degrees) {}
 
     public Double getMechanismDegrees() {return null;}

@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.super_structure.States.StateValues;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.NTpreferences.Module;
@@ -18,6 +19,16 @@ public final class Constants {
     public static final double LEFT_JOYSTICK_DAEDBAND = 0.1;
     public static final double RIGHT_JOYSTICK_DEADBAND = 0.2;
   }
+
+  public static class SuperStructure {
+
+    public static class StateConsts {
+        public static final StateValues HOME = new StateValues(10.0, 10.0);
+    }
+
+
+  }
+
 
   public static class Swerve {
     public static final int PIGEON_ID = 33;

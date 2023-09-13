@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Swerve;
 import frc.robot.Robot;
-import frc.robot.util.CTREModuleState;
 import frc.robot.util.SwerveModuleConstants;
 
 public class SwerveModule {
@@ -86,10 +85,32 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = CTREModuleState.optimize(desiredState, getAbsoluteAngle());
+        desiredState = optimize(desiredState, getAbsoluteAngle());
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Desired State", desiredState.angle.getDegrees());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
+    }
+
+    public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
+        double currAngle = scope0To360(currentAngle.getDegrees());
+        double targetAngle = desiredState.angle.getDegrees() + 180;
+        double targetSpeed = desiredState.speedMetersPerSecond;
+        double targetAngleDelta = targetAngle - currAngle;
+        if (Math.abs(targetAngleDelta) > 90){
+            targetSpeed = -targetSpeed;
+            targetAngle = targetAngleDelta > 90 ? targetAngle - 180 : targetAngle + 180;
+        }
+        return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    } 
+    
+    public double scope0To360(double angle) {
+        if (angle < 0) {
+            angle = 360-(Math.abs(angle)%360);
+        } 
+        else {
+            angle %= 360;
+        }
+        return angle;
     }
 
     public Rotation2d getAbsoluteAngle() {

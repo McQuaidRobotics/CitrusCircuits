@@ -1,6 +1,11 @@
 package frc.robot.subsystems.super_structure;
 
 public enum States {
+    /**
+     * TODO {Maddox} These are examples of states that could
+     * exist, not REAL states make sure to replace these values 
+     * with correct ones when the time comes
+    */
     HOME(10.0, 10.0, 9.0),
     PLACE(70.0, 20.0, 9.0);
 

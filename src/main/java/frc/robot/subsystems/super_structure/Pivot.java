@@ -1,7 +1,5 @@
 package frc.robot.subsystems.super_structure;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 public class Pivot {
     public Pivot() {}
 

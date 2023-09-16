@@ -13,5 +13,17 @@ public class Wrist {
 
     public Double getMechanismDegrees() {return null;}
 
+    public void enableRollers() {}
+
+    public void disableRollers() {}
+
+    public void stopRollers() {}
+
+    /**
+     * Reverses the rollers for a breif second or to so that
+     * that any game piece inside gets spit out
+     */
+    public void emptyRollers() {}
+
     public void periodic() {}
 }

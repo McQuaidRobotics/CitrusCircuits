@@ -5,9 +5,20 @@ public class Elevator {
 
     private void configureMotors() {};
 
-    public void setExtendPercent(Double percent) {}
+    public void setMechanismMeters(Double percent) {}
 
-    public Double getExtendPercent() {return null;}
+    public Double getMechanismMeters() {return frc.robot.Constants.SuperStructure.Specs.ELEVATOR_MIN_METERS;}
+
+    /**
+     * To be used for debugging, not guranteed to have all
+     * safety features
+     * 
+     * @param percentOut of the mechanisms motors
+     */
+    public void manualDriveMechanism(Double percentOut) {
+        // var percentControlRequest = new DutyCycleOut(percentOut, true, false);
+        // this.wristMotor.setControl(percentControlRequest);
+    }
 
     public void periodic() {}
 }

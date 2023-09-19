@@ -21,10 +21,10 @@ public class NTpreferences {
     public static void loadPreferences() {
         loadedCorrectly = true;
         
-        universalOffsets.put("3U", Rotation2d.fromRotations(Preferences.getDouble("Module 3 Offset Universal", 0)).getDegrees());
-        universalOffsets.put("0U", Rotation2d.fromRotations(Preferences.getDouble("Module 0 Offset Universal", 0)).getDegrees());
-        universalOffsets.put("2U", Rotation2d.fromRotations(Preferences.getDouble("Module 2 Offset Universal", 0)).getDegrees());
-        universalOffsets.put("1U", Rotation2d.fromRotations(Preferences.getDouble("Module 1 Offset Universal", 0)).getDegrees());
+        universalOffsets.put("0U", Preferences.getDouble("Module 0 Offset Universal", 0));
+        universalOffsets.put("1U", Preferences.getDouble("Module 1 Offset Universal", 0));
+        universalOffsets.put("2U", Preferences.getDouble("Module 2 Offset Universal", 0));
+        universalOffsets.put("3U", Preferences.getDouble("Module 3 Offset Universal", 0));
 
         for (Double angle : universalOffsets.values()) {
             if ((angle <= 0 || angle >= 360) && Robot.isReal()) loadedCorrectly = false;
@@ -35,12 +35,12 @@ public class NTpreferences {
         return loadedCorrectly;
     }
 
-    public static Double getRotationOffset(Module module) {
-        if (module == Module.u3) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("3U") + 225)).getRotations();
-        else if (module == Module.u0) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("0U") + 315)).getRotations();
-        else if (module == Module.u2) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("2U") + 125)).getRotations();
-        else if (module == Module.u1) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("1U") + 45)).getRotations();
-        return 0.0;
+    public static Rotation2d getRotationOffset(Module module) {
+        if (module == Module.u3) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("3U") + 225));
+        else if (module == Module.u0) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("0U") + 315));
+        else if (module == Module.u2) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("2U") + 125));
+        else if (module == Module.u1) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("1U") + 45));
+        throw new IllegalArgumentException("Module not found");
     }
 
     public static double findCoterminalAngle(double angleOffset) {

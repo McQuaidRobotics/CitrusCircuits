@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.super_structure.elevator.Elevator;
 import frc.robot.subsystems.super_structure.wrist.Wrist;
 import frc.robot.subsystems.super_structure.wrist.WristReal;
 

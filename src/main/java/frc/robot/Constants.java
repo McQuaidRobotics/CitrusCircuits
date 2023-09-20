@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.super_structure.Elevator;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.NTpreferences.Module;
@@ -29,9 +28,6 @@ public final class Constants {
     }
 
     public static class SuperStructure {
-
-        public static final int ELEVATOR_LEFT_MOTOR_ID = 16;
-        public static final int ELEVATOR_RIGHT_MOTOR_ID = 17;
 
         public static final class Wrist {
             public static final int MOTOR_ID = 12;
@@ -73,6 +69,10 @@ public final class Constants {
             public static final double CURRENT_LIMIT = 10.0;
         }
 
+        public static final class Elevator {
+            public static final int MOTOR_ID_LEADER = 16;
+            public static final int MOTOR_ID_FOLLOWER = 17;
+        }
 
         public static final class Pivot {
             public static final int LEFT_MOTOR_ID = 13;

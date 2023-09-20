@@ -1,4 +1,4 @@
-package frc.robot.subsystems.super_structure;
+package frc.robot.subsystems.super_structure.elevator;
 
 public class Elevator {
     public Elevator() {}

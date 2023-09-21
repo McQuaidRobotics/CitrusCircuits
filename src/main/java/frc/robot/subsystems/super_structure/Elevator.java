@@ -1,13 +1,18 @@
 package frc.robot.subsystems.super_structure;
 
 public class Elevator {
-    public Elevator() {}
+    public Elevator() {
+    }
 
-    private void configureMotors() {};
+    private void configureMotors() {
+    };
 
-    public void setMechanismMeters(Double percent) {}
+    public void setMechanismMeters(Double percent) {
+    }
 
-    public Double getMechanismMeters() {return frc.robot.Constants.SuperStructure.Specs.ELEVATOR_MIN_METERS;}
+    public Double getMechanismMeters() {
+        return frc.robot.Constants.kSuperStructure.Specs.ELEVATOR_MIN_METERS;
+    }
 
     /**
      * To be used for debugging, not guranteed to have all
@@ -20,5 +25,6 @@ public class Elevator {
         // this.wristMotor.setControl(percentControlRequest);
     }
 
-    public void periodic() {}
+    public void periodic() {
+    }
 }

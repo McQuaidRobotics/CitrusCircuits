@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.super_structure.Elevator;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.NTpreferences.Module;
@@ -21,82 +20,108 @@ public final class Constants {
     public static final int iPlaceholder = 0;
     public static final boolean bPlaceholder = false;
 
-
     public static class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final double LEFT_JOYSTICK_DAEDBAND = 0.1;
         public static final double RIGHT_JOYSTICK_DEADBAND = 0.2;
     }
 
-    public static class SuperStructure {
+    public static class kSuperStructure {
 
         public static final int ELEVATOR_LEFT_MOTOR_ID = 16;
         public static final int ELEVATOR_RIGHT_MOTOR_ID = 17;
 
-        public static final class Wrist {
+        public static final class kWrist {
             public static final int MOTOR_ID = 12;
-            public static final double MOTOR_kP = dPlaceholder;
-            public static final double MOTOR_kI = dPlaceholder;
-            public static final double MOTOR_kD = dPlaceholder;
+            public static final double MOTOR_kP = 1.0;
+            public static final double MOTOR_kI = 0.0;
+            public static final double MOTOR_kD = 0.0;
 
             public static final double MOTOR_kS = dPlaceholder;
             public static final double MOTOR_kV = dPlaceholder;
 
-            /**For every x rotations of the motor the mechanix moves 1 rotation */
-            //motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
+            /** For every {@value} rotations of the motor the mechanism moves 1 rotation */
+            // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
-            public static final double MAX_VELOCITY = dPlaceholder;
-            public static final double MAX_ACCELERATION = dPlaceholder;
-            public static final double MAX_JERK = dPlaceholder;
+            public static final double MAX_VELOCITY = 100;
+            public static final double MAX_ACCELERATION = 750;
+            public static final double MAX_JERK = 5000;
 
-            public static final boolean INVERTED = bPlaceholder;
+            public static final boolean INVERTED = true;
 
-            /**Zero is parallel with the elevator */
-            public static final double MAX_DEGREES = dPlaceholder;
-            /**Zero is parallel with the elevator */
-            public static final double MIN_DEGREES = dPlaceholder;
+            /**
+             * Zero is parallel with the elevator <p>
+             * Alias for {@link Specs#WRIST_MAX_ANGLE}
+             */
+            public static final double MAX_DEGREES = Specs.WRIST_MAX_ANGLE;
+            /**
+             * Zero is parallel with the floor <p>
+             * Alias for {@link Specs#WRIST_MIN_ANGLE}
+             */
+            public static final double MIN_DEGREES = Specs.WRIST_MIN_ANGLE;
 
             public static final boolean ENABLE_SOFTLIMITS = true;
 
-            /** the ammount of current the motor needs to pull to
+            /**
+             * the ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
             public static final double CURRENT_PEAK_FOR_ZERO = dPlaceholder;
         }
 
-        public static final class Intake {
+        public static final class kIntake {
             public static final int MOTOR_ID = 11;
 
-            public static final boolean INVERTED = bPlaceholder;
+            public static final boolean INVERTED = true;
+            public static final boolean BREAK_DEFAULT = true;
 
-            public static final double CURRENT_LIMIT = 10.0;
+            public static final double CURRENT_LIMIT = 40.0;
         }
 
-
-        public static final class Pivot {
+        public static final class kPivot {
             public static final int LEFT_MOTOR_ID = 13;
             public static final int RIGHT_MOTOR_ID = 14;
 
-            public static final double MOTOR_kP = dPlaceholder;
-            public static final double MOTOR_kI = dPlaceholder;
-            public static final double MOTOR_kD = dPlaceholder;
+            public static final double MOTOR_kP = 1.0;
+            public static final double MOTOR_kI = 0;
+            public static final double MOTOR_kD = 0;
 
-            public static final double MIN_MECH_ANGLE = dPlaceholder;
-            public static final double MAX_MECH_ANGLE = dPlaceholder;
+            public static final double MAX_VELOCITY = 100;
+            public static final double MAX_ACCELERATION = 750;
+            public static final double MAX_JERK = 5000;
 
-            /**For every x rotations of the motor the mechanix moves 1 rotation */
-            //motor -> gbx(25:1) -> (30t -> 64t) -> (12t -> 54t)
-            public static final double MOTOR_TO_MECHANISM_RATIO = (1.0 / 25.0) * (30.0 / 64.0) * (12.0 / 54.0);
+            /**
+             * Zero is parallel with the floor <p>
+             * Alias for {@link Specs#PIVOT_MIN_ANGLE}
+             */
+            public static final double MIN_DEGREES = Specs.PIVOT_MIN_ANGLE;
+            /**
+             * Zero is parallel with the floor <p>
+             * Alias for {@link Specs#PIVOT_MAX_ANGLE}
+             */
+            public static final double MAX_DEGREES = Specs.PIVOT_MAX_ANGLE;
 
             public static final boolean ENABLE_SOFTLIMITS = true;
 
-            /** the ammount of current the motor needs to pull to
+            /** For every {@value} rotations of the motor the mechanism moves 1 rotation */
+            // motor -> gbx(25:1) -> (30t -> 64t) -> (12t -> 54t)
+            public static final double MOTOR_TO_MECHANISM_RATIO = (1.0 / 25.0) * (30.0 / 64.0) * (12.0 / 54.0);
+
+            public static final boolean INVERTED = false;
+
+            /**
+             * The max voltage of the motors to behave more predictably
+             * throughout the match.
+             */
+            public static final double VOLTAGE_COMP = 11.8;
+
+            /**
+             * The ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
             public static final double CURRENT_PEAK_FOR_ZERO = dPlaceholder;
         }
-
 
         public static final class Specs {
             public static final double WRIST_MASS_GRAMS = 3250;
@@ -108,17 +133,19 @@ public final class Constants {
             public static final double PIVOT_MIN_ANGLE = -7.0;
             public static final double PIVOT_MAX_ANGLE = 90.0;
 
+            public static final double WRIST_MIN_ANGLE = dPlaceholder;
+            public static final double WRIST_MAX_ANGLE = dPlaceholder;
+
             public static final Transform3d PIVOT_OFFSET_METERS = new Transform3d(
-                new Translation3d(0.0, -0.232953, -0.252125),
-                new Rotation3d()
-            );
+                    new Translation3d(0.0, -0.232953, -0.252125),
+                    new Rotation3d());
 
             public static final double RIM_ABOVE_FLOOR_METERS = 0.09525;
         }
 
     }
 
-    public static class Swerve {
+    public static class kSwerve {
         public static final int PIGEON_ID = 33;
         public static final boolean INVERT_GYRO = false;
         public static final String CANBUS = "McQDriveBus";

@@ -1,36 +1,52 @@
 package frc.robot.subsystems.super_structure;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.super_structure.wrist.Wrist;
-import frc.robot.subsystems.super_structure.wrist.WristReal;
+import frc.robot.subsystems.super_structure.States.IntakeDirection;
+import frc.robot.subsystems.super_structure.States.SuperStructureForm;
+import frc.robot.subsystems.super_structure.pivot.*;
+import frc.robot.subsystems.super_structure.wrist.*;
 
 public class SuperStructure extends SubsystemBase{
     private final Wrist wrist;
     private final Elevator elevator;
     private final Pivot pivot;
 
+    private final Visualizer visualizer = new Visualizer();
+
     private States currentState = States.START;
 
     public SuperStructure() {
+        this.elevator = new Elevator();
         if (Robot.isReal()) {
             this.wrist = new WristReal();
-            this.elevator = new Elevator();
-            this.pivot = new Pivot();
+            this.pivot = new PivotReal();
         } else {
+            this.wrist = new WristSim();
+            this.pivot = new PivotSim();
         }
         setupShuffleboard();
     }
 
     public void setState(States state) {
+        this.visualizer.updateSetpoint(state);
+        this.currentState = state;
         this.wrist.setMechanismDegrees(state.wristDegrees);
         this.elevator.setMechanismMeters(state.elevatorMeters);
         this.pivot.setMechanismDegrees(state.pivotDegrees);
-        this.currentState = state;
     }
+
+
+    public SuperStructureForm getForm() {
+        return new SuperStructureForm(
+            this.wrist.getMechanismDegrees(),
+            this.pivot.getMechanismDegrees(),
+            this.elevator.getMechanismMeters(),
+            IntakeDirection.STOP //TODO
+        );
+    }
+
 
     /**
      * To be used for debugging, not guranteed to have all
@@ -44,18 +60,6 @@ public class SuperStructure extends SubsystemBase{
         this.wrist.manualDriveMechanism(wristPercent);
         this.pivot.manualDriveMechanism(pivotPercent);
         this.elevator.manualDriveMechanism(elevatorPercent);
-    }
-
-
-    private Mechanism2d constructMechanism2d() {
-        var mechanism2d = new Mechanism2d(2.0, 2.0);
-        var root = mechanism2d.getRoot(
-            "Pivot",
-            Constants.SuperStructure.Specs.PIVOT_OFFSET_METERS.getY(),
-            Constants.SuperStructure.Specs.PIVOT_OFFSET_METERS.getZ()
-        );
-        
-        return mechanism2d;
     }
 
 
@@ -75,6 +79,7 @@ public class SuperStructure extends SubsystemBase{
 
     @Override
     public void periodic() {
+        visualizer.updateCurrent(getForm());
         this.wrist.periodic();
         this.elevator.periodic();
         this.pivot.periodic();

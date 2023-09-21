@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
 public class TeleopSwerve extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
   private Swerve swerve;
   private DoubleSupplier translationAxisSup;
@@ -29,14 +29,17 @@ public class TeleopSwerve extends CommandBase {
 
   @Override
   public void execute() {
-    double translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(), Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
-    double strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(), Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
-    double rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), Constants.OperatorConstants.RIGHT_JOYSTICK_DEADBAND);
+    double translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(),
+        Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
+    double strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(),
+        Constants.OperatorConstants.LEFT_JOYSTICK_DAEDBAND);
+    double rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(),
+        Constants.OperatorConstants.RIGHT_JOYSTICK_DEADBAND);
 
     swerve.Drive(
-        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.MAX_SPEED), 
-        rotationVal * Constants.Swerve.MAX_ANGULAR_VELOCITY, 
-        true, 
+        new Translation2d(translationVal, strafeVal).times(Constants.kSwerve.MAX_SPEED),
+        rotationVal * Constants.kSwerve.MAX_ANGULAR_VELOCITY,
+        true,
         false);
   }
 }

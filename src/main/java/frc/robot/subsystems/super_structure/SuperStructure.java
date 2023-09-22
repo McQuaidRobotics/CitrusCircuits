@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.super_structure.elevator.Elevator;
 import frc.robot.subsystems.super_structure.elevator.ElevatorReal;
+import frc.robot.subsystems.super_structure.elevator.ElevatorSim;
 import frc.robot.subsystems.super_structure.wrist.Wrist;
 import frc.robot.subsystems.super_structure.wrist.WristReal;
 import frc.robot.subsystems.super_structure.States.IntakeDirection;
@@ -22,13 +23,14 @@ public class SuperStructure extends SubsystemBase{
     private States currentState = States.START;
 
     public SuperStructure() {
-        this.elevator = new ElevatorReal();
         if (Robot.isReal()) {
             this.wrist = new WristReal();
             this.pivot = new PivotReal();
+            this.elevator = new ElevatorReal();
         } else {
             this.wrist = new WristSim();
             this.pivot = new PivotSim();
+            this.elevator = new ElevatorSim();
         }
         setupShuffleboard();
     }

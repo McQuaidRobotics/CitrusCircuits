@@ -30,7 +30,10 @@ public class ElevatorReal implements Elevator{
     }
 
     private Double mechMetersToMotorRots(Double meters) {
-        return ((180.0 * meters)/(kElevator.MECHANISM_RADIUS_METERS*Math.PI))/360.0;
+        return ((180.0 * meters) / (kElevator.MECHANISM_RADIUS_METERS * Math.PI)) / 360.0;
+    }
+    private Double motorRotsToMechMeters(Double motorRots) {
+        return (kElevator.MECHANISM_RADIUS_METERS * Math.PI * (motorRots * 360.0)) / 180.0;
     }
 
     private TalonFXConfiguration getMotorConfiguration() {
@@ -84,12 +87,7 @@ public class ElevatorReal implements Elevator{
     @Override
     public Double getMechanismMeters() {
         BaseStatusSignal.waitForAll(0, motorRots, motorVelo);
-        return (
-            (
-                (BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo) * 360.0) 
-                * Math.PI 
-                * kElevator.MECHANISM_RADIUS_METERS)
-            /180.0);
+        return motorRotsToMechMeters(BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
     }
 
     @Override

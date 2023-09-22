@@ -1,63 +1,67 @@
 package frc.robot.subsystems.super_structure.wrist;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import frc.robot.Constants.SuperStructure;;
+import frc.robot.Constants.kSuperStructure.*;
+import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ErrorHelper.*;
 
 public class WristReal implements Wrist {
 
     private final TalonFX wristMotor, intakeMotor;
 
+    private final StatusSignal<Double> wristMotorRots, wristMotorVelo;
+
     public WristReal() {
-        wristMotor = new TalonFX(SuperStructure.Wrist.MOTOR_ID);
+        wristMotor = new TalonFX(kWrist.MOTOR_ID);
         wristMotor.getConfigurator().apply(getWristMotorConfig());
 
-        intakeMotor = new TalonFX(SuperStructure.Intake.MOTOR_ID);
-        intakeMotor.getConfigurator().apply(getIntakeMotorConfig());
+        wristMotorRots = wristMotor.getRotorPosition();
+        wristMotorVelo = wristMotor.getRotorVelocity();
 
-        setupShuffleboard();
+        intakeMotor = new TalonFX(kIntake.MOTOR_ID);
+        intakeMotor.getConfigurator().apply(getIntakeMotorConfig());
     }
 
     private Double mechDegreesToMotorRots(Double mechanismDegrees) {
-        return (mechanismDegrees / 360.0) / SuperStructure.Wrist.MOTOR_TO_MECHANISM_RATIO;
+        return (mechanismDegrees / 360.0) / kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
 
     /**
      * Constructs a TalonFXConfiguration object only from values
-     * from {@link frc.robot.Constants.SuperStructure.Wrist}
+     * from {@link frc.robot.Constants.kWrist}
      * 
      * @return the TalonFXConfiguration object
      */
     private TalonFXConfiguration getWristMotorConfig() {
         TalonFXConfiguration wristMotorCfg = new TalonFXConfiguration();
-        wristMotorCfg.Slot0.kP = SuperStructure.Wrist.MOTOR_kP;
-        wristMotorCfg.Slot0.kI = SuperStructure.Wrist.MOTOR_kI;
-        wristMotorCfg.Slot0.kD = SuperStructure.Wrist.MOTOR_kD;
-        wristMotorCfg.Slot0.kS = SuperStructure.Wrist.MOTOR_kS;
-        wristMotorCfg.Slot0.kV = SuperStructure.Wrist.MOTOR_kV;
+        wristMotorCfg.Slot0.kP = kWrist.MOTOR_kP;
+        wristMotorCfg.Slot0.kI = kWrist.MOTOR_kI;
+        wristMotorCfg.Slot0.kD = kWrist.MOTOR_kD;
+        wristMotorCfg.Slot0.kS = kWrist.MOTOR_kS;
+        wristMotorCfg.Slot0.kV = kWrist.MOTOR_kV;
 
-        wristMotorCfg.MotionMagic.MotionMagicCruiseVelocity = SuperStructure.Wrist.MAX_VELOCITY;
-        wristMotorCfg.MotionMagic.MotionMagicAcceleration = SuperStructure.Wrist.MAX_ACCELERATION;
-        wristMotorCfg.MotionMagic.MotionMagicJerk = SuperStructure.Wrist.MAX_JERK;
+        wristMotorCfg.MotionMagic.MotionMagicCruiseVelocity = kWrist.MAX_VELOCITY;
+        wristMotorCfg.MotionMagic.MotionMagicAcceleration = kWrist.MAX_ACCELERATION;
+        wristMotorCfg.MotionMagic.MotionMagicJerk = kWrist.MAX_JERK;
 
-        wristMotorCfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = SuperStructure.Wrist.ENABLE_SOFTLIMITS;
-        wristMotorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = SuperStructure.Wrist.ENABLE_SOFTLIMITS;
+        wristMotorCfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = kWrist.ENABLE_SOFTLIMITS;
+        wristMotorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = kWrist.ENABLE_SOFTLIMITS;
         wristMotorCfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechDegreesToMotorRots(
-                SuperStructure.Wrist.MAX_DEGREES);
+                kWrist.MAX_DEGREES);
         wristMotorCfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechDegreesToMotorRots(
-                -SuperStructure.Wrist.MIN_DEGREES);
+                kWrist.MIN_DEGREES);
 
-        wristMotorCfg.MotorOutput.Inverted = SuperStructure.Wrist.INVERTED ? InvertedValue.Clockwise_Positive
+        wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
         return wristMotorCfg;
@@ -65,33 +69,32 @@ public class WristReal implements Wrist {
 
     /**
      * Constructs a TalonFXConfiguration object only from values
-     * from {@link frc.robot.Constants.SuperStructure.Intake}
+     * from {@link frc.robot.Constants.kIntake}
      * 
      * @return the TalonFXConfiguration object
      */
     private TalonFXConfiguration getIntakeMotorConfig() {
         TalonFXConfiguration intakeMotorCfg = new TalonFXConfiguration();
 
-        intakeMotorCfg.MotorOutput.Inverted = SuperStructure.Intake.INVERTED ? InvertedValue.Clockwise_Positive
+        intakeMotorCfg.MotorOutput.Inverted = kIntake.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        intakeMotorCfg.CurrentLimits.StatorCurrentLimitEnable = SuperStructure.Intake.CURRENT_LIMIT != 0;
-        intakeMotorCfg.CurrentLimits.StatorCurrentLimit = SuperStructure.Intake.CURRENT_LIMIT;
+        intakeMotorCfg.CurrentLimits.StatorCurrentLimitEnable = kIntake.CURRENT_LIMIT != 0;
+        intakeMotorCfg.CurrentLimits.StatorCurrentLimit = kIntake.CURRENT_LIMIT;
 
         return intakeMotorCfg;
     }
 
     @Override
-    public void setMechanismDegrees(Double degrees) {
-        if (degrees > SuperStructure.Wrist.MAX_DEGREES) {
-            DriverStation.reportError("Wrist setpoint too high", false);
-            return;
-        } else if (degrees < -SuperStructure.Wrist.MIN_DEGREES) {
-            DriverStation.reportError("Wrist setpoint too low", false);
-            return;
+    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismDegrees(Double degrees) {
+        if (degrees > kWrist.MAX_DEGREES) {
+            return Result.err(new SetpointTooHigh(kWrist.MAX_DEGREES, degrees));
+        } else if (degrees < kWrist.MIN_DEGREES) {
+            return Result.err(new SetpointTooLow(kWrist.MIN_DEGREES, degrees));
         }
-        var posControlRequest = new PositionTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
+        var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
+        return Result.ok(new Ok());
     }
 
     @Override
@@ -107,11 +110,10 @@ public class WristReal implements Wrist {
 
     @Override
     public Double getMechanismDegrees() {
-        var motorRots = wristMotor.getRotorPosition();
-        var motorVelo = wristMotor.getRotorVelocity();
-        return BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
+        BaseStatusSignal.waitForAll(0, wristMotorRots, wristMotorVelo);
+        return BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots, wristMotorVelo)
                 * 360.0
-                * SuperStructure.Wrist.MOTOR_TO_MECHANISM_RATIO;
+                * kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
 
     @Override
@@ -132,7 +134,7 @@ public class WristReal implements Wrist {
         // needed
         timer.start();
         wristMotor.set(0.1);
-        while (currentSignal.getValue() < SuperStructure.Wrist.CURRENT_PEAK_FOR_ZERO) {
+        while (currentSignal.getValue() < kWrist.CURRENT_PEAK_FOR_ZERO) {
             if (timer.hasElapsed(1.0)) {
                 // took too long, stop motor and report error. NO ZERO
                 wristMotor.set(0.0);
@@ -142,7 +144,7 @@ public class WristReal implements Wrist {
         }
 
         // stop motor, reset encoder
-        wristMotor.set(mechDegreesToMotorRots(SuperStructure.Wrist.MAX_DEGREES));
+        wristMotor.set(mechDegreesToMotorRots(kWrist.MAX_DEGREES));
         wristMotor.setRotorPosition(0);
 
         // set soft limits
@@ -150,7 +152,6 @@ public class WristReal implements Wrist {
         softLimitCfg.ReverseSoftLimitEnable = true;
         wristMotor.getConfigurator().apply(softLimitCfg);
     }
-
 
     @Override
     public void runIntake(Double percentOut) {
@@ -163,16 +164,10 @@ public class WristReal implements Wrist {
         this.intakeMotor.setVoltage(0.0);
     }
 
-
-    /** once moved over to TEMPLATE this can be removed */
-    private void setupShuffleboard() {
-        var tab = Shuffleboard.getTab("Wrist");
-        tab.addDouble("Wrist Degrees", this::getMechanismDegrees)
-            .withPosition(0, 0)
-            .withSize(3, 3)
-            .withWidget(BuiltInWidgets.kGraph);
-    }
+    @Override
+    public void playErrorTone() {}
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+    }
 }

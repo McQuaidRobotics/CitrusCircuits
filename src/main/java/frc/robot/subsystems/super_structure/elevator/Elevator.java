@@ -1,13 +1,11 @@
 package frc.robot.subsystems.super_structure.elevator;
 
-public class Elevator {
-    public Elevator() {}
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-    private void configureMotors() {};
+public interface Elevator {
+    public void setMechanismMeters(Double percent);
 
-    public void setMechanismMeters(Double percent) {}
-
-    public Double getMechanismMeters() {return frc.robot.Constants.SuperStructure.Specs.ELEVATOR_MIN_METERS;}
+    public Double getMechanismMeters();
 
     /**
      * To be used for debugging, not guranteed to have all
@@ -15,10 +13,7 @@ public class Elevator {
      * 
      * @param percentOut of the mechanisms motors
      */
-    public void manualDriveMechanism(Double percentOut) {
-        // var percentControlRequest = new DutyCycleOut(percentOut, true, false);
-        // this.wristMotor.setControl(percentControlRequest);
-    }
+    public void manualDriveMechanism(Double percentOut);
 
-    public void periodic() {}
+    public void periodic();
 }

@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.Swerve;
+import frc.robot.Constants.kSwerve;
 import frc.robot.Robot;
 import frc.robot.util.SwerveModuleConstants;
 
@@ -41,13 +41,13 @@ public class SwerveModule {
 
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Rotation Offset", rotationOffset.getDegrees());
 
-        driveMotor = new TalonFX(moduleConstants.driveMotorID, Swerve.CANBUS);
+        driveMotor = new TalonFX(moduleConstants.driveMotorID, kSwerve.CANBUS);
         configureDriveMotor();
 
-        angleMotor = new TalonFX(moduleConstants.angleMotorID, Swerve.CANBUS);
+        angleMotor = new TalonFX(moduleConstants.angleMotorID, kSwerve.CANBUS);
         configureAngleMotor();
 
-        angleEncoder = new CANcoder(moduleConstants.cancoderID, Swerve.CANBUS);
+        angleEncoder = new CANcoder(moduleConstants.cancoderID, kSwerve.CANBUS);
         configureCANcoder();
         this.encoderPosStatus = angleEncoder.getAbsolutePosition();
         this.encoderVeloStatus = angleEncoder.getVelocity();
@@ -56,22 +56,22 @@ public class SwerveModule {
     public void configureDriveMotor() {
         driveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
         var mDriveConfig = new MotorOutputConfigs();
-        mDriveConfig.Inverted = Swerve.DRIVE_MOTOR_INVERT;
-        mDriveConfig.NeutralMode = Swerve.DRIVE_NEUTRAL_MODE;
+        mDriveConfig.Inverted = kSwerve.DRIVE_MOTOR_INVERT;
+        mDriveConfig.NeutralMode = kSwerve.DRIVE_NEUTRAL_MODE;
         driveMotor.getConfigurator().apply(mDriveConfig);
     }
 
     public void configureAngleMotor() {
         angleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
         var mAngleConfig = new TalonFXConfiguration();
-        mAngleConfig.MotorOutput.Inverted = Swerve.ANGLE_MOTOR_INVERT;
-        mAngleConfig.MotorOutput.NeutralMode = Swerve.ANGLE_NEUTRAL_MODE;
-        mAngleConfig.Slot0.kP = Swerve.ANGLE_KP;
-        mAngleConfig.Slot0.kI = Swerve.ANGLE_KI;
-        mAngleConfig.Slot0.kD = Swerve.ANGLE_KD;
+        mAngleConfig.MotorOutput.Inverted = kSwerve.ANGLE_MOTOR_INVERT;
+        mAngleConfig.MotorOutput.NeutralMode = kSwerve.ANGLE_NEUTRAL_MODE;
+        mAngleConfig.Slot0.kP = kSwerve.ANGLE_KP;
+        mAngleConfig.Slot0.kI = kSwerve.ANGLE_KI;
+        mAngleConfig.Slot0.kD = kSwerve.ANGLE_KD;
         mAngleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
         mAngleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        mAngleConfig.Feedback.RotorToSensorRatio = Swerve.ANGLE_GEAR_RATIO;
+        mAngleConfig.Feedback.RotorToSensorRatio = kSwerve.ANGLE_GEAR_RATIO;
         mAngleConfig.Feedback.SensorToMechanismRatio = 1.0;
         mAngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
         angleMotor.getConfigurator().apply(mAngleConfig);
@@ -90,9 +90,8 @@ public class SwerveModule {
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            driveMotor.getRotorPosition().getValue() * (Swerve.WHEEL_CIRCUMFERENCE / Swerve.DRIVE_GEAR_RATIO),
-            getAngle()
-        );
+                driveMotor.getRotorPosition().getValue() * (kSwerve.WHEEL_CIRCUMFERENCE / kSwerve.DRIVE_GEAR_RATIO),
+                getAngle());
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -105,12 +104,11 @@ public class SwerveModule {
     public Rotation2d getAngle() {
         BaseStatusSignal.waitForAll(0, encoderPosStatus, encoderVeloStatus);
         return Rotation2d.fromRotations(
-            BaseStatusSignal.getLatencyCompensatedValue(encoderPosStatus, encoderVeloStatus)
-        );
+                BaseStatusSignal.getLatencyCompensatedValue(encoderPosStatus, encoderVeloStatus));
     }
 
     public void setAngle(SwerveModuleState desiredState) {
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.MAX_SPEED * 0.01)) ? lastAngle
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (kSwerve.MAX_SPEED * 0.01)) ? lastAngle
                 : desiredState.angle;
 
         var controlRequest = new PositionDutyCycle(angle.getRotations());
@@ -119,20 +117,20 @@ public class SwerveModule {
     }
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        double percentOutput = desiredState.speedMetersPerSecond / Swerve.MAX_SPEED;
+        double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
         var controlRequest = new DutyCycleOut(percentOutput);
         if (!isOpenLoop) {
             var slot0Config = new Slot0Configs();
-            slot0Config.kP = Swerve.DRIVE_KP;
-            slot0Config.kI = Swerve.DRIVE_KI;
-            slot0Config.kD = Swerve.DRIVE_KD;
+            slot0Config.kP = kSwerve.DRIVE_KP;
+            slot0Config.kI = kSwerve.DRIVE_KI;
+            slot0Config.kD = kSwerve.DRIVE_KD;
             driveMotor.getConfigurator().apply(slot0Config);
         }
         driveMotor.setControl(controlRequest);
     }
 
     private double driveRotationsToMeters(double rotations) {
-        return (rotations / Swerve.DRIVE_GEAR_RATIO) * (Swerve.WHEEL_DIAMETER * Math.PI);
+        return (rotations / kSwerve.DRIVE_GEAR_RATIO) * (kSwerve.WHEEL_DIAMETER * Math.PI);
     }
 
     public SwerveModuleState getState() {
@@ -146,7 +144,7 @@ public class SwerveModule {
         double targetAngle = desiredState.angle.getDegrees() + 180;
         double targetSpeed = desiredState.speedMetersPerSecond;
         double targetAngleDelta = targetAngle - currAngle;
-        if (Math.abs(targetAngleDelta) > 90){
+        if (Math.abs(targetAngleDelta) > 90) {
             targetSpeed = -targetSpeed;
             targetAngle = targetAngleDelta > 90 ? targetAngle - 180 : targetAngle + 180;
         }
@@ -155,9 +153,8 @@ public class SwerveModule {
 
     public double scope0To360(double angle) {
         if (angle < 0) {
-            angle = 360-(Math.abs(angle)%360);
-        } 
-        else {
+            angle = 360 - (Math.abs(angle) % 360);
+        } else {
             angle %= 360;
         }
         return angle;

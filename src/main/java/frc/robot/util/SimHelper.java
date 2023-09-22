@@ -35,6 +35,7 @@ public class SimHelper {
         }
     }
 
+    //TODO: make this able to properly represent the internal state of a motor
     public static class SetPoint {
         private final Boundries upper, lower;
         private StateVector start_state, end_state;
@@ -52,6 +53,24 @@ public class SimHelper {
 
         public void setTarget(StateVector target) {
             this.end_state = target;
+            this.has_setpoint = true;
+            this.start_time = Timer.getFPGATimestamp();
+        }
+
+        public void setTargetVelocity(Double velocity) {
+            this.end_state = new StateVector(null, velocity, null);
+            this.has_setpoint = true;
+            this.start_time = Timer.getFPGATimestamp();
+        }
+
+        public void setTargetAcceleration(Double acceleration) {
+            this.end_state = new StateVector(null, null, acceleration);
+            this.has_setpoint = true;
+            this.start_time = Timer.getFPGATimestamp();
+        }
+
+        public void setTargetPosition(Double position) {
+            this.end_state = new StateVector(position, null, null);
             this.has_setpoint = true;
             this.start_time = Timer.getFPGATimestamp();
         }

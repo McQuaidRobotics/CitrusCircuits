@@ -1,11 +1,10 @@
-package frc.robot.subsystems.super_structure.wrist;
+package frc.robot.subsystems.super_structure.pivot;
 
-import frc.robot.subsystems.super_structure.Errors.SuperStructureErrors;
-import frc.robot.util.ErrorHelper.GroupError;
-import frc.robot.util.ErrorHelper.Ok;
-import frc.robot.util.ErrorHelper.Result;
+import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ErrorHelper.*;
 
-public interface Wrist {
+public interface Pivot {
+
     /**
      * Abstract from motors, will set the wrist degrees.
      * Parallel to the elevator is 0 degrees
@@ -33,21 +32,9 @@ public interface Wrist {
     /**
      * Moves the mechanism up until the current detection is triggered,
      * detection position resolves to 0 -
-     * {@link frc.robot.Constants.kSuperStructure.kWrist#MAX_DEGREES}
+     * {@link frc.robot.Constants.kSuperStructure.kPivot#MIN_DEGREES}
      */
     public void zeroMechanism();
-
-    /**
-     * Runs the intake at a given percent output
-     * 
-     * @param percentOut of the intake motor
-     */
-    public void runIntake(Double percentOut);
-
-    /**
-     * Stops the intake
-     */
-    public void stopIntake();
 
     /**
      * Plays a chirp on the motors to signify an error

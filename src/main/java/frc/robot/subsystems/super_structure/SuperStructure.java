@@ -80,6 +80,8 @@ public class SuperStructure extends SubsystemBase{
             .withSize(2, 1);
         tab.addString("Current State", () -> {return this.currentState.name();})
             .withSize(2, 1);
+        tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
+            .withSize(2, 1);
     }
 
 

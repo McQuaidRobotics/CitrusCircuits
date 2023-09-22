@@ -2,6 +2,7 @@ package frc.robot.subsystems.super_structure.elevator;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -92,7 +93,8 @@ public class ElevatorReal implements Elevator{
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
-
+        var percentControlRequest = new DutyCycleOut(percentOut, true, false);
+        this.leaderMotor.setControl(percentControlRequest);
     }
 
     @Override

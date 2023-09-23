@@ -86,8 +86,6 @@ public final class Constants {
             public static final double MOTOR_kI = 0;
             public static final double MOTOR_kD = 0;
 
-            //TODO {Maddox} Feel like we should rename so that units
-            //are intuitive in the variable name like MAX_VELOCITY_RPS or something
             public static final double MAX_VELOCITY = 100;
             public static final double MAX_ACCELERATION = 750;
             public static final double MAX_JERK = 5000;
@@ -136,9 +134,9 @@ public final class Constants {
 
             public static final boolean INVERTED = bPlaceholder;
 
-            public static final double MAX_VELOCITY_RPS = dPlaceholder;
-            public static final double MAX_ACCELERATION_RPS_SQRD = dPlaceholder;
-            public static final double MAX_JERK_RPS_CUBED = dPlaceholder;
+            public static final double MAX_VELOCITY = 100;
+            public static final double MAX_ACCELERATION = 750;
+            public static final double MAX_JERK = 5000;
 
             public static final double VOLTAGE_COMP = dPlaceholder;
 

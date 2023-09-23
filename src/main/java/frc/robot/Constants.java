@@ -126,9 +126,11 @@ public final class Constants {
             public static final int ELEVATOR_LEFT_MOTOR_ID = 16;
             public static final int ELEVATOR_RIGHT_MOTOR_ID = 17;
 
-            public static final double MOTOR_kP = dPlaceholder;
-            public static final double MOTOR_kD = dPlaceholder;
-            public static final double MOTOR_kI = dPlaceholder;
+            public static final double MOTOR_kP = 1.0;
+            public static final double MOTOR_kD = 0.0;
+            public static final double MOTOR_kI = 0.0;
+            public static final double MOTOR_kS = dPlaceholder;
+            public static final double MOTOR_kV = dPlaceholder;
 
             public static final boolean ENABLE_SOFTLIMITS = true;
 
@@ -137,8 +139,6 @@ public final class Constants {
             public static final double MAX_VELOCITY = 100;
             public static final double MAX_ACCELERATION = 750;
             public static final double MAX_JERK = 5000;
-
-            public static final double VOLTAGE_COMP = dPlaceholder;
 
             public static final double MOTOR_TO_MECHANISM_RATIO = dPlaceholder;
             public static final double MECHANISM_RADIUS_METERS = dPlaceholder;

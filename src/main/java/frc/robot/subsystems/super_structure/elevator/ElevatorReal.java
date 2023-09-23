@@ -42,13 +42,8 @@ public class ElevatorReal implements Elevator{
         motorConfig.Slot0.kP = kElevator.MOTOR_kP;
         motorConfig.Slot0.kP = kElevator.MOTOR_kI;
         motorConfig.Slot0.kP = kElevator.MOTOR_kD;
-
-        /**TODO {Maddox} Not 100% sure what this is, 
-         * I think it has something to do with feedworward but dont know, 
-         * unsure if we need it so I will let you decide that
-         */
-        // motorConfig.Slot0.kS = kElevator.MOTOR_kS;
-        // motorConfig.Slot0.kV = kElevator.MOTOR_kV;
+        motorConfig.Slot0.kS = kElevator.MOTOR_kS;
+        motorConfig.Slot0.kV = kElevator.MOTOR_kV;
 
         motorConfig.MotionMagic.MotionMagicCruiseVelocity = kElevator.MAX_VELOCITY;
         motorConfig.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;
@@ -61,12 +56,6 @@ public class ElevatorReal implements Elevator{
 
         motorConfig.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
-
-        //TODO {Maddox} I think we need voltage comp for the arm, but I may be wrong
-        //I never learned what voltage comp is and am basing this off of a 1 minute google
-        //search of what it is
-        motorConfig.Voltage.PeakForwardVoltage = kElevator.VOLTAGE_COMP;
-        motorConfig.Voltage.PeakReverseVoltage = -kElevator.VOLTAGE_COMP;
 
         return motorConfig;
     }

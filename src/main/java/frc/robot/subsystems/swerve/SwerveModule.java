@@ -41,14 +41,15 @@ public class SwerveModule {
 
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Rotation Offset", rotationOffset.getDegrees());
 
+        
         driveMotor = new TalonFX(moduleConstants.driveMotorID, kSwerve.CANBUS);
-        configureDriveMotor();
-
         angleMotor = new TalonFX(moduleConstants.angleMotorID, kSwerve.CANBUS);
-        configureAngleMotor();
-
         angleEncoder = new CANcoder(moduleConstants.cancoderID, kSwerve.CANBUS);
+
+        configureDriveMotor();
+        configureAngleMotor();
         configureCANcoder();
+
         this.encoderPosStatus = angleEncoder.getAbsolutePosition();
         this.encoderVeloStatus = angleEncoder.getVelocity();
     }

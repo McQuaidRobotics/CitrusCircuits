@@ -82,7 +82,10 @@ public class StateManager {
          * this also delays inner cmd initialize
          */
         private Integer deadCycles = 0;
+
+        //inner cmd tracking
         private Boolean innerInit = false;
+        private Boolean innerFinish = false;
 
         public CmdTransitionState(SuperStructure superStructure, States to) {
             this.superStructure = superStructure;
@@ -94,10 +97,11 @@ public class StateManager {
             this.from = lastState;
             lastState = to;
             this.innerCmd = getTransitionCmd(new TransitionData(from, to, superStructure));
+            this.innerInit = false;
+            this.innerFinish = false;
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
                 superStructure.runEndEffector(from.intakeRequest.getVoltage());
                 this.deadCycles = 10;
-                this.innerInit = false;
                 return;
             } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_START || to.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME) {
                 superStructure.runEndEffector(to.intakeRequest.getVoltage());
@@ -116,7 +120,26 @@ public class StateManager {
             if (!innerInit) {
                 this.innerCmd.initialize();
             }
-            this.innerCmd.execute();
+            if (!innerFinish) {
+                this.innerCmd.execute();
+            }
+            if (innerCmd.isFinished()) {
+                this.innerCmd.end(false);
+                this.innerFinish = true;
+            }
+
+            if (superStructure.reachedSetpoint()) {
+                if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
+                    superStructure.runEndEffector(0.0);
+                } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_REACH) {
+                    superStructure.runEndEffector(to.intakeRequest.getVoltage());
+                } 
+            }
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            superStructure.runEndEffector(0.0);
         }
 
         @Override

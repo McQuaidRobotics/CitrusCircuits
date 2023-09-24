@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -56,6 +57,8 @@ public class PivotReal implements Pivot {
                 kPivot.MAX_DEGREES);
         motorCfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechDegreesToMotorRots(
                 kPivot.MIN_DEGREES);
+
+        motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         motorCfg.MotorOutput.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;

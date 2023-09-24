@@ -41,8 +41,6 @@ public final class Constants {
             // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
-            //TODO {Maddox} Feel like we should rename so that units
-            //are intuitive in the variable name like MAX_VELOCITY_RPS or something
             public static final double MAX_VELOCITY = 100;
             public static final double MAX_ACCELERATION = 750;
             public static final double MAX_JERK = 5000;
@@ -50,23 +48,25 @@ public final class Constants {
             public static final boolean INVERTED = true;
 
             /**
-             * Zero is parallel with the elevator <p>
+             * Zero is parallel with the elevator
+             * <p>
              * Alias for {@link Specs#WRIST_MAX_ANGLE}
              */
             public static final double MAX_DEGREES = Specs.WRIST_MAX_ANGLE;
             /**
-             * Zero is parallel with the floor <p>
+             * Zero is parallel with the floor
+             * <p>
              * Alias for {@link Specs#WRIST_MIN_ANGLE}
              */
             public static final double MIN_DEGREES = Specs.WRIST_MIN_ANGLE;
 
-            public static final boolean ENABLE_SOFTLIMITS = true;
+            public static final boolean ENABLE_SOFTLIMITS = false;
 
             /**
              * the ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_ZERO = dPlaceholder;
+            public static final double CURRENT_PEAK_FOR_ZERO = 15.0;
         }
 
         public static final class kIntake {
@@ -91,17 +91,19 @@ public final class Constants {
             public static final double MAX_JERK = 5000;
 
             /**
-             * Zero is parallel with the floor <p>
+             * Zero is parallel with the floor
+             * <p>
              * Alias for {@link Specs#PIVOT_MIN_ANGLE}
              */
             public static final double MIN_DEGREES = Specs.PIVOT_MIN_ANGLE;
             /**
-             * Zero is parallel with the floor <p>
+             * Zero is parallel with the floor
+             * <p>
              * Alias for {@link Specs#PIVOT_MAX_ANGLE}
              */
             public static final double MAX_DEGREES = Specs.PIVOT_MAX_ANGLE;
 
-            public static final boolean ENABLE_SOFTLIMITS = true;
+            public static final boolean ENABLE_SOFTLIMITS = false;
 
             /** For every {@value} rotations of the motor the mechanism moves 1 rotation */
             // motor -> gbx(25:1) -> (30t -> 64t) -> (12t -> 54t)
@@ -132,7 +134,7 @@ public final class Constants {
             public static final double MOTOR_kS = dPlaceholder;
             public static final double MOTOR_kV = dPlaceholder;
 
-            public static final boolean ENABLE_SOFTLIMITS = true;
+            public static final boolean ENABLE_SOFTLIMITS = false;
 
             public static final boolean INVERTED = bPlaceholder;
 
@@ -140,8 +142,16 @@ public final class Constants {
             public static final double MAX_ACCELERATION = 750;
             public static final double MAX_JERK = 5000;
 
-            public static final double MOTOR_TO_MECHANISM_RATIO = dPlaceholder;
-            public static final double MECHANISM_RADIUS_METERS = dPlaceholder;
+            public static final double MOTOR_TO_MECHANISM_RATIO = 1.0/3.0;
+            public static final double MECHANISM_DIAMETER_METERS = 0.042164;
+
+            /**Alias for {@link Specs#ELEVATOR_MIN_METERS} */
+            public static final double HOME_METERS = Specs.ELEVATOR_MIN_METERS;
+
+            /**Alias for {@link Specs#ELEVATOR_MIN_METERS} */
+            public static final double MIN_METERS = Specs.ELEVATOR_MIN_METERS;
+            /**Alias for {@link Specs#ELEVATOR_MAX_METERS} */
+            public static final double MAX_METERS = Specs.ELEVATOR_MAX_METERS;
         }
 
         public static final class Specs {
@@ -154,8 +164,10 @@ public final class Constants {
             public static final double PIVOT_MIN_ANGLE = -7.0;
             public static final double PIVOT_MAX_ANGLE = 90.0;
 
-            public static final double WRIST_MIN_ANGLE = dPlaceholder;
-            public static final double WRIST_MAX_ANGLE = dPlaceholder;
+            //arbitrary min, not mechanical limit(which is ~15 less)
+            public static final double WRIST_MIN_ANGLE = -66.04;
+            public static final double WRIST_MIN_ANGLE_FLOOR = 21.1;
+            public static final double WRIST_MAX_ANGLE = 149.39;
 
             public static final Transform3d PIVOT_OFFSET_METERS = new Transform3d(
                     new Translation3d(0.0, -0.232953, -0.252125),

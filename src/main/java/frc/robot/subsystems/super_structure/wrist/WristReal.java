@@ -1,16 +1,16 @@
 package frc.robot.subsystems.super_structure.wrist;
 
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ErrorHelper.*;
@@ -19,7 +19,7 @@ public class WristReal implements Wrist {
 
     private final TalonFX wristMotor, intakeMotor;
 
-    private final StatusSignal<Double> wristMotorRots, wristMotorVelo;
+    private final StatusSignal<Double> wristMotorRots, wristMotorVelo, wristMotorAmps;
 
     public WristReal() {
         wristMotor = new TalonFX(kWrist.MOTOR_ID);
@@ -27,6 +27,7 @@ public class WristReal implements Wrist {
 
         wristMotorRots = wristMotor.getRotorPosition();
         wristMotorVelo = wristMotor.getRotorVelocity();
+        wristMotorAmps = wristMotor.getStatorCurrent();
 
         intakeMotor = new TalonFX(kIntake.MOTOR_ID);
         intakeMotor.getConfigurator().apply(getIntakeMotorConfig());
@@ -60,6 +61,8 @@ public class WristReal implements Wrist {
                 kWrist.MAX_DEGREES);
         wristMotorCfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechDegreesToMotorRots(
                 kWrist.MIN_DEGREES);
+
+        wristMotorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
@@ -116,47 +119,57 @@ public class WristReal implements Wrist {
                 * kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
 
+    // @Override
+    // public void zeroMechanism() {
+    //     // disable soft limits to not interfere with zeroing
+    //     var softLimitCfg = new SoftwareLimitSwitchConfigs();
+    //     wristMotor.getConfigurator().refresh(softLimitCfg);
+    //     softLimitCfg.ForwardSoftLimitEnable = false;
+    //     softLimitCfg.ReverseSoftLimitEnable = false;
+    //     wristMotor.getConfigurator().apply(softLimitCfg);
+
+    //     var currentSignal = wristMotor.getTorqueCurrent();
+    //     currentSignal.setUpdateFrequency(250);
+
+    //     var timer = new Timer();
+
+    //     // start timer an motor, monitor current. this could also use moving average if
+    //     // needed
+    //     timer.start();
+    //     wristMotor.set(0.1);
+    //     while (currentSignal.getValue() < kWrist.CURRENT_PEAK_FOR_ZERO) {
+    //         if (timer.hasElapsed(1.0)) {
+    //             // took too long, stop motor and report error. NO ZERO
+    //             wristMotor.set(0.0);
+    //             DriverStation.reportError("Wrist Motor Zero Timeout", false);
+    //             return;
+    //         }
+    //     }
+
+    //     // stop motor, reset encoder
+    //     wristMotor.set(mechDegreesToMotorRots(kWrist.MAX_DEGREES));
+    //     wristMotor.setRotorPosition(0);
+
+    //     // set soft limits
+    //     softLimitCfg.ForwardSoftLimitEnable = true;
+    //     softLimitCfg.ReverseSoftLimitEnable = true;
+    //     wristMotor.getConfigurator().apply(softLimitCfg);
+    // }
+
     @Override
-    public void zeroMechanism() {
-        // disable soft limits to not interfere with zeroing
-        var softLimitCfg = new SoftwareLimitSwitchConfigs();
-        wristMotor.getConfigurator().refresh(softLimitCfg);
-        softLimitCfg.ForwardSoftLimitEnable = false;
-        softLimitCfg.ReverseSoftLimitEnable = false;
-        wristMotor.getConfigurator().apply(softLimitCfg);
-
-        var currentSignal = wristMotor.getTorqueCurrent();
-        currentSignal.setUpdateFrequency(250);
-
-        var timer = new Timer();
-
-        // start timer an motor, monitor current. this could also use moving average if
-        // needed
-        timer.start();
-        wristMotor.set(0.1);
-        while (currentSignal.getValue() < kWrist.CURRENT_PEAK_FOR_ZERO) {
-            if (timer.hasElapsed(1.0)) {
-                // took too long, stop motor and report error. NO ZERO
-                wristMotor.set(0.0);
-                DriverStation.reportError("Wrist Motor Zero Timeout", false);
-                return;
-            }
-        }
-
-        // stop motor, reset encoder
-        wristMotor.set(mechDegreesToMotorRots(kWrist.MAX_DEGREES));
-        wristMotor.setRotorPosition(0);
-
-        // set soft limits
-        softLimitCfg.ForwardSoftLimitEnable = true;
-        softLimitCfg.ReverseSoftLimitEnable = true;
-        wristMotor.getConfigurator().apply(softLimitCfg);
+    public Double getMechanismCurrent() {
+        return wristMotorAmps.getValue();
     }
 
     @Override
     public void runIntake(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.intakeMotor.setControl(percentControlRequest);
+    }
+
+    @Override
+    public Double getIntakeVoltage() {
+        return intakeMotor.getSupplyVoltage().getValue();
     }
 
     @Override
@@ -169,5 +182,13 @@ public class WristReal implements Wrist {
 
     @Override
     public void periodic() {
+    }
+
+    @Override
+    public void setupShuffleboard(ShuffleboardTab tab) {
+        tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue())
+            .withSize(2, 1);
+        tab.addDouble("Wrist Volts", () -> wristMotor.getSupplyVoltage().getValue())
+            .withSize(2, 1);
     }
 }

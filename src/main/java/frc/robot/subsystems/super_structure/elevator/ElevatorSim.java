@@ -14,12 +14,17 @@ public class ElevatorSim implements Elevator{
 
     @Override
     public Double getMechanismMeters() {
-        return null;
+        return 0.0;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
         
+    }
+
+    @Override
+    public Boolean isLimitSwitchHit() {
+        return false;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package frc.robot.subsystems.super_structure.wrist;
 
 import frc.robot.util.SimHelper.SetPoint;
-
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ErrorHelper.*;
@@ -38,13 +38,18 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public void zeroMechanism() {
-        wristDegrees.setTargetPosition(0.0);
+    public Double getMechanismCurrent() {
+        return 0.0;
     }
 
     @Override
     public void runIntake(Double percentOut) {
         this.intakeVelocity.setTargetVelocity(6480.0 * percentOut);
+    }
+
+    @Override
+    public Double getIntakeVoltage() {
+        return 0.0;
     }
 
     @Override
@@ -57,4 +62,8 @@ public class WristSim implements Wrist {
 
     @Override
     public void periodic() {}
+
+    @Override
+    public void setupShuffleboard(ShuffleboardTab tab) {
+    }
 }

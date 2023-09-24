@@ -6,23 +6,29 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import frc.robot.Constants.kSuperStructure.*;
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+
 import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ErrorHelper.*;
 
-public class ElevatorReal implements Elevator{
-    private final TalonFX leaderMotor, followerMotor;
+public class ElevatorReal implements Elevator {
+    /**Right */
+    private final TalonFX leaderMotor;
+    /**Left */
+    private final TalonFX followerMotor;
     private final StatusSignal<Double> motorRots, motorVelo;
 
     public ElevatorReal() {
-        //Left
-        leaderMotor = new TalonFX(kElevator.ELEVATOR_LEFT_MOTOR_ID);
+        // Right
+        leaderMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID);
         leaderMotor.getConfigurator().apply(getMotorConfiguration());
 
-        //Right
-        followerMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID);
+        // Left
+        followerMotor = new TalonFX(kElevator.ELEVATOR_LEFT_MOTOR_ID);
         followerMotor.getConfigurator().apply(getMotorConfiguration());
         followerMotor.setControl(new Follower(kElevator.ELEVATOR_RIGHT_MOTOR_ID, true));
 
@@ -31,10 +37,15 @@ public class ElevatorReal implements Elevator{
     }
 
     private Double mechMetersToMotorRots(Double meters) {
-        return ((180.0 * meters) / (kElevator.MECHANISM_RADIUS_METERS * Math.PI)) / 360.0;
+        return ((meters - kElevator.HOME_METERS)
+                / (kElevator.MECHANISM_DIAMETER_METERS * Math.PI))
+                / kElevator.MOTOR_TO_MECHANISM_RATIO;
     }
+
     private Double motorRotsToMechMeters(Double motorRots) {
-        return (kElevator.MECHANISM_RADIUS_METERS * Math.PI * (motorRots * 360.0)) / 180.0;
+        return (motorRots * kElevator.MOTOR_TO_MECHANISM_RATIO)
+                * (kElevator.MECHANISM_DIAMETER_METERS * Math.PI)
+                + kElevator.HOME_METERS;
     }
 
     private TalonFXConfiguration getMotorConfiguration() {
@@ -50,9 +61,9 @@ public class ElevatorReal implements Elevator{
         motorConfig.MotionMagic.MotionMagicJerk = kElevator.MAX_JERK;
 
         motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = kElevator.ENABLE_SOFTLIMITS;
-        motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = kElevator.ENABLE_SOFTLIMITS;
         motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechMetersToMotorRots(Specs.ELEVATOR_MAX_METERS);
-        motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechMetersToMotorRots(Specs.ELEVATOR_MIN_METERS);
+
+        motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         motorConfig.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
@@ -64,12 +75,11 @@ public class ElevatorReal implements Elevator{
     public Result<Ok, GroupError<SuperStructureErrors>> setMechanismMeters(Double meters) {
         if (meters < Specs.ELEVATOR_MIN_METERS) {
             return Result.err(new SetpointTooLow(Specs.ELEVATOR_MIN_METERS, meters));
-        }
-        else if (meters > Specs.ELEVATOR_MAX_METERS) {
+        } else if (meters > Specs.ELEVATOR_MAX_METERS) {
             return Result.err(new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters));
         }
 
-        var posControlRequest = new MotionMagicTorqueCurrentFOC(mechMetersToMotorRots(meters));
+        var posControlRequest = new MotionMagicVoltage(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
         return Result.ok(new Ok());
     }
@@ -84,6 +94,16 @@ public class ElevatorReal implements Elevator{
     public void manualDriveMechanism(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
+    }
+
+    @Override
+    public Boolean isLimitSwitchHit() {
+        switch (leaderMotor.getReverseLimit().getValue()) {
+            case ClosedToGround:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

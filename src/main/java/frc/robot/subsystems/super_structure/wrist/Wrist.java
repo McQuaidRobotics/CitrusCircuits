@@ -1,5 +1,6 @@
 package frc.robot.subsystems.super_structure.wrist;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.subsystems.super_structure.Errors.SuperStructureErrors;
 import frc.robot.util.ErrorHelper.GroupError;
 import frc.robot.util.ErrorHelper.Ok;
@@ -31,18 +32,21 @@ public interface Wrist {
     public Double getMechanismDegrees();
 
     /**
-     * Moves the mechanism up until the current detection is triggered,
-     * detection position resolves to 0 -
-     * {@link frc.robot.Constants.kSuperStructure.kWrist#MAX_DEGREES}
+     * @return the current draw of the mechanism
      */
-    public void zeroMechanism();
+    public Double getMechanismCurrent();
 
     /**
      * Runs the intake at a given percent output
      * 
-     * @param percentOut of the intake motor
+     * @param volts of the intake motor
      */
-    public void runIntake(Double percentOut);
+    public void runIntake(Double volts);
+
+    /**
+     * @return the voltage of the intake motor
+     */
+    public Double getIntakeVoltage();
 
     /**
      * Stops the intake
@@ -55,4 +59,6 @@ public interface Wrist {
     public void playErrorTone();
 
     public void periodic();
+
+    public void setupShuffleboard(ShuffleboardTab tab);
 }

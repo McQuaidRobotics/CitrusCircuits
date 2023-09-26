@@ -24,6 +24,7 @@ public class PivotReal implements Pivot {
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
     private Boolean isHomed = false;
+    private Boolean softLimitsEnabled = true;
 
     public PivotReal() {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
@@ -82,6 +83,10 @@ public class PivotReal implements Pivot {
             new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
             return false;
         }
+        if (!this.softLimitsEnabled) {
+            this.massSoftLimits(true, leaderMotor);
+            this.softLimitsEnabled = true;
+        }
         isHomed = false;
         var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
@@ -112,6 +117,10 @@ public class PivotReal implements Pivot {
     public Boolean homeMechanism() {
         if (isHomed) {
             return true;
+        }
+        if (this.softLimitsEnabled) {
+            this.massSoftLimits(false, leaderMotor);
+            this.softLimitsEnabled = false;
         }
         this.manualDriveMechanism(-0.1);
         if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {

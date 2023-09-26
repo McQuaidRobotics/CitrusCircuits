@@ -5,6 +5,7 @@ import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.super_structure.States.SuperStructurePosition;
 
+/**Used to define State->State transition commands, to be used by {@link StateManager} */
 public class Transitions {
 
     public static class TransitionData {
@@ -17,7 +18,6 @@ public class Transitions {
             this.superStructure = superStructure;
         }
     }
-
 
 
     public static Command defaultTransition(TransitionData data) {

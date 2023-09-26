@@ -11,8 +11,18 @@ import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 
+/**
+ * Acts as a stateful interface for the {@link SuperStructure}.
+ * State transitions can be defined in {@link Transitions}.
+ * The only public member is the {@link CmdTransitionState} command and should
+ *  be used as the main way of controlling the {@link SuperStructure}.
+ */
 public class StateManager {
 
+    /**
+     * Is essential for determining transitions,
+     * can only be mutated by {@link CmdTransitionState}
+     */
     private static States lastState = States.START;
 
     @SuppressWarnings("unused")
@@ -58,10 +68,14 @@ public class StateManager {
     private static Map<States, Map<States, Function<TransitionData, Command>>> transitions;
 
     static {
+        //without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
     }
 
-
+    /**
+     * @param data
+     * @return The command to run when transitioning from one state to another
+     */
     private static Command getTransitionCmd(TransitionData data) {
         if (transitions.containsKey(data.from)) {
             if (transitions.get(data.from).containsKey(data.to)) {
@@ -100,29 +114,26 @@ public class StateManager {
             this.innerCmd = getTransitionCmd(new TransitionData(from, to, superStructure));
             this.innerInit = false;
             this.innerFinish = false;
+            this.deadCycles = 0;
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
                 superStructure.runEndEffector(from.intakeRequest.getVoltage());
                 this.deadCycles = 10;
-                return;
-            } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_START || to.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME) {
-                superStructure.runEndEffector(to.intakeRequest.getVoltage());
             }
-            this.deadCycles = 0;
-            this.innerCmd.initialize();
-            this.innerInit = true;
         }
 
         @Override
         public void execute() {
-            Double endEffectorVolts = 0.0;
-
+            //skipping dead cycles
             if (deadCycles > 0) {
                 deadCycles--;
                 return;
             }
 
+
+            //inner command handling
             if (!innerInit) {
                 this.innerCmd.initialize();
+                this.innerInit = true;
             }
             if (!innerFinish) {
                 this.innerCmd.execute();
@@ -132,10 +143,11 @@ public class StateManager {
                 this.innerFinish = true;
             }
 
+            //solving intake behavior
+            Double endEffectorVolts = 0.0;
             if (from.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME || from.intakeBehavior == IntakeBehavior.RUN_ON_START) {
                 endEffectorVolts = to.intakeRequest.getVoltage();
             }
-
             if (superStructure.reachedSetpoint()) {
                 if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
                     endEffectorVolts = 0.0;

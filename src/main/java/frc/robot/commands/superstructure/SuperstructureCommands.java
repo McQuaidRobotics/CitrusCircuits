@@ -30,6 +30,14 @@ public class SuperstructureCommands {
         });
     }
 
+    /**
+     * Acts as a pseudo-proxy command for 
+     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_HIGH}),
+     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_MID}), or
+     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_LOW})
+     * that will dynamically determine which to use based on {@link OperatorPrefs.ScoreLevel#getCurrentLevel()}.
+     * the decided proxy command can only be changed by calling {@link #initialize()} again.
+     */
     public static class TransitionToPlace extends CommandBase {
         private final SuperStructure superStructure;
         private Command placeCmd;
@@ -78,12 +86,18 @@ public class SuperstructureCommands {
 
         @Override
         public String getName() {
-            if (placeCmd == null)
-                return "TransitionToPlace(null)";
+            if (placeCmd == null) return "TransitionToPlace(null)";
             return "TransitionToPlace(" + placeCmd.getName() + ")";
         }
     }
 
+    /**
+     * Acts as a pseudo-proxy command for 
+     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PICKUP_GROUND}) or
+     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PICKUP_STATION})
+     * that will dynamically determine which to use based on {@link OperatorPrefs.PickupMode#getCurrentMode()}.
+     * the decided proxy command can only be changed by calling {@link #initialize()} again.
+     */
     public static class TransitionToPickup extends CommandBase {
         private final SuperStructure superStructure;
         private Command placeCmd;
@@ -127,8 +141,7 @@ public class SuperstructureCommands {
 
         @Override
         public String getName() {
-            if (placeCmd == null)
-                return "TransitionToPickup(null)";
+            if (placeCmd == null) return "TransitionToPickup(null)";
             return "TransitionToPickup(" + placeCmd.getName() + ")";
         }
     }

@@ -22,6 +22,7 @@ public class WristReal implements Wrist {
     private final StatusSignal<Double> intakeMotorAmps, intakeMotorVolts;
 
     private Boolean isHomed = false;
+    private Boolean softLimitsEnabled = true;
 
     public WristReal() {
         wristMotor = new TalonFX(kWrist.MOTOR_ID);
@@ -104,6 +105,10 @@ public class WristReal implements Wrist {
             return false;
         }
         isHomed = false;
+        if (!this.softLimitsEnabled) {
+            this.massSoftLimits(true, wristMotor);
+            this.softLimitsEnabled = true;
+        }
         var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
         return Math.abs(degrees - getMechanismDegrees()) < kWrist.TOLERANCE;
@@ -167,6 +172,10 @@ public class WristReal implements Wrist {
     public Boolean homeMechanism() {
         if (isHomed) {
             return true;
+        }
+        if (this.softLimitsEnabled) {
+            this.massSoftLimits(false, wristMotor);
+            this.softLimitsEnabled = false;
         }
         this.manualDriveMechanism(0.1);
         if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {

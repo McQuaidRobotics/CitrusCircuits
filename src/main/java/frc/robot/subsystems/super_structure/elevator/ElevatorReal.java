@@ -55,8 +55,8 @@ public class ElevatorReal implements Elevator {
         motorConfig.Slot0.kP = kElevator.MOTOR_kP;
         motorConfig.Slot0.kP = kElevator.MOTOR_kI;
         motorConfig.Slot0.kP = kElevator.MOTOR_kD;
-        motorConfig.Slot0.kS = kElevator.MOTOR_kS;
-        motorConfig.Slot0.kV = kElevator.MOTOR_kV;
+        // motorConfig.Slot0.kS = kElevator.MOTOR_kS;
+        // motorConfig.Slot0.kV = kElevator.MOTOR_kV;
 
         motorConfig.MotionMagic.MotionMagicCruiseVelocity = kElevator.MAX_VELOCITY;
         motorConfig.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;

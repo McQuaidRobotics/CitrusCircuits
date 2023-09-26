@@ -142,7 +142,7 @@ public final class Constants {
 
             public static final boolean ENABLE_SOFTLIMITS = false;
 
-            public static final boolean INVERTED = bPlaceholder;
+            public static final boolean INVERTED = false;
 
             public static final double MAX_VELOCITY = 100;
             public static final double MAX_ACCELERATION = 750;

@@ -54,8 +54,8 @@ public class WristReal implements Wrist {
         wristMotorCfg.Slot0.kP = kWrist.MOTOR_kP;
         wristMotorCfg.Slot0.kI = kWrist.MOTOR_kI;
         wristMotorCfg.Slot0.kD = kWrist.MOTOR_kD;
-        wristMotorCfg.Slot0.kS = kWrist.MOTOR_kS;
-        wristMotorCfg.Slot0.kV = kWrist.MOTOR_kV;
+        // wristMotorCfg.Slot0.kS = kWrist.MOTOR_kS;
+        // wristMotorCfg.Slot0.kV = kWrist.MOTOR_kV;
 
         wristMotorCfg.MotionMagic.MotionMagicCruiseVelocity = kWrist.MAX_VELOCITY;
         wristMotorCfg.MotionMagic.MotionMagicAcceleration = kWrist.MAX_ACCELERATION;

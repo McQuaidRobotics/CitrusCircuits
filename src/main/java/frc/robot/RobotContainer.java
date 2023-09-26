@@ -79,22 +79,22 @@ public class RobotContainer {
 
     private void configureOperatorBindings() {
         //Face buttons
-        driveController.y().onTrue(new InstantCommand(
+        operatorController.y().onTrue(new InstantCommand(
             () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)));
-        driveController.b().onTrue(new InstantCommand(
+        operatorController.b().onTrue(new InstantCommand(
             () -> ScoreLevel.setCurrentLevel(ScoreLevel.MIDDLE)));
         driveController.a().onTrue(new InstantCommand(
             () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW)));
         driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
 
         //Bumpers/Triggers
-        driveController.rightBumper().onTrue(new InstantCommand(
+        operatorController.rightBumper().onTrue(new InstantCommand(
             () -> PickupMode.setCurrentMode(PickupMode.GROUND)));
-        driveController.leftBumper().onTrue(new InstantCommand(
+        operatorController.leftBumper().onTrue(new InstantCommand(
             () -> PickupMode.setCurrentMode(PickupMode.STATION)));
-        driveController.leftTrigger().onTrue(new InstantCommand(
+        operatorController.leftTrigger().onTrue(new InstantCommand(
             () -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE)));
-        driveController.rightTrigger().onTrue(new InstantCommand(
+        operatorController.rightTrigger().onTrue(new InstantCommand(
             () -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)));
     }
 

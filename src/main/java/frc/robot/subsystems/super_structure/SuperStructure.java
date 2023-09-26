@@ -124,19 +124,19 @@ public class SuperStructure extends SubsystemBase {
         tab.addDouble("Elevator Setpoint Meters", () -> this.setpoint.elevatorMeters)
                 .withSize(2, 1);
 
-        var form = getPose();
-
-        tab.addDouble("Wrist Current Degrees", () -> form.wristDegrees)
+        tab.addDouble("Wrist Current Degrees", () -> this.wrist.getMechanismDegrees())
                 .withSize(2, 1);
-        tab.addDouble("Pivot Current Degrees", () -> form.pivotDegrees)
+        tab.addDouble("Pivot Current Degrees", () -> this.pivot.getMechanismDegrees())
                 .withSize(2, 1);
-        tab.addDouble("Elevator Current Degrees", () -> form.elevatorMeters)
+        tab.addDouble("Elevator Current Degrees", () -> this.elevator.getMechanismMeters())
                 .withSize(2, 1);
 
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
                 .withSize(2, 1);
 
-        wrist.setupShuffleboard(tab);
+        wrist.setupShuffleboard(tab.getLayout("Wrist"));
+        pivot.setupShuffleboard(tab.getLayout("Pivot"));
+        elevator.setupShuffleboard(tab.getLayout("Elevator"));
     }
 
     @Override

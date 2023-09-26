@@ -4,7 +4,6 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
-import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -13,7 +12,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);

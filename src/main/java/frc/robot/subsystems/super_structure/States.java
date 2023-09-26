@@ -1,16 +1,18 @@
 package frc.robot.subsystems.super_structure;
 
+import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.GamepieceMode;
+
 
 public enum States {
     START(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
-    HOME(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
-    STANDBY(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
-    PLACE_HIGH(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
-    PLACE_MID(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
-    PLACE_LOW(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
-    PICKUP_GROUND(10.0, 10.0, 10.0, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
-    PICKUP_STATION(10.0, 10.0, 10.0, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH);
+    HOME(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
+    STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
+    PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, elevRelative(1.04), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
+    PLACE_MID(kPivot.SCORE_DEGREES, -23.2, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
+    PLACE_LOW(kPivot.SCORE_DEGREES, 15.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
+    PICKUP_GROUND(kPivot.HOME_DEGREES, 21.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
+    PICKUP_STATION(60.11, -50.0, elevRelative(0.579), IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH);
 
     public final Double pivotDegrees;
     public final Double wristDegrees;
@@ -26,6 +28,10 @@ public enum States {
         this.elevatorMeters = elevatorMeters;
         this.intakeRequest = intakeRequest;
         this.intakeBehavior = intakeBehavior;
+    }
+
+    private static Double elevRelative(Double setpoint) {
+        return setpoint + kElevator.MIN_METERS;
     }
 
     public enum IntakeRequest {

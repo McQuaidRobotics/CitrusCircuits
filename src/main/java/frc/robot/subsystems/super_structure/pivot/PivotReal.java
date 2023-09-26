@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 
@@ -20,7 +21,7 @@ public class PivotReal implements Pivot {
     /** Right */
     private final TalonFX followerMotor;
 
-    private final StatusSignal<Double> motorRots, motorVelo, motorAmps;
+    private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
     private Boolean isHomed = false;
 
@@ -33,6 +34,7 @@ public class PivotReal implements Pivot {
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
         motorAmps = leaderMotor.getStatorCurrent();
+        motorVolts = leaderMotor.getSupplyVoltage();
 
         followerMotor.setControl(
             new Follower(kPivot.LEFT_MOTOR_ID, true)
@@ -112,7 +114,7 @@ public class PivotReal implements Pivot {
             return true;
         }
         this.manualDriveMechanism(-0.1);
-        if (motorAmps.getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
+        if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
             this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
             isHomed = true;
@@ -122,4 +124,14 @@ public class PivotReal implements Pivot {
 
     @Override
     public void periodic() {}
+
+    @Override
+    public void setupShuffleboard(ShuffleboardContainer tab) {
+        BaseStatusSignal.waitForAll(0, motorRots, motorVelo, motorAmps, motorVolts);
+        tab.addNumber("Pivot Rots", () -> motorRots.getValue());
+        tab.addNumber("Pivot Velo", () -> motorVelo.getValue());
+        tab.addNumber("Pivot Amps", () -> motorAmps.getValue());
+        tab.addNumber("Pivot Volts", () -> motorVolts.getValue());
+        tab.addBoolean("Pivot Homed", () -> isHomed);
+    }
 }

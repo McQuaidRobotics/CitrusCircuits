@@ -105,6 +105,8 @@ public final class Constants {
             /** Alias for {@link Specs#PIVOT_MIN_ANGLE} */
             public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE;
 
+            public final static double SCORE_DEGREES = 39.8;
+
             public static final boolean ENABLE_SOFTLIMITS = false;
 
             /** For every {@value} rotations of the motor the mechanism moves 1 rotation */

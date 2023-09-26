@@ -1,12 +1,12 @@
 package frc.robot.subsystems.super_structure;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 
 public interface Component {
 
     public void periodic();
 
-    default public void setupShuffleboard(ShuffleboardTab tab) {};
+    default public void setupShuffleboard(ShuffleboardContainer tab) {};
 
     /**
      * To be used for debugging, not guranteed to have all

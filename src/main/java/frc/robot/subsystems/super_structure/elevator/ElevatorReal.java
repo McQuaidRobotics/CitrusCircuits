@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -19,7 +20,7 @@ public class ElevatorReal implements Elevator {
     private final TalonFX leaderMotor;
     /**Left */
     private final TalonFX followerMotor;
-    private final StatusSignal<Double> motorRots, motorVelo;
+    private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
     public ElevatorReal() {
         // Right
@@ -33,6 +34,8 @@ public class ElevatorReal implements Elevator {
 
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
+        motorAmps = leaderMotor.getStatorCurrent();
+        motorVolts = leaderMotor.getSupplyVoltage();
     }
 
     private Double mechMetersToMotorRots(Double meters) {
@@ -104,7 +107,7 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Boolean isLimitSwitchHit() {
-        switch (leaderMotor.getReverseLimit().getValue()) {
+        switch (leaderMotor.getReverseLimit().refresh().getValue()) {
             case ClosedToGround:
                 return true;
             default:
@@ -126,7 +129,14 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public void periodic() {
+    public void periodic() {}
 
+    @Override
+    public void setupShuffleboard(ShuffleboardContainer tab) {
+        BaseStatusSignal.waitForAll(0, motorRots, motorVelo, motorAmps, motorVolts);
+        tab.addNumber("Elevator Rots", () -> motorRots.getValue());
+        tab.addNumber("Elevator Velo", () -> motorVelo.getValue());
+        tab.addNumber("Elevator Amps", () -> motorAmps.getValue());
+        tab.addNumber("Elevator Volts", () -> motorVolts.getValue());
     }
 }

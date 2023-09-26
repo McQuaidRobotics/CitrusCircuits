@@ -10,7 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 
@@ -18,7 +18,8 @@ public class WristReal implements Wrist {
 
     private final TalonFX wristMotor, intakeMotor;
 
-    private final StatusSignal<Double> wristMotorRots, wristMotorVelo, wristMotorAmps;
+    private final StatusSignal<Double> wristMotorRots, wristMotorVelo, wristMotorAmps, wristMotorVolts;
+    private final StatusSignal<Double> intakeMotorAmps, intakeMotorVolts;
 
     private Boolean isHomed = false;
 
@@ -29,9 +30,13 @@ public class WristReal implements Wrist {
         wristMotorRots = wristMotor.getRotorPosition();
         wristMotorVelo = wristMotor.getRotorVelocity();
         wristMotorAmps = wristMotor.getStatorCurrent();
+        wristMotorVolts = wristMotor.getSupplyVoltage();
 
         intakeMotor = new TalonFX(kIntake.MOTOR_ID);
         intakeMotor.getConfigurator().apply(getIntakeMotorConfig());
+
+        intakeMotorAmps = intakeMotor.getStatorCurrent();
+        intakeMotorVolts = intakeMotor.getSupplyVoltage();
     }
 
     private Double mechDegreesToMotorRots(Double mechanismDegrees) {
@@ -145,11 +150,17 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleboardTab tab) {
-        tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue())
-            .withSize(2, 1);
-        tab.addDouble("Wrist Volts", () -> wristMotor.getSupplyVoltage().getValue())
-            .withSize(2, 1);
+    public void setupShuffleboard(ShuffleboardContainer tab) {
+        BaseStatusSignal.waitForAll(0, wristMotorRots, wristMotorVelo, wristMotorAmps,
+                wristMotorVolts, intakeMotorAmps, intakeMotorVolts);
+        tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue());
+        tab.addDouble("Wrist Volts", () -> wristMotorVolts.getValue());
+        tab.addDouble("Wrist Rots", () -> wristMotorRots.getValue());
+        tab.addDouble("Wrist Velo", () -> wristMotorVelo.getValue());
+        tab.addBoolean("Wrist Homed", () -> isHomed);
+
+        tab.addDouble("Intake Amps", () -> intakeMotorAmps.getValue());
+        tab.addDouble("Intake Volts", () -> intakeMotorVolts.getValue());
     }
 
     @Override

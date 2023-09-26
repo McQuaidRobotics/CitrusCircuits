@@ -1,7 +1,6 @@
 package frc.robot.subsystems.super_structure.wrist;
 
 import frc.robot.util.SimHelper.SetPoint;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 
@@ -55,9 +54,6 @@ public class WristSim implements Wrist {
 
     @Override
     public void periodic() {}
-
-    @Override
-    public void setupShuffleboard(ShuffleboardTab tab) {}
 
     @Override
     public Boolean homeMechanism() {

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.super_structure;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -34,16 +36,55 @@ public class SuperStructure extends SubsystemBase {
         setupShuffleboard();
     }
 
-    public void setSetpoint(SuperStructurePosition pose) {
+    /**@returns true of the setpoint has been reached */
+    public Boolean setSetpoint(SuperStructurePosition pose) {
         this.visualizer.updateSetpoint(pose);
-        this.wrist.setMechanismDegrees(pose.wristDegrees);
-        this.elevator.setMechanismMeters(pose.elevatorMeters);
-        this.pivot.setMechanismDegrees(pose.pivotDegrees);
+
+        //only pivot or wrist+elevator should run at a time
+        BooleanSupplier runWristElevator = () -> {
+            return this.wrist.setMechanismDegrees(pose.wristDegrees) &&
+            this.elevator.setMechanismMeters(pose.elevatorMeters);
+        };
+        BooleanSupplier pivot = () -> {
+            return this.pivot.setMechanismDegrees(pose.pivotDegrees);
+        };
+
+        //We need to make sure the pivot and elevator do not move at the same time.
+        //We need to also try and run the pivot when the elevator is in the least
+        //extended between the two states(pose and current).
+
+        //i.e. if the elevator is currently not extended but the pose wants it all the way out,
+        //we will move the pivot first to reduce stress, but if the current elevator extension
+        //is greater than set pose we move elevator first
+
+        if (this.elevator.getMechanismMeters() - 0.1 < pose.elevatorMeters) {
+            //check if wrist and elevator have reached their setpoints
+            //if they have, run pivot
+            if (runWristElevator.getAsBoolean()) {
+                return pivot.getAsBoolean();
+            }
+        } else {
+            if (pivot.getAsBoolean()) {
+                return runWristElevator.getAsBoolean();
+            }
+        }
+        return false;
+    }
+
+    public Boolean home() {
+        //always home elevator/wrist then home pivot
+        if (this.elevator.homeMechanism() && this.wrist.homeMechanism()) {
+            return this.pivot.homeMechanism();
+        }
+        return false;
     }
 
     public void runEndEffector(Double volts) {
+        //assume max voltage is 12.0
         this.wrist.runIntake(volts / 12.0);
     }
+
+
 
     public Boolean reachedSetpoint() {
         return this.setpoint.reachedState(this.getPose());

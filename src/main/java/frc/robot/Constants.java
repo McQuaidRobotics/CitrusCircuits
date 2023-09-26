@@ -20,12 +20,6 @@ public final class Constants {
     public static final int iPlaceholder = 0;
     public static final boolean bPlaceholder = false;
 
-    public static class OperatorConstants {
-        public static final int DRIVER_CONTROLLER_PORT = 0;
-        public static final double LEFT_JOYSTICK_DAEDBAND = 0.1;
-        public static final double RIGHT_JOYSTICK_DEADBAND = 0.2;
-    }
-
     public static class kSuperStructure {
 
         public static final class kWrist {
@@ -67,6 +61,11 @@ public final class Constants {
              * be recognized at mechanical limit.
              */
             public static final double CURRENT_PEAK_FOR_ZERO = 15.0;
+
+            /**Alias for {@link Specs#WRIST_MAX_ANGLE} */
+            public static final double HOME_DEGREES = Specs.WRIST_MAX_ANGLE;
+
+            public static final double TOLERANCE = 0.5;
         }
 
         public static final class kIntake {
@@ -103,6 +102,9 @@ public final class Constants {
              */
             public static final double MAX_DEGREES = Specs.PIVOT_MAX_ANGLE;
 
+            /** Alias for {@link Specs#PIVOT_MIN_ANGLE} */
+            public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE;
+
             public static final boolean ENABLE_SOFTLIMITS = false;
 
             /** For every {@value} rotations of the motor the mechanism moves 1 rotation */
@@ -121,7 +123,9 @@ public final class Constants {
              * The ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_ZERO = dPlaceholder;
+            public static final double CURRENT_PEAK_FOR_ZERO = 15.0;
+
+            public static final double TOLERANCE = 0.5;
         }
 
         public static final class kElevator {
@@ -152,6 +156,8 @@ public final class Constants {
             public static final double MIN_METERS = Specs.ELEVATOR_MIN_METERS;
             /**Alias for {@link Specs#ELEVATOR_MAX_METERS} */
             public static final double MAX_METERS = Specs.ELEVATOR_MAX_METERS;
+
+            public static final double TOLERANCE = 0.3;
         }
 
         public static final class Specs {

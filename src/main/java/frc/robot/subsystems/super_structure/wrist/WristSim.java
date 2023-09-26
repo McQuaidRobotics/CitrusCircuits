@@ -4,7 +4,6 @@ import frc.robot.util.SimHelper.SetPoint;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
-import frc.robot.util.ErrorHelper.*;
 
 public class WristSim implements Wrist {
 
@@ -12,14 +11,16 @@ public class WristSim implements Wrist {
     private final SetPoint intakeVelocity = new SetPoint(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
     @Override
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismDegrees(Double degrees) {
+    public Boolean setMechanismDegrees(Double degrees) {
         if (degrees > kWrist.MAX_DEGREES) {
-            return Result.err(new SetpointTooHigh(kWrist.MAX_DEGREES, degrees));
+            new SetpointTooHigh(kWrist.MAX_DEGREES, degrees).log();
+            return false;
         } else if (degrees < kWrist.MIN_DEGREES) {
-            return Result.err(new SetpointTooLow(kWrist.MIN_DEGREES, degrees));
+            new SetpointTooLow(kWrist.MIN_DEGREES, degrees).log();
+            return false;
         }
         wristDegrees.setTargetPosition(degrees);
-        return Result.ok(new Ok());
+        return false;
     }
 
     @Override
@@ -53,17 +54,14 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public void stopIntake() {
-        this.intakeVelocity.setTargetVelocity(0.0);
-    }
-
-    @Override
-    public void playErrorTone() {}
-
-    @Override
     public void periodic() {}
 
     @Override
-    public void setupShuffleboard(ShuffleboardTab tab) {
+    public void setupShuffleboard(ShuffleboardTab tab) {}
+
+    @Override
+    public Boolean homeMechanism() {
+        wristDegrees.setTargetPosition(kWrist.HOME_DEGREES);
+        return true;
     }
 }

@@ -1,14 +1,9 @@
 package frc.robot.subsystems.super_structure.elevator;
 
-import frc.robot.subsystems.super_structure.Errors.SuperStructureErrors;
-import frc.robot.util.ErrorHelper.GroupError;
-import frc.robot.util.ErrorHelper.Ok;
-import frc.robot.util.ErrorHelper.Result;
-
 public class ElevatorSim implements Elevator{
 
     @Override
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismMeters(Double percent) {
+    public Boolean setMechanismMeters(Double percent) {
         return null;
     }
 
@@ -23,8 +18,18 @@ public class ElevatorSim implements Elevator{
     }
 
     @Override
+    public void stopMechanism() {
+        
+    }
+
+    @Override
     public Boolean isLimitSwitchHit() {
         return false;
+    }
+
+    @Override
+    public Boolean homeMechanism() {
+        return true;
     }
 
     @Override

@@ -1,30 +1,14 @@
 package frc.robot.subsystems.super_structure.wrist;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.subsystems.super_structure.Errors.SuperStructureErrors;
-import frc.robot.util.ErrorHelper.GroupError;
-import frc.robot.util.ErrorHelper.Ok;
-import frc.robot.util.ErrorHelper.Result;
+import frc.robot.subsystems.super_structure.Component;
 
-public interface Wrist {
+public interface Wrist extends Component {
     /**
      * Abstract from motors, will set the wrist degrees.
      * Parallel to the elevator is 0 degrees
+     * @return true if degrees has been reached
      */
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismDegrees(Double degrees);
-
-    /**
-     * To be used for debugging, not guranteed to have all
-     * safety features
-     * 
-     * @param percentOut of the mechanisms motors
-     */
-    public void manualDriveMechanism(Double percentOut);
-
-    /**
-     * Stops the mechanism
-     */
-    public void stopMechanism();
+    public Boolean setMechanismDegrees(Double degrees);
 
     /**
      * @return the current angle of the mechanism
@@ -47,18 +31,4 @@ public interface Wrist {
      * @return the voltage of the intake motor
      */
     public Double getIntakeVoltage();
-
-    /**
-     * Stops the intake
-     */
-    public void stopIntake();
-
-    /**
-     * Plays a chirp on the motors to signify an error
-     */
-    public void playErrorTone();
-
-    public void periodic();
-
-    public void setupShuffleboard(ShuffleboardTab tab);
 }

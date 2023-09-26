@@ -13,13 +13,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
-import frc.robot.util.ErrorHelper.*;
 
 public class WristReal implements Wrist {
 
     private final TalonFX wristMotor, intakeMotor;
 
     private final StatusSignal<Double> wristMotorRots, wristMotorVelo, wristMotorAmps;
+
+    private Boolean isHomed = false;
 
     public WristReal() {
         wristMotor = new TalonFX(kWrist.MOTOR_ID);
@@ -89,19 +90,23 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismDegrees(Double degrees) {
+    public Boolean setMechanismDegrees(Double degrees) {
         if (degrees > kWrist.MAX_DEGREES) {
-            return Result.err(new SetpointTooHigh(kWrist.MAX_DEGREES, degrees));
+            new SetpointTooHigh(kWrist.MIN_DEGREES, degrees).log();
+            return false;
         } else if (degrees < kWrist.MIN_DEGREES) {
-            return Result.err(new SetpointTooLow(kWrist.MIN_DEGREES, degrees));
+            new SetpointTooLow(kWrist.MIN_DEGREES, degrees).log();
+            return false;
         }
+        isHomed = false;
         var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
-        return Result.ok(new Ok());
+        return Math.abs(degrees - getMechanismDegrees()) < kWrist.TOLERANCE;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
+        isHomed = false;
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.wristMotor.setControl(percentControlRequest);
     }
@@ -118,43 +123,6 @@ public class WristReal implements Wrist {
                 * 360.0
                 * kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
-
-    // @Override
-    // public void zeroMechanism() {
-    //     // disable soft limits to not interfere with zeroing
-    //     var softLimitCfg = new SoftwareLimitSwitchConfigs();
-    //     wristMotor.getConfigurator().refresh(softLimitCfg);
-    //     softLimitCfg.ForwardSoftLimitEnable = false;
-    //     softLimitCfg.ReverseSoftLimitEnable = false;
-    //     wristMotor.getConfigurator().apply(softLimitCfg);
-
-    //     var currentSignal = wristMotor.getTorqueCurrent();
-    //     currentSignal.setUpdateFrequency(250);
-
-    //     var timer = new Timer();
-
-    //     // start timer an motor, monitor current. this could also use moving average if
-    //     // needed
-    //     timer.start();
-    //     wristMotor.set(0.1);
-    //     while (currentSignal.getValue() < kWrist.CURRENT_PEAK_FOR_ZERO) {
-    //         if (timer.hasElapsed(1.0)) {
-    //             // took too long, stop motor and report error. NO ZERO
-    //             wristMotor.set(0.0);
-    //             DriverStation.reportError("Wrist Motor Zero Timeout", false);
-    //             return;
-    //         }
-    //     }
-
-    //     // stop motor, reset encoder
-    //     wristMotor.set(mechDegreesToMotorRots(kWrist.MAX_DEGREES));
-    //     wristMotor.setRotorPosition(0);
-
-    //     // set soft limits
-    //     softLimitCfg.ForwardSoftLimitEnable = true;
-    //     softLimitCfg.ReverseSoftLimitEnable = true;
-    //     wristMotor.getConfigurator().apply(softLimitCfg);
-    // }
 
     @Override
     public Double getMechanismCurrent() {
@@ -173,14 +141,6 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void stopIntake() {
-        this.intakeMotor.setVoltage(0.0);
-    }
-
-    @Override
-    public void playErrorTone() {}
-
-    @Override
     public void periodic() {
     }
 
@@ -190,5 +150,19 @@ public class WristReal implements Wrist {
             .withSize(2, 1);
         tab.addDouble("Wrist Volts", () -> wristMotor.getSupplyVoltage().getValue())
             .withSize(2, 1);
+    }
+
+    @Override
+    public Boolean homeMechanism() {
+        if (isHomed) {
+            return true;
+        }
+        this.manualDriveMechanism(0.1);
+        if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
+            this.stopMechanism();
+            this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES));
+            isHomed = true;
+        }
+        return isHomed;
     }
 }

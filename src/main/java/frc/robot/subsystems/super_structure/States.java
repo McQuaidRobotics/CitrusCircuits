@@ -5,11 +5,11 @@ import frc.robot.GamepieceMode;
 public enum States {
     START(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
     HOME(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
-    PLACE_STANDBY(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
+    STANDBY(10.0, 10.0, 10.0, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
     PLACE_HIGH(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_MID(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_LOW(10.0, 10.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
-    PICKUP_FLOOR(10.0, 10.0, 10.0, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
+    PICKUP_GROUND(10.0, 10.0, 10.0, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
     PICKUP_STATION(10.0, 10.0, 10.0, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH);
 
     public final Double pivotDegrees;
@@ -27,7 +27,6 @@ public enum States {
         this.intakeRequest = intakeRequest;
         this.intakeBehavior = intakeBehavior;
     }
-
 
     public enum IntakeRequest {
         IDLE(0.0, 0.0),
@@ -80,14 +79,14 @@ public enum States {
             this.intakeVoltage = intakeVoltage;
         }
 
-        /**Does not check intake */
+        /** Does not check intake */
         public boolean reachedState(SuperStructurePosition pose) {
             return Math.abs(pose.pivotDegrees - pivotDegrees) < 0.1 &&
                     Math.abs(pose.wristDegrees - wristDegrees) < 0.1 &&
                     Math.abs(pose.elevatorMeters - elevatorMeters) < 0.05;
         }
 
-        /**Does not set intake */
+        /** Does not set intake */
         public static SuperStructurePosition fromState(States state) {
             return new SuperStructurePosition(
                     state.wristDegrees, state.pivotDegrees,

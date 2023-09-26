@@ -27,4 +27,8 @@ public class Transitions {
             );
         });
     }
+
+    public static Command homeTransition(TransitionData data) {
+        return data.superStructure.run(() -> data.superStructure.home());
+    }
 }

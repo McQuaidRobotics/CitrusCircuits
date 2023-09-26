@@ -58,7 +58,7 @@ public class StateManager {
     private static Map<States, Map<States, Function<TransitionData, Command>>> transitions;
 
     static {
-        fromAllStates(States.HOME, null);
+        fromAllStates(States.HOME, Transitions::homeTransition);
     }
 
 
@@ -87,9 +87,10 @@ public class StateManager {
         private Boolean innerInit = false;
         private Boolean innerFinish = false;
 
-        public CmdTransitionState(SuperStructure superStructure, States to) {
+        public CmdTransitionState(final SuperStructure superStructure, final States to) {
             this.superStructure = superStructure;
             this.to = to;
+            addRequirements(superStructure);
         }
 
         @Override
@@ -113,10 +114,13 @@ public class StateManager {
 
         @Override
         public void execute() {
+            Double endEffectorVolts = 0.0;
+
             if (deadCycles > 0) {
                 deadCycles--;
                 return;
             }
+
             if (!innerInit) {
                 this.innerCmd.initialize();
             }
@@ -128,18 +132,25 @@ public class StateManager {
                 this.innerFinish = true;
             }
 
+            if (from.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME || from.intakeBehavior == IntakeBehavior.RUN_ON_START) {
+                endEffectorVolts = to.intakeRequest.getVoltage();
+            }
+
             if (superStructure.reachedSetpoint()) {
                 if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
-                    superStructure.runEndEffector(0.0);
+                    endEffectorVolts = 0.0;
                 } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_REACH) {
-                    superStructure.runEndEffector(to.intakeRequest.getVoltage());
+                    endEffectorVolts = to.intakeRequest.getVoltage();
                 } 
             }
+
+            superStructure.runEndEffector(endEffectorVolts);
         }
 
         @Override
         public void end(boolean interrupted) {
             superStructure.runEndEffector(0.0);
+            from = null;
         }
 
         @Override

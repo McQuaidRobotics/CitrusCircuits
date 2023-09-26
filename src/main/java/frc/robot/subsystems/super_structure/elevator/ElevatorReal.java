@@ -13,7 +13,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 import frc.robot.subsystems.super_structure.Errors.*;
-import frc.robot.util.ErrorHelper.*;
 
 public class ElevatorReal implements Elevator {
     /**Right */
@@ -72,16 +71,18 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismMeters(Double meters) {
+    public Boolean setMechanismMeters(Double meters) {
         if (meters < Specs.ELEVATOR_MIN_METERS) {
-            return Result.err(new SetpointTooLow(Specs.ELEVATOR_MIN_METERS, meters));
+            new SetpointTooLow(Specs.ELEVATOR_MIN_METERS, meters).log();
+            return false;
         } else if (meters > Specs.ELEVATOR_MAX_METERS) {
-            return Result.err(new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters));
+            new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters).log();
+            return false;
         }
 
         var posControlRequest = new MotionMagicVoltage(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
-        return Result.ok(new Ok());
+        return Math.abs(meters - getMechanismMeters()) < kPivot.TOLERANCE;
     }
 
     @Override
@@ -97,6 +98,11 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
+    public void stopMechanism() {
+        this.leaderMotor.setVoltage(0.0);;
+    }
+
+    @Override
     public Boolean isLimitSwitchHit() {
         switch (leaderMotor.getReverseLimit().getValue()) {
             case ClosedToGround:
@@ -104,6 +110,19 @@ public class ElevatorReal implements Elevator {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public Boolean homeMechanism() {
+        if (this.isLimitSwitchHit()) {
+            return true;
+        }
+        this.manualDriveMechanism(-0.1);
+        if (this.isLimitSwitchHit()) {
+            this.stopMechanism();
+            this.leaderMotor.setRotorPosition(0.0);
+        }
+        return this.isLimitSwitchHit();
     }
 
     @Override

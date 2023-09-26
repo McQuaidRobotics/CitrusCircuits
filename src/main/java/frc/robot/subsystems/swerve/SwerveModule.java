@@ -28,6 +28,7 @@ public class SwerveModule {
 
     public final int moduleNumber;
     private final Rotation2d rotationOffset;
+    @SuppressWarnings("unused")
     private final Translation2d moduleChassisPose;
     private Rotation2d lastAngle = new Rotation2d();
 

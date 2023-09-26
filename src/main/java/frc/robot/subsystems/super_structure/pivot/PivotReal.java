@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
-import frc.robot.util.ErrorHelper.*;
 
 public class PivotReal implements Pivot {
 
@@ -21,7 +20,9 @@ public class PivotReal implements Pivot {
     /** Right */
     private final TalonFX followerMotor;
 
-    private final StatusSignal<Double> motorRots, motorVelo;
+    private final StatusSignal<Double> motorRots, motorVelo, motorAmps;
+
+    private Boolean isHomed = false;
 
     public PivotReal() {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
@@ -31,6 +32,7 @@ public class PivotReal implements Pivot {
 
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
+        motorAmps = leaderMotor.getStatorCurrent();
 
         followerMotor.setControl(
             new Follower(kPivot.LEFT_MOTOR_ID, true)
@@ -70,19 +72,23 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Result<Ok, GroupError<SuperStructureErrors>> setMechanismDegrees(Double degrees) {
+    public Boolean setMechanismDegrees(Double degrees) {
         if (degrees > kPivot.MAX_DEGREES) {
-            return Result.err(new SetpointTooHigh(kPivot.MAX_DEGREES, degrees));
+            new SetpointTooHigh(kPivot.MAX_DEGREES, degrees).log();
+            return false;
         } else if (degrees < kPivot.MIN_DEGREES) {
-            return Result.err(new SetpointTooLow(kPivot.MIN_DEGREES, degrees));
+            new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
+            return false;
         }
+        isHomed = false;
         var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
-        return Result.ok(new Ok());
+        return Math.abs(degrees - getMechanismDegrees()) < kPivot.TOLERANCE;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
+        isHomed = false;
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
     }
@@ -101,12 +107,18 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public void zeroMechanism() {
-
+    public Boolean homeMechanism() {
+        if (isHomed) {
+            return true;
+        }
+        this.manualDriveMechanism(-0.1);
+        if (motorAmps.getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
+            this.stopMechanism();
+            this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
+            isHomed = true;
+        }
+        return isHomed;
     }
-
-    @Override
-    public void playErrorTone() {}
 
     @Override
     public void periodic() {}

@@ -6,7 +6,19 @@
   },
   "NetworkTables": {
     "transitory": {
-      "SmartDashboard": {
+      "Shuffleboard": {
+        "Driver": {
+          "Gamepiece Mode": {
+            "open": true
+          },
+          "Pickup Mode": {
+            "open": true
+          },
+          "Score Levels": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       }
     }

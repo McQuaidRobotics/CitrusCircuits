@@ -19,4 +19,8 @@ public interface Elevator extends Component {
      * @return if the reverse limit switch is activated
      */
     public Boolean isLimitSwitchHit();
+
+    default public void hold() {
+        setMechanismMeters(getMechanismMeters());
+    }
 }

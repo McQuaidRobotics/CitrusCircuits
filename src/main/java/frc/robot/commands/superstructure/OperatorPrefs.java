@@ -19,7 +19,7 @@ public class OperatorPrefs {
 
     public static enum ScoreLevel {
         LOW,
-        MIDDLE,
+        MID,
         HIGH;
 
         private static ScoreLevel currentLevel = HIGH;
@@ -32,6 +32,5 @@ public class OperatorPrefs {
             return currentLevel;
         }
     }
-
 
 }

@@ -54,6 +54,10 @@ public enum States {
                 return voltageCube;
             }
         }
+
+        public boolean getCurrentLimitEnabled() {
+            return this != OUTTAKING;
+        }
     }
 
     public enum IntakeBehavior {

@@ -74,7 +74,7 @@ public final class Constants {
             public static final boolean INVERTED = true;
             public static final boolean BREAK_DEFAULT = true;
 
-            public static final double CURRENT_LIMIT = 40.0;
+            public static final double CURRENT_LIMIT = 15.0;
         }
 
         public static final class kPivot {

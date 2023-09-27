@@ -15,10 +15,9 @@ public interface Wrist extends Component {
      */
     public Double getMechanismDegrees();
 
-    /**
-     * @return the current draw of the mechanism
-     */
-    public Double getMechanismCurrent();
+    default public void hold() {
+        setMechanismDegrees(getMechanismDegrees());
+    }
 
     /**
      * Runs the intake at a given percent output
@@ -31,4 +30,9 @@ public interface Wrist extends Component {
      * @return the voltage of the intake motor
      */
     public Double getIntakeVoltage();
+
+    /**
+     * @param enable true to enable current limits, false to disable
+     */
+    public void enableIntakeCurrentLimits(Boolean enable);
 }

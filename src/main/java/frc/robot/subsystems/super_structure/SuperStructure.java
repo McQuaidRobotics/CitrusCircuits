@@ -2,7 +2,7 @@ package frc.robot.subsystems.super_structure;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -63,26 +63,33 @@ public class SuperStructure extends SubsystemBase {
             //if they have, run pivot
             if (runWristElevator.getAsBoolean()) {
                 return pivot.getAsBoolean();
-            }
+            }// else {
+            //    this.pivot.hold();
+            //}
         } else {
             if (pivot.getAsBoolean()) {
                 return runWristElevator.getAsBoolean();
-            }
+            }// else {
+            //    this.elevator.hold();
+            //    this.wrist.hold();
+            //}
         }
         return false;
-        // return pivot.getAsBoolean();
     }
 
     public Boolean home() {
         // always home elevator/wrist then home pivot
         if (this.elevator.homeMechanism() && this.wrist.homeMechanism()) {
             return this.pivot.homeMechanism();
-        }
+        }// else {
+        //    this.pivot.hold();
+        //}
         return false;
-        // return this.elevator.homeMechanism();
     }
 
-    public void runEndEffector(Double volts) {
+    public void runEndEffector(Double volts, Boolean currentLimits) {
+        //when outtaking this should be false
+        this.wrist.enableIntakeCurrentLimits(currentLimits);
         //assume max voltage is 12.0
         this.wrist.runIntake(volts / 12.0);
     }
@@ -137,9 +144,9 @@ public class SuperStructure extends SubsystemBase {
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
                 .withSize(2, 1);
 
-        wrist.setupShuffleboard(tab.getLayout("Wrist", "kList"));
-        pivot.setupShuffleboard(tab.getLayout("Pivot", "kList"));
-        elevator.setupShuffleboard(tab.getLayout("Elevator", "kList"));
+        wrist.setupShuffleboard(tab.getLayout("Wrist", BuiltInLayouts.kList));
+        pivot.setupShuffleboard(tab.getLayout("Pivot", BuiltInLayouts.kList));
+        elevator.setupShuffleboard(tab.getLayout("Elevator", BuiltInLayouts.kList));
     }
 
     @Override

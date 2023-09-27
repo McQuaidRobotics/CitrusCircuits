@@ -116,7 +116,8 @@ public class StateManager {
             this.innerFinish = false;
             this.deadCycles = 0;
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
-                superStructure.runEndEffector(from.intakeRequest.getVoltage());
+                superStructure.runEndEffector(
+                    from.intakeRequest.getVoltage(), from.intakeRequest.getCurrentLimitEnabled());
                 this.deadCycles = 10;
             }
         }
@@ -156,12 +157,12 @@ public class StateManager {
                 } 
             }
 
-            superStructure.runEndEffector(endEffectorVolts);
+            superStructure.runEndEffector(endEffectorVolts, to.intakeRequest.getCurrentLimitEnabled());
         }
 
         @Override
         public void end(boolean interrupted) {
-            superStructure.runEndEffector(0.0);
+            superStructure.runEndEffector(0.0, true);
             from = null;
         }
 

@@ -38,11 +38,6 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Double getMechanismCurrent() {
-        return 0.0;
-    }
-
-    @Override
     public void runIntake(Double percentOut) {
         this.intakeVelocity.setTargetVelocity(6480.0 * percentOut);
     }
@@ -60,4 +55,7 @@ public class WristSim implements Wrist {
         wristDegrees.setTargetPosition(kWrist.HOME_DEGREES);
         return true;
     }
+
+    @Override
+    public void enableIntakeCurrentLimits(Boolean enable) {}
 }

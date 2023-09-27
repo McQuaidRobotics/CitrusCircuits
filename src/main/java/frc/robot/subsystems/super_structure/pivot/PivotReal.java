@@ -62,7 +62,7 @@ public class PivotReal implements Pivot {
         motorCfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechDegreesToMotorRots(
                 kPivot.MIN_DEGREES);
 
-        motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         motorCfg.MotorOutput.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;

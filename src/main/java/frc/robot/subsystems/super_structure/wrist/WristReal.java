@@ -3,6 +3,7 @@ package frc.robot.subsystems.super_structure.wrist;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -89,8 +90,9 @@ public class WristReal implements Wrist {
         intakeMotorCfg.MotorOutput.Inverted = kIntake.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        intakeMotorCfg.CurrentLimits.StatorCurrentLimitEnable = kIntake.CURRENT_LIMIT != 0;
-        intakeMotorCfg.CurrentLimits.StatorCurrentLimit = kIntake.CURRENT_LIMIT;
+        intakeMotorCfg.CurrentLimits.SupplyCurrentLimitEnable = kIntake.CURRENT_LIMIT != 0;
+        intakeMotorCfg.CurrentLimits.SupplyCurrentThreshold = kIntake.CURRENT_LIMIT;
+        intakeMotorCfg.CurrentLimits.SupplyTimeThreshold = 0.5;
 
         return intakeMotorCfg;
     }
@@ -134,11 +136,6 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public Double getMechanismCurrent() {
-        return wristMotorAmps.getValue();
-    }
-
-    @Override
     public void runIntake(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.intakeMotor.setControl(percentControlRequest);
@@ -147,6 +144,14 @@ public class WristReal implements Wrist {
     @Override
     public Double getIntakeVoltage() {
         return intakeMotor.getSupplyVoltage().getValue();
+    }
+
+    @Override
+    public void enableIntakeCurrentLimits(Boolean enable) {
+        var cfg = new CurrentLimitsConfigs();
+        this.intakeMotor.getConfigurator().refresh(cfg);
+        cfg.SupplyCurrentLimitEnable = enable;
+        this.intakeMotor.getConfigurator().apply(cfg);
     }
 
     @Override

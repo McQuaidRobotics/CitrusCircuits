@@ -39,7 +39,7 @@ public final class Constants {
             public static final double MAX_ACCELERATION = 750;
             public static final double MAX_JERK = 5000;
 
-            public static final boolean INVERTED = true;
+            public static final boolean INVERTED = false;
 
             /**
              * Zero is parallel with the elevator
@@ -131,8 +131,8 @@ public final class Constants {
         }
 
         public static final class kElevator {
-            public static final int ELEVATOR_LEFT_MOTOR_ID = 16;
-            public static final int ELEVATOR_RIGHT_MOTOR_ID = 17;
+            public static final int ELEVATOR_LEFT_MOTOR_ID = 17;
+            public static final int ELEVATOR_RIGHT_MOTOR_ID = 16;
 
             public static final double MOTOR_kP = 1.0;
             public static final double MOTOR_kD = 0.0;
@@ -142,7 +142,7 @@ public final class Constants {
 
             public static final boolean ENABLE_SOFTLIMITS = false;
 
-            public static final boolean INVERTED = false;
+            public static final boolean INVERTED = true;
 
             public static final double MAX_VELOCITY = 100;
             public static final double MAX_ACCELERATION = 750;

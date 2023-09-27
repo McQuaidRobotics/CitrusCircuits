@@ -128,8 +128,7 @@ public class WristReal implements Wrist {
 
     @Override
     public Double getMechanismDegrees() {
-        BaseStatusSignal.waitForAll(0, wristMotorRots, wristMotorVelo);
-        return BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots, wristMotorVelo)
+        return BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh())
                 * 360.0
                 * kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
@@ -156,16 +155,14 @@ public class WristReal implements Wrist {
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
-        BaseStatusSignal.waitForAll(0, wristMotorRots, wristMotorVelo, wristMotorAmps,
-                wristMotorVolts, intakeMotorAmps, intakeMotorVolts);
-        tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue());
-        tab.addDouble("Wrist Volts", () -> wristMotorVolts.getValue());
-        tab.addDouble("Wrist Rots", () -> wristMotorRots.getValue());
-        tab.addDouble("Wrist Velo", () -> wristMotorVelo.getValue());
+        tab.addDouble("Wrist Amps", () -> wristMotorAmps.refresh().getValue());
+        tab.addDouble("Wrist Volts", () -> wristMotorVolts.refresh().getValue());
+        tab.addDouble("Wrist Rots", () -> wristMotorRots.refresh().getValue());
+        tab.addDouble("Wrist Velo", () -> wristMotorVelo.refresh().getValue());
         tab.addBoolean("Wrist Homed", () -> isHomed);
 
-        tab.addDouble("Intake Amps", () -> intakeMotorAmps.getValue());
-        tab.addDouble("Intake Volts", () -> intakeMotorVolts.getValue());
+        tab.addDouble("Intake Amps", () -> intakeMotorAmps.refresh().getValue());
+        tab.addDouble("Intake Volts", () -> intakeMotorVolts.refresh().getValue());
     }
 
     @Override
@@ -177,7 +174,7 @@ public class WristReal implements Wrist {
             this.massSoftLimits(false, wristMotor);
             this.softLimitsEnabled = false;
         }
-        this.manualDriveMechanism(0.1);
+        this.manualDriveMechanism(0.2);
         if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
             this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES));

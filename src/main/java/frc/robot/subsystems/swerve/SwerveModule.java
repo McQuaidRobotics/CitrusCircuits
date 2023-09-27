@@ -101,9 +101,8 @@ public class SwerveModule {
     }
 
     public Rotation2d getAngle() {
-        BaseStatusSignal.waitForAll(0, encoderPosStatus, encoderVeloStatus);
         return Rotation2d.fromRotations(
-                BaseStatusSignal.getLatencyCompensatedValue(encoderPosStatus, encoderVeloStatus));
+                BaseStatusSignal.getLatencyCompensatedValue(encoderPosStatus.refresh(), encoderVeloStatus.refresh()));
     }
 
     public void setAngle(SwerveModuleState desiredState) {

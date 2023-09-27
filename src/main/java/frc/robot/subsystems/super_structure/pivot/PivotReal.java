@@ -1,6 +1,5 @@
 package frc.robot.subsystems.super_structure.pivot;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -107,10 +106,7 @@ public class PivotReal implements Pivot {
 
     @Override
     public Double getMechanismDegrees() {
-        BaseStatusSignal.waitForAll(0, motorRots, motorVelo);
-        return BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
-                * 360.0
-                * kPivot.MOTOR_TO_MECHANISM_RATIO;
+        return motorRots.refresh().getValue() * 360.0 * kPivot.MOTOR_TO_MECHANISM_RATIO;
     }
 
     @Override
@@ -122,10 +118,11 @@ public class PivotReal implements Pivot {
             this.massSoftLimits(false, leaderMotor);
             this.softLimitsEnabled = false;
         }
-        this.manualDriveMechanism(-0.1);
+        //TODO: move to 0 via pose then switch to open loop
+        this.manualDriveMechanism(-0.15);
         if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
-            this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
+            this.leaderMotor.setRotorPosition(-15.0);//mechDegreesToMotorRots(kPivot.HOME_DEGREES - 10.0);
             isHomed = true;
         }
         return isHomed;
@@ -136,11 +133,10 @@ public class PivotReal implements Pivot {
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
-        BaseStatusSignal.waitForAll(0, motorRots, motorVelo, motorAmps, motorVolts);
-        tab.addNumber("Pivot Rots", () -> motorRots.getValue());
-        tab.addNumber("Pivot Velo", () -> motorVelo.getValue());
-        tab.addNumber("Pivot Amps", () -> motorAmps.getValue());
-        tab.addNumber("Pivot Volts", () -> motorVolts.getValue());
+        tab.addNumber("Pivot Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
+        tab.addNumber("Pivot Motor Amps", () -> motorAmps.refresh().getValue());
+        tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
         tab.addBoolean("Pivot Homed", () -> isHomed);
     }
 }

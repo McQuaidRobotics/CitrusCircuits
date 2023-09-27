@@ -65,7 +65,7 @@ public class StateManager {
      * default is simply setting the motors to the states' setpoints
      * WARNING: be careful of the order you edit the map in
      */
-    private static Map<States, Map<States, Function<TransitionData, Command>>> transitions;
+    private static Map<States, Map<States, Function<TransitionData, Command>>> transitions = new HashMap<>();
 
     static {
         //without this the superstructure will never reseed

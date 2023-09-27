@@ -10,7 +10,7 @@ public enum States {
     STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME),
     PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, elevRelative(1.04), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_MID(kPivot.SCORE_DEGREES, -23.2, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
-    PLACE_LOW(kPivot.SCORE_DEGREES, 15.0, 10.0, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
+    PLACE_LOW(kPivot.SCORE_DEGREES, 15.0, kElevator.HOME_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PICKUP_GROUND(kPivot.HOME_DEGREES, 21.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
     PICKUP_STATION(60.11, -50.0, elevRelative(0.579), IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH);
 

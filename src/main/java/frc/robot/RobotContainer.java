@@ -37,31 +37,6 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(translationAxis),
                         () -> -driveController.getRawAxis(strafeAxis),
                         () -> -driveController.getRawAxis(rotationAxis)));
-
-        // superStructure.setDefaultCommand(
-        // Commands.manualControl(
-        // superStructure,
-        // // () -> driveController.getRawAxis(XboxController.Axis.kRightY.value),
-        // () -> 0.0,
-        // () -> driveController.getRawAxis(XboxController.Axis.kLeftY.value),
-        // // () -> 0.0,
-        // // () -> driveController.getLeftTriggerAxis() -
-        // driveController.getRightTriggerAxis(),
-        // () -> driveController.getRawAxis(XboxController.Axis.kRightY.value),
-        // () -> {
-        // if (driveController.getAButton() && driveController.getBButton()) {
-        // return 0.0;
-        // }
-        // if (driveController.getAButton()) {
-        // return 1.0;
-        // }
-        // if (driveController.getBButton()) {
-        // return -1.0;
-        // }
-        // return 0.0;
-        // }
-        // )
-        // );
     }
 
     private void configureDriverBindings() {
@@ -70,6 +45,14 @@ public class RobotContainer {
         driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
         driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+
+
+        driveController.pov(180).onTrue(new InstantCommand(() -> superStructure.runEndEffector(12.0), superStructure));
+        driveController.pov(0).onTrue(new InstantCommand(() -> superStructure.runEndEffector(-12.0), superStructure));
+        driveController.pov(90).onTrue(new InstantCommand(() -> superStructure.runEndEffector(0.0), superStructure));
+
+
+
 
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));

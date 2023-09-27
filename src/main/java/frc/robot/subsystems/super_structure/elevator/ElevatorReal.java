@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
@@ -21,6 +22,8 @@ public class ElevatorReal implements Elevator {
     /**Left */
     private final TalonFX followerMotor;
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
+
+    private Boolean isHomed = false;
 
     public ElevatorReal() {
         // Right
@@ -62,8 +65,8 @@ public class ElevatorReal implements Elevator {
         motorConfig.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;
         motorConfig.MotionMagic.MotionMagicJerk = kElevator.MAX_JERK;
 
-        motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = kElevator.ENABLE_SOFTLIMITS;
-        motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechMetersToMotorRots(Specs.ELEVATOR_MAX_METERS);
+        // motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = kElevator.ENABLE_SOFTLIMITS;
+        // motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechMetersToMotorRots(Specs.ELEVATOR_MAX_METERS);
 
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -82,7 +85,7 @@ public class ElevatorReal implements Elevator {
             new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters).log();
             return false;
         }
-
+        this.isHomed = true;
         var posControlRequest = new MotionMagicVoltage(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(meters - getMechanismMeters()) < kPivot.TOLERANCE;
@@ -90,14 +93,14 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Double getMechanismMeters() {
-        BaseStatusSignal.waitForAll(0, motorRots, motorVelo);
-        return motorRotsToMechMeters(BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
+        return motorRotsToMechMeters(BaseStatusSignal.getLatencyCompensatedValue(motorRots.refresh(), motorVelo.refresh()));
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
+        this.isHomed = false;
     }
 
     @Override
@@ -107,23 +110,22 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Boolean isLimitSwitchHit() {
-        switch (leaderMotor.getReverseLimit().refresh().getValue()) {
-            case ClosedToGround:
-                return true;
-            default:
-                return false;
+        if (leaderMotor.getReverseLimit().refresh().getValue() == ReverseLimitValue.ClosedToGround) {
+            return true;
         }
+        return false;
     }
 
     @Override
     public Boolean homeMechanism() {
-        if (this.isLimitSwitchHit()) {
+        if (this.isHomed) {
             return true;
         }
-        this.manualDriveMechanism(-0.1);
+        this.manualDriveMechanism(-0.15);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
             this.leaderMotor.setRotorPosition(0.0);
+            this.isHomed = true;
         }
         return this.isLimitSwitchHit();
     }
@@ -133,10 +135,10 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
-        BaseStatusSignal.waitForAll(0, motorRots, motorVelo, motorAmps, motorVolts);
-        tab.addNumber("Elevator Rots", () -> motorRots.getValue());
-        tab.addNumber("Elevator Velo", () -> motorVelo.getValue());
-        tab.addNumber("Elevator Amps", () -> motorAmps.getValue());
-        tab.addNumber("Elevator Volts", () -> motorVolts.getValue());
+        tab.addNumber("Elevator Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addNumber("Elevator Motor Velo", () -> motorVelo.refresh().getValue());
+        tab.addNumber("Elevator Motor Amps", () -> motorAmps.refresh().getValue());
+        tab.addNumber("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
+        tab.addBoolean("Elevator LimitSwitch", this::isLimitSwitchHit);
     }
 }

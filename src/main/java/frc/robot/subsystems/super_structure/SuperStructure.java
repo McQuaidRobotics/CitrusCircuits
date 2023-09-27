@@ -2,6 +2,7 @@ package frc.robot.subsystems.super_structure;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -69,14 +70,16 @@ public class SuperStructure extends SubsystemBase {
             }
         }
         return false;
+        // return pivot.getAsBoolean();
     }
 
     public Boolean home() {
-        //always home elevator/wrist then home pivot
+        // always home elevator/wrist then home pivot
         if (this.elevator.homeMechanism() && this.wrist.homeMechanism()) {
             return this.pivot.homeMechanism();
         }
         return false;
+        // return this.elevator.homeMechanism();
     }
 
     public void runEndEffector(Double volts) {
@@ -134,9 +137,9 @@ public class SuperStructure extends SubsystemBase {
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
                 .withSize(2, 1);
 
-        wrist.setupShuffleboard(tab.getLayout("Wrist"));
-        pivot.setupShuffleboard(tab.getLayout("Pivot"));
-        elevator.setupShuffleboard(tab.getLayout("Elevator"));
+        wrist.setupShuffleboard(tab.getLayout("Wrist", "kList"));
+        pivot.setupShuffleboard(tab.getLayout("Pivot", "kList"));
+        elevator.setupShuffleboard(tab.getLayout("Elevator", "kList"));
     }
 
     @Override

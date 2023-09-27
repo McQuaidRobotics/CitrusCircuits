@@ -25,7 +25,7 @@ public class WristReal implements Wrist {
     private Boolean isHomed = false;
     private Boolean softLimitsEnabled = true;
 
-    public WristReal() {
+    public WristReal(Double startingDegrees) {
         wristMotor = new TalonFX(kWrist.MOTOR_ID);
         wristMotor.getConfigurator().apply(getWristMotorConfig());
 
@@ -33,6 +33,8 @@ public class WristReal implements Wrist {
         wristMotorVelo = wristMotor.getRotorVelocity();
         wristMotorAmps = wristMotor.getStatorCurrent();
         wristMotorVolts = wristMotor.getSupplyVoltage();
+
+        wristMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
 
         intakeMotor = new TalonFX(kIntake.MOTOR_ID);
         intakeMotor.getConfigurator().apply(getIntakeMotorConfig());

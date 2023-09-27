@@ -2,6 +2,7 @@ package frc.robot.subsystems.super_structure;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,20 +27,23 @@ public class SuperStructure extends SubsystemBase {
 
     public SuperStructure() {
         if (Robot.isReal()) {
-            this.wrist = new WristReal();
-            this.pivot = new PivotReal();
-            this.elevator = new ElevatorReal();
+            this.wrist = new WristReal(setpoint.wristDegrees);
+            this.pivot = new PivotReal(setpoint.pivotDegrees);
+            this.elevator = new ElevatorReal(setpoint.elevatorMeters);
         } else {
-            this.wrist = new WristSim();
-            this.pivot = new PivotSim();
-            this.elevator = new ElevatorSim();
+            this.wrist = new WristSim(setpoint.wristDegrees);
+            this.pivot = new PivotSim(setpoint.pivotDegrees);
+            this.elevator = new ElevatorSim(setpoint.elevatorMeters);
         }
         setupShuffleboard();
+        visualizer.updateSetpoint(setpoint);
+        visualizer.updateCurrent(setpoint);
     }
 
     /**@returns true of the setpoint has been reached */
     public Boolean setSetpoint(SuperStructurePosition pose) {
         this.visualizer.updateSetpoint(pose);
+        this.setpoint = pose;
 
         //only pivot or wrist+elevator should run at a time
         BooleanSupplier runWristElevator = () -> {
@@ -78,6 +82,8 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public Boolean home() {
+        this.setpoint = SuperStructurePosition.fromState(States.HOME);
+        this.visualizer.updateSetpoint(this.setpoint);
         // always home elevator/wrist then home pivot
         if (this.elevator.homeMechanism() && this.wrist.homeMechanism()) {
             return this.pivot.homeMechanism();
@@ -138,7 +144,7 @@ public class SuperStructure extends SubsystemBase {
                 .withSize(2, 1);
         tab.addDouble("Pivot Current Degrees", () -> this.pivot.getMechanismDegrees())
                 .withSize(2, 1);
-        tab.addDouble("Elevator Current Degrees", () -> this.elevator.getMechanismMeters())
+        tab.addDouble("Elevator Current Meters", () -> this.elevator.getMechanismMeters())
                 .withSize(2, 1);
 
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
@@ -147,6 +153,8 @@ public class SuperStructure extends SubsystemBase {
         wrist.setupShuffleboard(tab.getLayout("Wrist", BuiltInLayouts.kList));
         pivot.setupShuffleboard(tab.getLayout("Pivot", BuiltInLayouts.kList));
         elevator.setupShuffleboard(tab.getLayout("Elevator", BuiltInLayouts.kList));
+
+        visualizer.setShuffleboardTab(tab);
     }
 
     @Override
@@ -155,5 +163,9 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.periodic();
         this.elevator.periodic();
         this.pivot.periodic();
+
+        if (DriverStation.isDisabled() && this.getCurrentCommand() != null) {
+            this.getCurrentCommand().cancel();
+        }
     }
 }

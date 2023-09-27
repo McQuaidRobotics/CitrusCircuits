@@ -167,7 +167,7 @@ public final class Constants {
             public static final double ARM_MASS_GRAMS = 9500;
 
             public static final double ELEVATOR_MIN_METERS = 0.51562;
-            public static final double ELEVATOR_MAX_METERS = 1.39192;
+            public static final double ELEVATOR_MAX_METERS = ELEVATOR_MIN_METERS + 1.04;
 
             public static final double PIVOT_MIN_ANGLE = -7.0;
             public static final double PIVOT_MAX_ANGLE = 90.0;
@@ -178,7 +178,7 @@ public final class Constants {
             public static final double WRIST_MAX_ANGLE = 149.39;
 
             public static final Transform3d PIVOT_OFFSET_METERS = new Transform3d(
-                    new Translation3d(0.0, -0.232953, -0.252125),
+                    new Translation3d(0.0, -0.232953, 0.252125),
                     new Rotation3d());
 
             public static final double RIM_ABOVE_FLOOR_METERS = 0.09525;

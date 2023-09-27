@@ -1,5 +1,6 @@
 package frc.robot.subsystems.super_structure;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -20,10 +21,14 @@ public class Visualizer {
         public Visualizer() {
                 mechanism = new Mechanism2d(2.0, 2.0);
 
+                // rootCurrent = mechanism.getRoot(
+                //                 "Pivot Current",
+                //                 Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getY(),
+                //                 Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getZ());
                 rootCurrent = mechanism.getRoot(
                                 "Pivot Current",
-                                Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getY(),
-                                Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getZ());
+                                0.0,
+                                0.0);
                 elevatorCurrent = rootCurrent.append(new MechanismLigament2d(
                                 "Elevator Current",
                                 Constants.kSuperStructure.Specs.ELEVATOR_MIN_METERS,
@@ -37,10 +42,14 @@ public class Visualizer {
                                 0.43,
                                 20));
 
+                // rootSetpoint = mechanism.getRoot(
+                //                 "Pivot Setpoint",
+                //                 Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getY(),
+                //                 Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getZ());
                 rootSetpoint = mechanism.getRoot(
                                 "Pivot Setpoint",
-                                Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getY(),
-                                Constants.kSuperStructure.Specs.PIVOT_OFFSET_METERS.getZ());
+                                0.0,
+                                0.0);
                 elevatorSetpoint = rootSetpoint.append(new MechanismLigament2d(
                                 "Elevator Setpoint",
                                 Constants.kSuperStructure.Specs.ELEVATOR_MIN_METERS,
@@ -57,9 +66,13 @@ public class Visualizer {
                 elevatorSetpoint.setColor(new Color8Bit(170, 180, 180));
                 wristLowerSetpoint.setColor(new Color8Bit(170, 180, 180));
                 wristUpperSetpoint.setColor(new Color8Bit(170, 180, 180));
-                elevatorSetpoint.setLineWeight(7.5);
-                wristLowerSetpoint.setLineWeight(7.5);
-                wristUpperSetpoint.setLineWeight(7.5);
+                elevatorSetpoint.setLineWeight(3.0);
+                wristLowerSetpoint.setLineWeight(3.0);
+                wristUpperSetpoint.setLineWeight(3.0);
+        }
+
+        public void setShuffleboardTab(ShuffleboardTab tab) {
+                tab.add("Superstructure Visualizer", mechanism);
         }
 
         public void updateCurrent(SuperStructurePosition currentForm) {

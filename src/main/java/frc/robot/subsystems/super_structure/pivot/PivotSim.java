@@ -1,13 +1,18 @@
 package frc.robot.subsystems.super_structure.pivot;
 
-import frc.robot.util.SimHelper.SetPoint;
+import frc.robot.util.SimHelper.SimplePoseSim;
 
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
 
 public class PivotSim implements Pivot {
 
-    private final SetPoint pivotDegrees = new SetPoint(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    private final Double maxVelo = 112.0 * 360.0 * kPivot.MOTOR_TO_MECHANISM_RATIO;
+    private final SimplePoseSim pivotDegrees = new SimplePoseSim(maxVelo);
+
+    public PivotSim(Double startingDegrees) {
+        pivotDegrees.instantSetPose(startingDegrees);
+    }
 
     @Override
     public Boolean setMechanismDegrees(Double degrees) {
@@ -19,12 +24,12 @@ public class PivotSim implements Pivot {
             return false;
         }
         pivotDegrees.setTargetPosition(degrees);
-        return false;
+        return Math.abs(pivotDegrees.getPose() - degrees) < 0.1;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
-        pivotDegrees.setTargetVelocity(360.0 * percentOut);
+        pivotDegrees.setTargetVelocity(percentOut * maxVelo);
     }
 
     @Override
@@ -40,10 +45,7 @@ public class PivotSim implements Pivot {
     @Override
     public Boolean homeMechanism() {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
-        return true;
+        return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }
-
-    @Override
-    public void periodic() {}
 
 }

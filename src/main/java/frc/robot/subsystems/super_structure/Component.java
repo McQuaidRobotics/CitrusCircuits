@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 
 public interface Component {
 
-    public void periodic();
+    default public void periodic() {};
 
     default public void setupShuffleboard(ShuffleboardContainer tab) {};
 

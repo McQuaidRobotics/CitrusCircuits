@@ -25,7 +25,7 @@ public class PivotReal implements Pivot {
     private Boolean isHomed = false;
     private Boolean softLimitsEnabled = true;
 
-    public PivotReal() {
+    public PivotReal(Double startingDegrees) {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
         followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID);
         leaderMotor.getConfigurator().apply(getMotorConfig());
@@ -39,6 +39,8 @@ public class PivotReal implements Pivot {
         followerMotor.setControl(
             new Follower(kPivot.LEFT_MOTOR_ID, true)
         );
+
+        leaderMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
     }
 
     private Double mechDegreesToMotorRots(Double mechanismDegrees) {

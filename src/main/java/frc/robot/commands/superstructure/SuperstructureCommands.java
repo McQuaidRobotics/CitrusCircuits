@@ -37,7 +37,7 @@ public class SuperstructureCommands {
      * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_LOW})
      * that will dynamically determine which to use based on
      * {@link OperatorPrefs.ScoreLevel#getCurrentLevel()}.
-     * the decided proxy command can only be changed by calling
+     * The decided proxy command can only be changed by calling
      * {@link #initialize()} again.
      */
     public static class TransitionToPlace extends CommandBase {

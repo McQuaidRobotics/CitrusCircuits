@@ -1,7 +1,15 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/SuperStructure/Superstructure Visualizer": "Mechanism2d"
+    },
+    "windows": {
+      "/Shuffleboard/SuperStructure/Superstructure Visualizer": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -11,10 +19,21 @@
           "Gamepiece Mode": {
             "open": true
           },
-          "Pickup Mode": {
-            "open": true
-          },
           "Score Levels": {
+            "open": true
+          }
+        },
+        "SuperStructure": {
+          "Superstructure Visualizer": {
+            "Pivot Current": {
+              "Elevator Current": {
+                "open": true
+              },
+              "open": true
+            },
+            "Pivot Setpoint": {
+              "open": true
+            },
             "open": true
           },
           "open": true

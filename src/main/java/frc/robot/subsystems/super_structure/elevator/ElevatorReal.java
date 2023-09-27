@@ -25,7 +25,7 @@ public class ElevatorReal implements Elevator {
 
     private Boolean isHomed = false;
 
-    public ElevatorReal() {
+    public ElevatorReal(Double startingMeters) {
         // Right
         leaderMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID);
         leaderMotor.getConfigurator().apply(getMotorConfiguration());
@@ -39,6 +39,8 @@ public class ElevatorReal implements Elevator {
         motorVelo = leaderMotor.getRotorVelocity();
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
+
+        leaderMotor.setRotorPosition(mechMetersToMotorRots(startingMeters));
     }
 
     private Double mechMetersToMotorRots(Double meters) {

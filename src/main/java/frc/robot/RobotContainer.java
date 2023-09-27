@@ -49,13 +49,17 @@ public class RobotContainer {
         // Bumpers/Triggers
         driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
         driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
-        driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
-        driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+        driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+        driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
 
         // used for testing
         // driveController.pov(0).onTrue(new InstantCommand(() -> superStructure.runEndEffector(12.0), superStructure));
         // driveController.pov(180).onTrue(new InstantCommand(() -> superStructure.runEndEffector(-12.0), superStructure));
         // driveController.pov(90).onTrue(new InstantCommand(() -> superStructure.runEndEffector(0.0), superStructure));
+        driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.PICKUP_STATION));
+        driveController.a().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
+        driveController.b().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
+        driveController.y().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
 
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));

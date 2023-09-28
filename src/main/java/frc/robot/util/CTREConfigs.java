@@ -1,10 +1,11 @@
-package frc.robot;
+package frc.robot.util;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 
+import frc.robot.Constants;
 import frc.robot.Constants.kSwerve;
 
 public final class CTREConfigs {

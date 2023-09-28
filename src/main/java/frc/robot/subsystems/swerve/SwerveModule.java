@@ -10,7 +10,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -93,11 +92,11 @@ public class SwerveModule {
                 getAngle());
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+    public void setDesiredState(SwerveModuleState desiredState) {
         desiredState = optimize(desiredState, getAngle());
         SmartDashboard.putNumber("Mod " + this.moduleNumber + " Desired State", desiredState.angle.getDegrees());
         setAngle(desiredState);
-        setSpeed(desiredState, isOpenLoop);
+        setSpeed(desiredState);
     }
 
     public Rotation2d getAngle() {
@@ -114,16 +113,9 @@ public class SwerveModule {
         lastAngle = angle;
     }
 
-    public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+    public void setSpeed(SwerveModuleState desiredState) {
         double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
         var controlRequest = new DutyCycleOut(percentOutput);
-        if (!isOpenLoop) {
-            var slot0Config = new Slot0Configs();
-            slot0Config.kP = kSwerve.DRIVE_KP;
-            slot0Config.kI = kSwerve.DRIVE_KI;
-            slot0Config.kD = kSwerve.DRIVE_KD;
-            driveMotor.getConfigurator().apply(slot0Config);
-        }
         driveMotor.setControl(controlRequest);
     }
 

@@ -1,9 +1,9 @@
 package frc.robot;
 
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
+import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;

@@ -24,6 +24,18 @@ public class ElevatorReal implements Elevator {
 
     private Boolean isHomed = false;
 
+    private Double mechMetersToMotorRots(Double meters) {
+        return ((meters - kElevator.HOME_METERS)
+                / (kElevator.MECHANISM_DIAMETER_METERS * Math.PI))
+                / kElevator.MOTOR_TO_MECHANISM_RATIO;
+    }
+
+    private Double motorRotsToMechMeters(Double motorRots) {
+        return (motorRots * kElevator.MOTOR_TO_MECHANISM_RATIO)
+                * (kElevator.MECHANISM_DIAMETER_METERS * Math.PI)
+                + kElevator.HOME_METERS;
+    }
+
     public ElevatorReal(Double startingMeters) {
         // Right
         leaderMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID);
@@ -40,18 +52,6 @@ public class ElevatorReal implements Elevator {
         motorVolts = leaderMotor.getSupplyVoltage();
 
         leaderMotor.setRotorPosition(mechMetersToMotorRots(startingMeters));
-    }
-
-    private Double mechMetersToMotorRots(Double meters) {
-        return ((meters - kElevator.HOME_METERS)
-                / (kElevator.MECHANISM_DIAMETER_METERS * Math.PI))
-                / kElevator.MOTOR_TO_MECHANISM_RATIO;
-    }
-
-    private Double motorRotsToMechMeters(Double motorRots) {
-        return (motorRots * kElevator.MOTOR_TO_MECHANISM_RATIO)
-                * (kElevator.MECHANISM_DIAMETER_METERS * Math.PI)
-                + kElevator.HOME_METERS;
     }
 
     private TalonFXConfiguration getMotorConfiguration() {

@@ -162,7 +162,7 @@ public class StateManager {
 
         @Override
         public void end(boolean interrupted) {
-            superStructure.runEndEffector(0.0, true);
+            superStructure.stopAll();
             from = null;
         }
 

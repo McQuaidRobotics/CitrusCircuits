@@ -100,7 +100,12 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.runIntake(volts / 12.0);
     }
 
-
+    public void stopAll() {
+        this.wrist.stopMechanism();
+        this.pivot.stopMechanism();
+        this.elevator.stopMechanism();
+        this.wrist.runIntake(0.0);
+    }
 
     public Boolean reachedSetpoint() {
         return this.setpoint.reachedState(this.getPose());

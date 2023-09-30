@@ -25,6 +25,10 @@ public class PivotReal implements Pivot {
     private Boolean isHomed = false;
     // private Boolean softLimitsEnabled = true;
 
+    private Double mechDegreesToMotorRots(Double mechanismDegrees) {
+        return (mechanismDegrees / 360.0) / kWrist.MOTOR_TO_MECHANISM_RATIO;
+    }
+
     public PivotReal(Double startingDegrees) {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
         followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID);
@@ -41,10 +45,6 @@ public class PivotReal implements Pivot {
         );
 
         leaderMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
-    }
-
-    private Double mechDegreesToMotorRots(Double mechanismDegrees) {
-        return (mechanismDegrees / 360.0) / kWrist.MOTOR_TO_MECHANISM_RATIO;
     }
 
     private TalonFXConfiguration getMotorConfig() {
@@ -131,9 +131,6 @@ public class PivotReal implements Pivot {
         }
         return isHomed;
     }
-
-    @Override
-    public void periodic() {}
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {

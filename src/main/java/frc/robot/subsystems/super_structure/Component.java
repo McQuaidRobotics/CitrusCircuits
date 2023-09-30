@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 
 public interface Component {
 
-    default public void periodic() {};
+    default public void periodic() {
+    };
 
-    default public void setupShuffleboard(ShuffleboardContainer tab) {};
+    default public void setupShuffleboard(ShuffleboardContainer tab) {
+    };
 
     default void massSoftLimits(Boolean toggle, TalonFX... motors) {
         for (var motor : motors) {
@@ -35,8 +37,10 @@ public interface Component {
     public void stopMechanism();
 
     /**
-     * Moves the mechanis towards the home postion resetting the encoders
+     * Moves the mechanis towards the stow position,
+     * if {@code toZero} is true the motor encoders will also be reseeded
+     * 
      * @return true if the mcahnism has reached home
      */
-    public Boolean homeMechanism();
+    public Boolean stowMechanism(Boolean toZero);
 }

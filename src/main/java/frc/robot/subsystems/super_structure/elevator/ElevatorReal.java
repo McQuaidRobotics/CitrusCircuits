@@ -1,9 +1,11 @@
 package frc.robot.subsystems.super_structure.elevator;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -11,18 +13,17 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
-import com.ctre.phoenix6.controls.PositionVoltage;
-
 import frc.robot.subsystems.super_structure.Errors.*;
 
 public class ElevatorReal implements Elevator {
-    /**Right */
+    /** Right */
     private final TalonFX leaderMotor;
-    /**Left */
+    /** Left */
     private final TalonFX followerMotor;
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
-    private Boolean isHomed = false;
+    private Boolean isStowed = false;
+    private Double cachedElevatorMeters;
 
     private Double mechMetersToMotorRots(Double meters) {
         return ((meters - kElevator.HOME_METERS)
@@ -52,32 +53,33 @@ public class ElevatorReal implements Elevator {
         motorVolts = leaderMotor.getSupplyVoltage();
 
         leaderMotor.setRotorPosition(mechMetersToMotorRots(startingMeters));
+        cachedElevatorMeters = startingMeters;
     }
 
     private TalonFXConfiguration getMotorConfiguration() {
-        var motorConfig = new TalonFXConfiguration();
-        motorConfig.Slot0.kP = kElevator.MOTOR_kP;
-        motorConfig.Slot0.kP = kElevator.MOTOR_kI;
-        motorConfig.Slot0.kP = kElevator.MOTOR_kD;
+        var motorCfg = new TalonFXConfiguration();
+        motorCfg.Slot0.kP = kElevator.MOTOR_kP;
+        motorCfg.Slot0.kI = kElevator.MOTOR_kI;
+        motorCfg.Slot0.kD = kElevator.MOTOR_kD;
         // motorConfig.Slot0.kS = kElevator.MOTOR_kS;
         // motorConfig.Slot0.kV = kElevator.MOTOR_kV;
 
-        motorConfig.MotionMagic.MotionMagicCruiseVelocity = kElevator.MAX_VELOCITY;
-        motorConfig.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;
-        motorConfig.MotionMagic.MotionMagicJerk = kElevator.MAX_JERK;
+        motorCfg.MotionMagic.MotionMagicCruiseVelocity = kElevator.MAX_VELOCITY;
+        motorCfg.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;
+        motorCfg.MotionMagic.MotionMagicJerk = kElevator.MAX_JERK;
 
-        // motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = kElevator.ENABLE_SOFTLIMITS;
-        // motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechMetersToMotorRots(Specs.ELEVATOR_MAX_METERS);
+        motorCfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        motorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
-        motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        motorConfig.MotorOutput.PeakForwardDutyCycle = 0.2;
-        motorConfig.MotorOutput.PeakReverseDutyCycle = -0.2;
+        motorCfg.MotorOutput.PeakForwardDutyCycle *= 0.25;
+        motorCfg.MotorOutput.PeakReverseDutyCycle *= 0.25;
 
-        motorConfig.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
+        motorCfg.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        return motorConfig;
+        return motorCfg;
     }
 
     @Override
@@ -89,27 +91,28 @@ public class ElevatorReal implements Elevator {
             new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters).log();
             return false;
         }
-        this.isHomed = true;
-        var posControlRequest = new PositionVoltage(mechMetersToMotorRots(meters));
+        this.isStowed = false;
+        var posControlRequest = new PositionDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
-        return Math.abs(meters - getMechanismMeters()) < kPivot.TOLERANCE;
+        return Math.abs(meters - getMechanismMeters()) < kElevator.TOLERANCE;
     }
 
     @Override
     public Double getMechanismMeters() {
-        return motorRotsToMechMeters(motorRots.refresh().getValue());
+        return cachedElevatorMeters;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
-        this.isHomed = false;
+        this.isStowed = false;
     }
 
     @Override
     public void stopMechanism() {
-        this.leaderMotor.setVoltage(0.0);;
+        this.leaderMotor.setVoltage(0.0);
+        ;
     }
 
     @Override
@@ -121,21 +124,20 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Boolean homeMechanism() {
-        if (this.isHomed) {
+    public Boolean stowMechanism(Boolean toZero) {
+        if (this.isStowed) {
             return true;
         }
         this.manualDriveMechanism(-0.15);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
-            this.leaderMotor.setRotorPosition(0.0);
-            this.isHomed = true;
+            if (toZero) {
+                this.leaderMotor.setRotorPosition(0.0);
+            }
+            this.isStowed = true;
         }
         return this.isLimitSwitchHit();
     }
-
-    @Override
-    public void periodic() {}
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
@@ -144,5 +146,12 @@ public class ElevatorReal implements Elevator {
         tab.addNumber("Elevator Motor Amps", () -> motorAmps.refresh().getValue());
         tab.addNumber("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
         tab.addBoolean("Elevator LimitSwitch", this::isLimitSwitchHit);
+    }
+
+    @Override
+    public void periodic() {
+        cachedElevatorMeters = motorRotsToMechMeters(
+            BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
+        );
     }
 }

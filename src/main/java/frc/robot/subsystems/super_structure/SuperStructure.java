@@ -40,63 +40,62 @@ public class SuperStructure extends SubsystemBase {
         visualizer.updateCurrent(setpoint);
     }
 
-    /**@returns true of the setpoint has been reached */
-    public Boolean setSetpoint(SuperStructurePosition pose) {
-        this.visualizer.updateSetpoint(pose);
-        this.setpoint = pose;
+    /** @returns true of the setpoint has been reached */
+    public Boolean setSetpoint(SuperStructurePosition to) {
+        this.visualizer.updateSetpoint(to);
+        this.setpoint = to;
 
-        //only pivot or wrist+elevator should run at a time
-        BooleanSupplier runWristElevator = () -> {
-            return this.wrist.setMechanismDegrees(pose.wristDegrees) &&
-            this.elevator.setMechanismMeters(pose.elevatorMeters);
+        // only pivot or wrist+elevator should run at a time
+        BooleanSupplier runWristElevatorParallel = () -> {
+            var wrist = this.wrist.setMechanismDegrees(to.wristDegrees);
+            var elev = this.elevator.setMechanismMeters(to.elevatorMeters);
+            return elev && wrist;
         };
-        BooleanSupplier pivot = () -> {
-            return this.pivot.setMechanismDegrees(pose.pivotDegrees);
+        // BooleanSupplier runWristElevatorSeq = () -> {
+        //     return this.wrist.setMechanismDegrees(to.wristDegrees)
+        //         && this.elevator.setMechanismMeters(to.elevatorMeters);
+        // };
+        BooleanSupplier runPivot = () -> {
+            return this.pivot.setPivotDegrees(to.pivotDegrees);
         };
 
-        //We need to make sure the pivot and elevator do not move at the same time.
-        //We need to also try and run the pivot when the elevator is in the least
-        //extended between the two states(pose and current).
+        // We need to make sure the pivot and elevator do not move at the same time.
+        // We need to also try and run the pivot when the elevator is in the least
+        // extended between the two states(pose and current).
 
-        //i.e. if the elevator is currently not extended but the pose wants it all the way out,
-        //we will move the pivot first to reduce stress, but if the current elevator extension
-        //is greater than set pose we move elevator first
+        // i.e. if the elevator is currently not extended but the pose wants it all the
+        // way out,
+        // we will move the pivot first to reduce stress, but if the current elevator
+        // extension
+        // is greater than set pose we move elevator first
 
-        if (this.elevator.getMechanismMeters() - 0.1 < pose.elevatorMeters) {
-            //check if wrist and elevator have reached their setpoints
-            //if they have, run pivot
-            if (runWristElevator.getAsBoolean()) {
-                return pivot.getAsBoolean();
-            }// else {
-            //    this.pivot.hold();
-            //}
+        if (this.elevator.getMechanismMeters() > to.elevatorMeters) {
+            // check if wrist and elevator have reached their setpoints
+            // if they have, run pivot
+            if (runWristElevatorParallel.getAsBoolean()) {
+                return runPivot.getAsBoolean();
+            }
         } else {
-            if (pivot.getAsBoolean()) {
-                return runWristElevator.getAsBoolean();
-            }// else {
-            //    this.elevator.hold();
-            //    this.wrist.hold();
-            //}
+            if (runPivot.getAsBoolean()) {
+                return runWristElevatorParallel.getAsBoolean();
+            }
         }
         return false;
     }
 
-    public Boolean home() {
+    public Boolean stow(Boolean toZero) {
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
-        // always home elevator/wrist then home pivot
-        if (this.elevator.homeMechanism() && this.wrist.homeMechanism()) {
-            return this.pivot.homeMechanism();
-        }// else {
-        //    this.pivot.hold();
-        //}
-        return false;
+        // this will do wrist -> elevator -> pivot
+        return this.wrist.stowMechanism(toZero)
+                && this.elevator.stowMechanism(toZero)
+                && this.pivot.stowMechanism(toZero);
     }
 
     public void runEndEffector(Double volts, Boolean currentLimits) {
-        //when outtaking this should be false
+        // when outtaking this should be false
         this.wrist.enableIntakeCurrentLimits(currentLimits);
-        //assume max voltage is 12.0
+        // assume max voltage is 12.0
         this.wrist.runIntake(volts / 12.0);
     }
 
@@ -114,10 +113,9 @@ public class SuperStructure extends SubsystemBase {
     public SuperStructurePosition getPose() {
         return new SuperStructurePosition(
                 this.wrist.getMechanismDegrees(),
-                this.pivot.getMechanismDegrees(),
+                this.pivot.getPivotDegrees(),
                 this.elevator.getMechanismMeters(),
-                this.wrist.getIntakeVoltage()
-        );
+                this.wrist.getIntakeVoltage());
     }
 
     /**
@@ -147,7 +145,7 @@ public class SuperStructure extends SubsystemBase {
 
         tab.addDouble("Wrist Current Degrees", () -> this.wrist.getMechanismDegrees())
                 .withSize(2, 1);
-        tab.addDouble("Pivot Current Degrees", () -> this.pivot.getMechanismDegrees())
+        tab.addDouble("Pivot Current Degrees", () -> this.pivot.getPivotDegrees())
                 .withSize(2, 1);
         tab.addDouble("Elevator Current Meters", () -> this.elevator.getMechanismMeters())
                 .withSize(2, 1);
@@ -164,10 +162,11 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        visualizer.updateCurrent(getPose());
         this.wrist.periodic();
         this.elevator.periodic();
         this.pivot.periodic();
+
+        visualizer.updateCurrent(getPose());
 
         if (DriverStation.isDisabled() && this.getCurrentCommand() != null) {
             this.getCurrentCommand().cancel();

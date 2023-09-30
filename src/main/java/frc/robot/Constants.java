@@ -60,10 +60,11 @@ public final class Constants {
              * the ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_ZERO = 22.5;
+            public static final double CURRENT_PEAK_FOR_ZERO = 40.0;
 
             /**Alias for {@link Specs#WRIST_MAX_ANGLE} */
             public static final double HOME_DEGREES = Specs.WRIST_MAX_ANGLE;
+            public static final double HARD_OFFSET = 3.5;
 
             public static final double TOLERANCE = 0.5;
         }
@@ -80,6 +81,7 @@ public final class Constants {
         public static final class kPivot {
             public static final int LEFT_MOTOR_ID = 13;
             public static final int RIGHT_MOTOR_ID = 14;
+            public static final int PIGEON_ID = 35;
 
             public static final double MOTOR_kP = 1.0;
             public static final double MOTOR_kI = 0;
@@ -104,8 +106,9 @@ public final class Constants {
 
             /** Alias for {@link Specs#PIVOT_MIN_ANGLE} */
             public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE;
+            public static final double HARD_OFFSET = 2.0;
 
-            public final static double SCORE_DEGREES = 39.8;
+            public final static double SCORE_DEGREES = 46.0;
 
             public static final boolean ENABLE_SOFTLIMITS = false;
 
@@ -128,13 +131,14 @@ public final class Constants {
             public static final double CURRENT_PEAK_FOR_ZERO = 20.0;
 
             public static final double TOLERANCE = 0.5;
+
         }
 
         public static final class kElevator {
             public static final int ELEVATOR_LEFT_MOTOR_ID = 17;
             public static final int ELEVATOR_RIGHT_MOTOR_ID = 16;
 
-            public static final double MOTOR_kP = 1.0;
+            public static final double MOTOR_kP = 0.5;
             public static final double MOTOR_kD = 0.0;
             public static final double MOTOR_kI = 0.0;
             public static final double MOTOR_kS = dPlaceholder;
@@ -153,13 +157,14 @@ public final class Constants {
 
             /**Alias for {@link Specs#ELEVATOR_MIN_METERS} */
             public static final double HOME_METERS = Specs.ELEVATOR_MIN_METERS;
+            public static final double HARD_OFFSET = 0.1;
 
             /**Alias for {@link Specs#ELEVATOR_MIN_METERS} */
             public static final double MIN_METERS = Specs.ELEVATOR_MIN_METERS;
             /**Alias for {@link Specs#ELEVATOR_MAX_METERS} */
             public static final double MAX_METERS = Specs.ELEVATOR_MAX_METERS;
 
-            public static final double TOLERANCE = 0.3;
+            public static final double TOLERANCE = 0.075;
         }
 
         public static final class Specs {
@@ -167,9 +172,10 @@ public final class Constants {
             public static final double ARM_MASS_GRAMS = 9500;
 
             public static final double ELEVATOR_MIN_METERS = 0.51562;
-            public static final double ELEVATOR_MAX_METERS = ELEVATOR_MIN_METERS + 1.04;
+            public static final double ELEVATOR_RANGE_METERS = 0.9438;
+            public static final double ELEVATOR_MAX_METERS = ELEVATOR_RANGE_METERS + ELEVATOR_MIN_METERS;
 
-            public static final double PIVOT_MIN_ANGLE = -7.0;
+            public static final double PIVOT_MIN_ANGLE = -8.0;
             public static final double PIVOT_MAX_ANGLE = 90.0;
 
             //arbitrary min, not mechanical limit(which is ~15 less)

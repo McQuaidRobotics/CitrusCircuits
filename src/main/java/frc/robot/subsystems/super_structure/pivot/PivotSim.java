@@ -15,7 +15,7 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Boolean setMechanismDegrees(Double degrees) {
+    public Boolean setPivotDegrees(Double degrees) {
         if (degrees > kPivot.MAX_DEGREES) {
             new SetpointTooHigh(kPivot.MAX_DEGREES, degrees).log();
             return false;
@@ -38,12 +38,12 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Double getMechanismDegrees() {
+    public Double getPivotDegrees() {
         return pivotDegrees.getPose();
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean stowMechanism(Boolean toZero) {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
         return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }

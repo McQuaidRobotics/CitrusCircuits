@@ -4,13 +4,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -25,7 +23,7 @@ public class PivotReal implements Pivot {
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
     private Boolean isHomed = false;
-    private Boolean softLimitsEnabled = true;
+    // private Boolean softLimitsEnabled = true;
 
     public PivotReal(Double startingDegrees) {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
@@ -89,11 +87,10 @@ public class PivotReal implements Pivot {
             new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
             return false;
         }
-        if (!this.softLimitsEnabled) {
-            DriverStation.reportWarning("setting soft limit", false);
-            // this.massSoftLimits(true, leaderMotor);
-            this.softLimitsEnabled = true;
-        }
+        // if (!this.softLimitsEnabled) {
+        //     this.massSoftLimits(true, leaderMotor);
+        //     this.softLimitsEnabled = true;
+        // }
         isHomed = false;
         var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
@@ -122,11 +119,10 @@ public class PivotReal implements Pivot {
         if (isHomed) {
             return true;
         }
-        if (this.softLimitsEnabled) {
-            this.massSoftLimits(false, leaderMotor);
-            this.softLimitsEnabled = false;
-        }
-        //TODO: move to 0 via pose then switch to open loop
+        // if (this.softLimitsEnabled) {
+        //     this.massSoftLimits(false, leaderMotor);
+        //     this.softLimitsEnabled = false;
+        // }
         this.manualDriveMechanism(-0.15);
         if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();

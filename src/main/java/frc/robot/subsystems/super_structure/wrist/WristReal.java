@@ -5,13 +5,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -24,7 +22,7 @@ public class WristReal implements Wrist {
     private final StatusSignal<Double> intakeMotorAmps, intakeMotorVolts;
 
     private Boolean isHomed = false;
-    private Boolean softLimitsEnabled = true;
+    // private Boolean softLimitsEnabled = true;
 
     public WristReal(Double startingDegrees) {
         wristMotor = new TalonFX(kWrist.MOTOR_ID);
@@ -113,11 +111,10 @@ public class WristReal implements Wrist {
             return false;
         }
         isHomed = false;
-        if (!this.softLimitsEnabled) {
-            DriverStation.reportWarning("setting soft limit", false);
-            // this.massSoftLimits(true, wristMotor);
-            this.softLimitsEnabled = true;
-        }
+        // if (!this.softLimitsEnabled) {
+        //     this.massSoftLimits(true, wristMotor);
+        //     this.softLimitsEnabled = true;
+        // }
         var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
         return Math.abs(degrees - getMechanismDegrees()) < kWrist.TOLERANCE;
@@ -162,7 +159,21 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void periodic() {
+    public Boolean homeMechanism() {
+        if (isHomed) {
+            return true;
+        }
+        // if (this.softLimitsEnabled) {
+        //     this.massSoftLimits(false, wristMotor);
+        //     this.softLimitsEnabled = false;
+        // }
+        this.manualDriveMechanism(0.2);
+        if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
+            this.stopMechanism();
+            this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES));
+            isHomed = true;
+        }
+        return isHomed;
     }
 
     @Override
@@ -175,23 +186,5 @@ public class WristReal implements Wrist {
 
         tab.addDouble("Intake Amps", () -> intakeMotorAmps.refresh().getValue());
         tab.addDouble("Intake Volts", () -> intakeMotorVolts.refresh().getValue());
-    }
-
-    @Override
-    public Boolean homeMechanism() {
-        if (isHomed) {
-            return true;
-        }
-        if (this.softLimitsEnabled) {
-            this.massSoftLimits(false, wristMotor);
-            this.softLimitsEnabled = false;
-        }
-        this.manualDriveMechanism(0.2);
-        if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
-            this.stopMechanism();
-            this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES));
-            isHomed = true;
-        }
-        return isHomed;
     }
 }

@@ -36,13 +36,13 @@ public class RobotContainer {
         configureDriverBindings();
         configureOperatorBindings();
         driverShuffleboard();
-        // swerve.setDefaultCommand(
-        //         new TeleopSwerve(
-        //                 swerve,
-        //                 () -> -driveController.getRawAxis(translationAxis),
-        //                 () -> -driveController.getRawAxis(strafeAxis),
-        //                 () -> -driveController.getRawAxis(rotationAxis))
-        // );
+        swerve.setDefaultCommand(
+                new TeleopSwerve(
+                        swerve,
+                        () -> -driveController.getRawAxis(translationAxis),
+                        () -> -driveController.getRawAxis(strafeAxis),
+                        () -> -driveController.getRawAxis(rotationAxis))
+        );
     }
 
     private void configureDriverBindings() {

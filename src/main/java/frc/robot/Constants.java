@@ -60,7 +60,7 @@ public final class Constants {
              * the ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_ZERO = 15.0;
+            public static final double CURRENT_PEAK_FOR_ZERO = 22.5;
 
             /**Alias for {@link Specs#WRIST_MAX_ANGLE} */
             public static final double HOME_DEGREES = Specs.WRIST_MAX_ANGLE;
@@ -125,7 +125,7 @@ public final class Constants {
              * The ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_ZERO = 15.0;
+            public static final double CURRENT_PEAK_FOR_ZERO = 20.0;
 
             public static final double TOLERANCE = 0.5;
         }

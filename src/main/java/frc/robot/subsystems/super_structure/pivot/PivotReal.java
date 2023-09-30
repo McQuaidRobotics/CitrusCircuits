@@ -4,11 +4,13 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -72,6 +74,9 @@ public class PivotReal implements Pivot {
         motorCfg.Voltage.PeakForwardVoltage = kPivot.VOLTAGE_COMP;
         motorCfg.Voltage.PeakReverseVoltage = -kPivot.VOLTAGE_COMP;
 
+        motorCfg.MotorOutput.PeakForwardDutyCycle = 0.4;
+        motorCfg.MotorOutput.PeakReverseDutyCycle = -0.4;
+
         return motorCfg;
     }
 
@@ -85,11 +90,12 @@ public class PivotReal implements Pivot {
             return false;
         }
         if (!this.softLimitsEnabled) {
-            this.massSoftLimits(true, leaderMotor);
+            DriverStation.reportWarning("setting soft limit", false);
+            // this.massSoftLimits(true, leaderMotor);
             this.softLimitsEnabled = true;
         }
         isHomed = false;
-        var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
+        var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(degrees - getMechanismDegrees()) < kPivot.TOLERANCE;
     }
@@ -124,7 +130,7 @@ public class PivotReal implements Pivot {
         this.manualDriveMechanism(-0.15);
         if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
-            this.leaderMotor.setRotorPosition(-15.0);//mechDegreesToMotorRots(kPivot.HOME_DEGREES - 10.0);
+            this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
             isHomed = true;
         }
         return isHomed;

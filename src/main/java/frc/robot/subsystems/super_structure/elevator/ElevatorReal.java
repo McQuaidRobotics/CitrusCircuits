@@ -11,8 +11,8 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import frc.robot.subsystems.super_structure.Errors.*;
 
@@ -72,6 +72,9 @@ public class ElevatorReal implements Elevator {
 
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+        motorConfig.MotorOutput.PeakForwardDutyCycle = 0.2;
+        motorConfig.MotorOutput.PeakReverseDutyCycle = -0.2;
+
         motorConfig.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
@@ -88,14 +91,14 @@ public class ElevatorReal implements Elevator {
             return false;
         }
         this.isHomed = true;
-        var posControlRequest = new MotionMagicVoltage(mechMetersToMotorRots(meters));
+        var posControlRequest = new PositionVoltage(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(meters - getMechanismMeters()) < kPivot.TOLERANCE;
     }
 
     @Override
     public Double getMechanismMeters() {
-        return motorRotsToMechMeters(BaseStatusSignal.getLatencyCompensatedValue(motorRots.refresh(), motorVelo.refresh()));
+        return motorRotsToMechMeters(motorRots.refresh().getValue());
     }
 
     @Override

@@ -1,16 +1,17 @@
 package frc.robot.subsystems.super_structure.wrist;
 
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -77,6 +78,9 @@ public class WristReal implements Wrist {
         wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
+        wristMotorCfg.MotorOutput.PeakForwardDutyCycle = 0.2;
+        wristMotorCfg.MotorOutput.PeakReverseDutyCycle = -0.2;
+
         return wristMotorCfg;
     }
 
@@ -110,10 +114,11 @@ public class WristReal implements Wrist {
         }
         isHomed = false;
         if (!this.softLimitsEnabled) {
-            this.massSoftLimits(true, wristMotor);
+            DriverStation.reportWarning("setting soft limit", false);
+            // this.massSoftLimits(true, wristMotor);
             this.softLimitsEnabled = true;
         }
-        var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
+        var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
         return Math.abs(degrees - getMechanismDegrees()) < kWrist.TOLERANCE;
     }
@@ -132,7 +137,7 @@ public class WristReal implements Wrist {
 
     @Override
     public Double getMechanismDegrees() {
-        return BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh())
+        return wristMotorRots.refresh().getValue()
                 * 360.0
                 * kWrist.MOTOR_TO_MECHANISM_RATIO;
     }

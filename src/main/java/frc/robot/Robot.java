@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.CTREConfigs;
 import frc.robot.util.NTpreferences;
+import frc.robot.commands.Autos.AutoPaths;
 
 public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;
@@ -32,7 +33,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand(AutoPaths.NOTHING);
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

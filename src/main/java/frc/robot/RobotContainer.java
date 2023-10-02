@@ -4,9 +4,11 @@ import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.Autos;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
+import frc.robot.subsystems.super_structure.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
 import java.util.Map;
@@ -18,6 +20,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import frc.robot.commands.Autos.AutoPaths;
 
 public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);
@@ -130,7 +134,8 @@ public class RobotContainer {
             .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"));
     }
 
-    public Command getAutonomousCommand() {
-        return new InstantCommand();
+    public Command getAutonomousCommand(AutoPaths autoPath) {
+        //TODO {Maddox} Don't forget to pass in subsystems when they are eventually initiallized in code
+        return Autos.getAutoPathCommand(autoPath, swerve, null, null, null);
     }
 }

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -184,6 +185,12 @@ public final class Constants {
             public static final double RIM_ABOVE_FLOOR_METERS = 0.09525;
         }
 
+    }
+
+    public static class kAuto {
+        public static final PIDController AUTO_X_PID = new PIDController(dPlaceholder, dPlaceholder, dPlaceholder);
+        public static final PIDController AUTO_Y_PID = new PIDController(dPlaceholder, iPlaceholder, dPlaceholder);
+        public static final PIDController AUTO_ANGULAR_PID = new PIDController(dPlaceholder, iPlaceholder, dPlaceholder);
     }
 
     public static class kSwerve {

@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,7 +23,6 @@ public class Autos {
     }
 
     private static Command commandThreeGamePiece(Swerve swerve, SuperStructure superStructure) {
-        
         return new InstantCommand().withName("commandThreeGamePiece");
     } 
 

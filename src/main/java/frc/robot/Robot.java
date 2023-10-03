@@ -3,9 +3,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.auto.Autos.AutoPaths;
 import frc.robot.util.CTREConfigs;
 import frc.robot.util.NTpreferences;
-import frc.robot.commands.Autos.AutoPaths;
 
 public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;

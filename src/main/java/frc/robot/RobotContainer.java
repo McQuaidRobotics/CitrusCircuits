@@ -4,7 +4,8 @@ import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.swerve.TeleopSwerve;
-import frc.robot.commands.Autos;
+import frc.robot.commands.auto.Autos;
+import frc.robot.commands.auto.Autos.AutoPaths;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -19,8 +20,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
-import frc.robot.commands.Autos.AutoPaths;
 
 public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);

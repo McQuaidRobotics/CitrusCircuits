@@ -40,9 +40,9 @@ public class Swerve extends SubsystemBase {
         zeroGyro();
 
         mSwerveMods = new SwerveModule[] {
-                new SwerveModule(Constants.kSwerve.Mod1.CONSTANTS, 0),
-                new SwerveModule(Constants.kSwerve.Mod2.CONSTANTS, 1),
-                new SwerveModule(Constants.kSwerve.Mod0.CONSTANTS, 2),
+                new SwerveModule(Constants.kSwerve.Mod0.CONSTANTS, 0),
+                new SwerveModule(Constants.kSwerve.Mod1.CONSTANTS, 1),
+                new SwerveModule(Constants.kSwerve.Mod2.CONSTANTS, 2),
                 new SwerveModule(Constants.kSwerve.Mod3.CONSTANTS, 3)
         };
 

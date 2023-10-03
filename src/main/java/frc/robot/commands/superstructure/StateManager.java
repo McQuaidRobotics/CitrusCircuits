@@ -6,9 +6,11 @@ import java.util.function.Function;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.GamepieceMode;
 import frc.robot.commands.superstructure.Transitions.TransitionData;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
+// import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 
 /**
@@ -70,6 +72,7 @@ public class StateManager {
     static {
         //without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
+        fromAllStates(States.STOW, Transitions::stowTransition);
     }
 
     /**
@@ -101,6 +104,8 @@ public class StateManager {
         private Boolean innerInit = false;
         private Boolean innerFinish = false;
 
+        private GamepieceMode gamepieceMode;
+
         public CmdTransitionState(final SuperStructure superStructure, final States to) {
             this.superStructure = superStructure;
             this.to = to;
@@ -110,14 +115,15 @@ public class StateManager {
         @Override
         public void initialize() {
             this.from = lastState;
-            lastState = to;
+            StateManager.lastState = to;
+            this.gamepieceMode = GamepieceMode.getCurrentMode();
             this.innerCmd = getTransitionCmd(new TransitionData(from, to, superStructure));
             this.innerInit = false;
             this.innerFinish = false;
             this.deadCycles = 0;
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
                 superStructure.runEndEffector(
-                    from.intakeRequest.getVoltage(), from.intakeRequest.getCurrentLimitEnabled());
+                    from.intakeRequest.getVoltage(gamepieceMode), from.intakeRequest.getCurrentLimitEnabled());
                 this.deadCycles = 10;
             }
         }
@@ -147,13 +153,13 @@ public class StateManager {
             //solving intake behavior
             Double endEffectorVolts = 0.0;
             if (from.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME || from.intakeBehavior == IntakeBehavior.RUN_ON_START) {
-                endEffectorVolts = to.intakeRequest.getVoltage();
+                endEffectorVolts = to.intakeRequest.getVoltage(gamepieceMode);
             }
             if (superStructure.reachedSetpoint()) {
                 if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
                     endEffectorVolts = 0.0;
                 } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_REACH) {
-                    endEffectorVolts = to.intakeRequest.getVoltage();
+                    endEffectorVolts = to.intakeRequest.getVoltage(gamepieceMode);
                 } 
             }
 
@@ -162,16 +168,16 @@ public class StateManager {
 
         @Override
         public void end(boolean interrupted) {
-            superStructure.runEndEffector(0.0, true);
+            superStructure.stopAll();
             from = null;
         }
 
         @Override
         public String getName() {
             if (from == null) {
-                return "CmdTransitionState(? -> " + to + ")";
+                return "CmdTransitionState(? -> " + to + "[" + gamepieceMode + "]" + ")";
             } else {
-                return "CmdTransitionState(" + from + " -> " + to + ")";
+                return "CmdTransitionState(" + from + " -> " + to + "[" + gamepieceMode + "]" + ")";
             }
         }
     }

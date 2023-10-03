@@ -39,7 +39,7 @@ public class ElevatorSim implements Elevator{
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean stowMechanism(Boolean toZero) {
         elevatorMeters.setTargetPosition(kElevator.HOME_METERS);
         return isLimitSwitchHit();
     }

@@ -29,6 +29,10 @@ public class Transitions {
     }
 
     public static Command homeTransition(TransitionData data) {
-        return data.superStructure.run(() -> data.superStructure.home());
+        return data.superStructure.run(() -> data.superStructure.stow(true));
+    }
+
+    public static Command stowTransition(TransitionData data) {
+        return data.superStructure.run(() -> data.superStructure.stow(false));
     }
 }

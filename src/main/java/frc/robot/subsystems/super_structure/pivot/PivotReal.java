@@ -1,10 +1,13 @@
 package frc.robot.subsystems.super_structure.pivot;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+// import com.ctre.phoenix.sensors.PigeonIMU;
+// import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -19,11 +22,20 @@ public class PivotReal implements Pivot {
     private final TalonFX leaderMotor;
     /** Right */
     private final TalonFX followerMotor;
+    // private final PigeonIMU gyro;
 
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
-    private Boolean isHomed = false;
-    private Boolean softLimitsEnabled = true;
+    private Boolean isStowed = false;
+    private Double cachedPivotDegrees;
+
+    private Double mechDegreesToMotorRots(Double mechanismDegrees) {
+        return (mechanismDegrees / 360.0) / kPivot.MOTOR_TO_MECHANISM_RATIO;
+    }
+
+    private Double motorRotsToMechDegrees(Double motorRots) {
+        return motorRots * 360.0 * kPivot.MOTOR_TO_MECHANISM_RATIO;
+    }
 
     public PivotReal(Double startingDegrees) {
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
@@ -31,20 +43,18 @@ public class PivotReal implements Pivot {
         leaderMotor.getConfigurator().apply(getMotorConfig());
         followerMotor.getConfigurator().apply(getMotorConfig());
 
+        followerMotor.setControl(
+                new Follower(kPivot.LEFT_MOTOR_ID, true));
+
+        leaderMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
+        cachedPivotDegrees = startingDegrees;
+
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
 
-        followerMotor.setControl(
-            new Follower(kPivot.LEFT_MOTOR_ID, true)
-        );
-
-        leaderMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
-    }
-
-    private Double mechDegreesToMotorRots(Double mechanismDegrees) {
-        return (mechanismDegrees / 360.0) / kWrist.MOTOR_TO_MECHANISM_RATIO;
+        // gyro = new PigeonIMU(kPivot.PIGEON_ID);
     }
 
     private TalonFXConfiguration getMotorConfig() {
@@ -57,13 +67,6 @@ public class PivotReal implements Pivot {
         motorCfg.MotionMagic.MotionMagicAcceleration = kPivot.MAX_ACCELERATION;
         motorCfg.MotionMagic.MotionMagicJerk = kPivot.MAX_JERK;
 
-        motorCfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = kPivot.ENABLE_SOFTLIMITS;
-        motorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = kPivot.ENABLE_SOFTLIMITS;
-        motorCfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mechDegreesToMotorRots(
-                kPivot.MAX_DEGREES);
-        motorCfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mechDegreesToMotorRots(
-                kPivot.MIN_DEGREES);
-
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         motorCfg.MotorOutput.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
@@ -72,11 +75,14 @@ public class PivotReal implements Pivot {
         motorCfg.Voltage.PeakForwardVoltage = kPivot.VOLTAGE_COMP;
         motorCfg.Voltage.PeakReverseVoltage = -kPivot.VOLTAGE_COMP;
 
+        motorCfg.MotorOutput.PeakForwardDutyCycle = 0.5;
+        motorCfg.MotorOutput.PeakReverseDutyCycle = -0.5;
+
         return motorCfg;
     }
 
     @Override
-    public Boolean setMechanismDegrees(Double degrees) {
+    public Boolean setPivotDegrees(Double degrees) {
         if (degrees > kPivot.MAX_DEGREES) {
             new SetpointTooHigh(kPivot.MAX_DEGREES, degrees).log();
             return false;
@@ -84,20 +90,24 @@ public class PivotReal implements Pivot {
             new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
             return false;
         }
-        if (!this.softLimitsEnabled) {
-            this.massSoftLimits(true, leaderMotor);
-            this.softLimitsEnabled = true;
-        }
-        isHomed = false;
-        var posControlRequest = new MotionMagicTorqueCurrentFOC(mechDegreesToMotorRots(degrees));
+
+        // if the last state was stow re seed motor by gyro
+        // if (isStowed) {
+        // this.leaderMotor.setRotorPosition(
+        // mechDegreesToMotorRots(gyro.getYaw())
+        // );
+        // }
+
+        isStowed = false;
+        var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
-        return Math.abs(degrees - getMechanismDegrees()) < kPivot.TOLERANCE;
+        return Math.abs(degrees - getPivotDegrees()) < kPivot.TOLERANCE;
     }
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
-        isHomed = false;
-        var percentControlRequest = new DutyCycleOut(percentOut, true, false);
+        isStowed = false;
+        var percentControlRequest = new DutyCycleOut(percentOut);
         this.leaderMotor.setControl(percentControlRequest);
     }
 
@@ -107,31 +117,25 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Double getMechanismDegrees() {
-        return motorRots.refresh().getValue() * 360.0 * kPivot.MOTOR_TO_MECHANISM_RATIO;
+    public Double getPivotDegrees() {
+        return cachedPivotDegrees;
     }
 
     @Override
-    public Boolean homeMechanism() {
-        if (isHomed) {
+    public Boolean stowMechanism(Boolean toZero) {
+        if (isStowed) {
             return true;
         }
-        if (this.softLimitsEnabled) {
-            this.massSoftLimits(false, leaderMotor);
-            this.softLimitsEnabled = false;
-        }
-        //TODO: move to 0 via pose then switch to open loop
         this.manualDriveMechanism(-0.15);
         if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
-            this.leaderMotor.setRotorPosition(-15.0);//mechDegreesToMotorRots(kPivot.HOME_DEGREES - 10.0);
-            isHomed = true;
+            if (toZero) {
+                this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
+            }
+            isStowed = true;
         }
-        return isHomed;
+        return isStowed;
     }
-
-    @Override
-    public void periodic() {}
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
@@ -139,6 +143,16 @@ public class PivotReal implements Pivot {
         tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
         tab.addNumber("Pivot Motor Amps", () -> motorAmps.refresh().getValue());
         tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
-        tab.addBoolean("Pivot Homed", () -> isHomed);
+        // tab.addNumber("Pivot Gyro Yaw", gyro::getYaw);
+        // tab.addNumber("Pivot Gyro Roll", gyro::getRoll);
+        // tab.addNumber("Pivot Gyro Pitch", gyro::getPitch);
+        tab.addBoolean("Pivot Homed", () -> isStowed);
+    }
+
+    @Override
+    public void periodic() {
+        cachedPivotDegrees = motorRotsToMechDegrees(
+            BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
+        );
     }
 }

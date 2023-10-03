@@ -7,16 +7,17 @@ public interface Pivot extends Component {
     /**
      * Abstract from motors, will set the wrist degrees.
      * Parallel to the elevator is 0 degrees
+     * 
      * @return true if degrees has been reached
      */
-    public Boolean setMechanismDegrees(Double degrees);
+    public Boolean setPivotDegrees(Double degrees);
 
     /**
      * @return the current angle of the mechanism
      */
-    public Double getMechanismDegrees();
+    public Double getPivotDegrees();
 
     default public void hold() {
-        setMechanismDegrees(getMechanismDegrees());
+        setPivotDegrees(getPivotDegrees());
     }
 }

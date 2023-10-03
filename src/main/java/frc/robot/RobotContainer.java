@@ -8,7 +8,6 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
-import frc.robot.subsystems.super_structure.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
 import java.util.Map;
@@ -135,7 +134,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand(AutoPaths autoPath) {
-        //TODO {Maddox} Don't forget to pass in subsystems when they are eventually initiallized in code
-        return Autos.getAutoPathCommand(autoPath, swerve, null, null, null);
+        return Autos.getAutoPathCommand(autoPath, swerve, superStructure);
     }
 }

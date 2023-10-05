@@ -106,8 +106,8 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.runIntake(0.0);
     }
 
-    public Boolean reachedSetpoint() {
-        return this.setpoint.reachedState(this.getPose());
+    public Boolean reachedSetpoint(Double toleranceMult) {
+        return this.setpoint.reachedState(this.getPose(), toleranceMult);
     }
 
     public SuperStructurePosition getPose() {

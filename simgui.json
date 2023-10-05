@@ -2,6 +2,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Driver/Autonomous Routine": "String Chooser",
       "/Shuffleboard/SuperStructure/Superstructure Visualizer": "Mechanism2d"
     },
     "windows": {

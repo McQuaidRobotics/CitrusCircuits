@@ -12,13 +12,13 @@ import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class Autos {
-    public enum AutoPaths {
+    public enum AutoRoutines {
         NOTHING,
         THREE_GAME_PIECE,
         TWO_GAME_PIECE_CHARGE_STATION
     }
 
-    public static Command getAutoPathCommand(AutoPaths autoPath, Swerve swerve, SuperStructure superStructure) {
+    public static Command getAutoRoutineCommand(AutoRoutines autoPath, Swerve swerve, SuperStructure superStructure) {
         Command autoCommand = new InstantCommand();
         switch (autoPath) {
             case THREE_GAME_PIECE: autoCommand = commandThreeGamePiece(swerve, superStructure);

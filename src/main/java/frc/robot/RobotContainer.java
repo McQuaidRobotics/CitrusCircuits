@@ -5,7 +5,7 @@ import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.auto.Autos;
-import frc.robot.commands.auto.Autos.AutoPaths;
+import frc.robot.commands.auto.Autos.AutoRoutines;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,12 +33,17 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final SuperStructure superStructure = new SuperStructure();
 
+    public final ShuffleboardTab driverTab;
+
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         configureDriverBindings();
         configureOperatorBindings();
-        driverShuffleboard();
+
+        driverTab = Shuffleboard.getTab("Driver");
+        configureDriverTabShuffleboard();
+
         swerve.setDefaultCommand(
                 new TeleopSwerve(
                         swerve,
@@ -45,6 +51,7 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(strafeAxis),
                         () -> -driveController.getRawAxis(rotationAxis))
         );
+
     }
 
     private void configureDriverBindings() {
@@ -106,33 +113,33 @@ public class RobotContainer {
                 () -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)));
     }
 
-    private void driverShuffleboard() {
-        var tab = Shuffleboard.getTab("Driver");
-        tab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
+    private void configureDriverTabShuffleboard() {
+        driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
             .withSize(2, 1)
-            .withPosition(6, 0)
+            .withPosition(4, 0)
             .withProperties(Map.of("colorWhenTrue", "Blue", "colorWhenFalse", "Black"));
-        tab.addBoolean("Middle", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.MID)
+        driverTab.addBoolean("Middle", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.MID)
             .withSize(2, 1)
-            .withPosition(6, 1)
+            .withPosition(4, 1)
             .withProperties(Map.of("colorWhenTrue", "Magenta", "colorWhenFalse", "Black"));
-        tab.addBoolean("Low", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW)
+        driverTab.addBoolean("Low", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW)
             .withSize(2, 1)
-            .withPosition(6, 2)
+            .withPosition(4, 2)
             .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
-        var pickup = tab.getLayout("Pickup Mode", BuiltInLayouts.kList)
+        var pickup = driverTab.getLayout("Pickup Mode", BuiltInLayouts.kList)
             .withSize(2, 2)
-            .withPosition(3, 0);
+            .withPosition(0, 2);
         pickup.addBoolean("GROUND", () -> PickupMode.getCurrentMode() == PickupMode.GROUND);
         pickup.addBoolean("STATION", () -> PickupMode.getCurrentMode() == PickupMode.STATION);
 
-        tab.addBoolean("Gampiece Mode", () -> GamepieceMode.getCurrentMode() == GamepieceMode.CUBE)
+        driverTab.addBoolean("Gampiece Mode", () -> GamepieceMode.getCurrentMode() == GamepieceMode.CUBE)
             .withSize(2, 2)
-            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"));
+            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
+            .withPosition(0, 0);
     }
 
-    public Command getAutonomousCommand(AutoPaths autoPath) {
-        return Autos.getAutoPathCommand(autoPath, swerve, superStructure);
+    public Command getAutonomousCommand(AutoRoutines autoPath) {
+        return Autos.getAutoRoutineCommand(autoPath, swerve, superStructure);
     }
 }

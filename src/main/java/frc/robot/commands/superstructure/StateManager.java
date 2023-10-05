@@ -74,7 +74,7 @@ public class StateManager {
     static {
         //without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
-        fromAllStates(States.STOW, Transitions::stowTransition);
+        // fromAllStates(States.STOW, Transitions::stowTransition);
     }
 
     /**

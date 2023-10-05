@@ -7,7 +7,7 @@ import frc.robot.GamepieceMode;
 public enum States {
     START(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.DONT_RUN),
     HOME(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START),
-    STOW(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START),
+    STOW(kPivot.HOME_DEGREES+2.0, kWrist.HOME_DEGREES-3.0, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START),
     STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START),
     PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, kElevator.MAX_METERS*0.91, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_MID(kPivot.SCORE_DEGREES, -23.2, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),

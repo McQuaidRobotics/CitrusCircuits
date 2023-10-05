@@ -183,5 +183,8 @@ public class WristReal implements Wrist {
         this.cachedWristDegrees = motorRotsToMechDegrees(
                 BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh()));
         this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
+        // if (intakeMotorAmps.refresh().getValue() > 60.0) {
+
+        // }
     }
 }

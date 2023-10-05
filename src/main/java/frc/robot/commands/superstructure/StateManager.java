@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.GamepieceMode;
@@ -19,7 +19,7 @@ import frc.robot.subsystems.super_structure.States.IntakeRequest;
  * Acts as a stateful interface for the {@link SuperStructure}.
  * State transitions can be defined in {@link Transitions}.
  * The only public member is the {@link CmdTransitionState} command and should
- *  be used as the main way of controlling the {@link SuperStructure}.
+ * be used as the main way of controlling the {@link SuperStructure}.
  */
 public class StateManager {
 
@@ -32,9 +32,10 @@ public class StateManager {
     @SuppressWarnings("unused")
     /**
      * Runs the given command when transitioning to the given state
+     * 
      * @param state The state to transition to
-     * @param cmd The command to run when transitioning
-     * WARNING: be careful of the order you call the methods in
+     * @param cmd   The command to run when transitioning
+     *              WARNING: be careful of the order you call the methods in
      */
     private static void toAllStates(States state, Function<TransitionData, Command> cmd) {
         HashMap<States, Function<TransitionData, Command>> map = new HashMap<>();
@@ -46,13 +47,15 @@ public class StateManager {
 
     /**
      * Sets the transition from all states to the given state to the given command
+     * 
      * @param state The state to transition to
-     * @param cmd The command to run when transitioning
-     * WARNING: be careful of the order you call the methods in
+     * @param cmd   The command to run when transitioning
+     *              WARNING: be careful of the order you call the methods in
      */
     private static void fromAllStates(States state, Function<TransitionData, Command> cmd) {
         for (var iState : States.values()) {
-            if (iState == state) continue;
+            if (iState == state)
+                continue;
             if (transitions.containsKey(iState)) {
                 transitions.get(iState).put(state, cmd);
             } else {
@@ -63,7 +66,6 @@ public class StateManager {
         }
     }
 
-
     /**
      * A map of all possible transitions from one state to another,
      * default is simply setting the motors to the states' setpoints
@@ -72,7 +74,7 @@ public class StateManager {
     private static Map<States, Map<States, Function<TransitionData, Command>>> transitions = new HashMap<>();
 
     static {
-        //without this the superstructure will never reseed
+        // without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
         // fromAllStates(States.STOW, Transitions::stowTransition);
     }
@@ -90,6 +92,23 @@ public class StateManager {
         return Transitions.defaultTransition(data);
     }
 
+    private static Double intakeVoltage(IntakeRequest req, Boolean useHeld) {
+        if (useHeld) {
+            var held = GamepieceMode.getHeldPiece();
+            if (held == null) {
+                return 0.0;
+            }
+            return req.getVoltage(held);
+        } else {
+            return req.getVoltage(
+                GamepieceMode.getDesiredPiece()
+            );
+        }
+    }
+
+    private static Double intakeVoltage(States to) {
+        return intakeVoltage(to.intakeRequest, to.useHeldGamepiece);
+    }
 
     public static class CmdTransitionState extends CommandBase {
         private final SuperStructure superStructure;
@@ -97,18 +116,17 @@ public class StateManager {
         private States from;
         private Command innerCmd;
 
-        /**Can only be set in initialize, will skip x many cycles,
+        /**
+         * Can only be set in initialize, will skip x many cycles,
          * this also delays inner cmd initialize
          */
         private Integer deadCycles = 0;
 
-        //inner cmd tracking
+        // inner cmd tracking
         private Boolean innerInit = false;
         private Boolean innerFinish = false;
 
         private Boolean reachedSetpoint;
-
-        private GamepieceMode gamepieceMode;
 
         public CmdTransitionState(final SuperStructure superStructure, final States to) {
             this.superStructure = superStructure;
@@ -120,30 +138,27 @@ public class StateManager {
         public void initialize() {
             this.from = lastState;
             StateManager.lastState = to;
-            this.gamepieceMode = GamepieceMode.getCurrentMode();
             this.innerCmd = getTransitionCmd(new TransitionData(from, to, superStructure));
             this.innerInit = false;
             this.innerFinish = false;
             this.reachedSetpoint = false;
             this.deadCycles = 0;
-            if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION 
-                && to.intakeBehavior != IntakeBehavior.RUN_ON_TRANSITION) {
-                superStructure.runEndEffector(
-                    from.intakeRequest.getVoltage(gamepieceMode), from.intakeRequest.getCurrentLimit());
+            if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION
+                    && to.intakeBehavior != IntakeBehavior.RUN_ON_TRANSITION) {
+                superStructure.runEndEffector(intakeVoltage(from), from.intakeRequest.getCurrentLimit());
                 this.deadCycles = 20;
             }
         }
 
         @Override
         public void execute() {
-            //skipping dead cycles
+            // skipping dead cycles
             if (deadCycles > 0) {
                 deadCycles--;
                 return;
             }
 
-
-            //inner command handling
+            // inner command handling
             if (!innerInit) {
                 this.innerCmd.initialize();
                 this.innerInit = true;
@@ -160,25 +175,26 @@ public class StateManager {
                 this.reachedSetpoint = true;
             }
 
-            //solving intake behavior
+            // solving intake behavior
             Double endEffectorVolts = 0.0;
 
             if (to.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
-                endEffectorVolts = IntakeRequest.HOLD.getVoltage(gamepieceMode);
+                endEffectorVolts = intakeVoltage(IntakeRequest.HOLD, to.useHeldGamepiece);
             }
 
-            if (to.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME || to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
-                SmartDashboard.putString("intake run type", "START/WHOLE");
-                endEffectorVolts = to.intakeRequest.getVoltage(gamepieceMode);
+            if (to.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME
+                    || to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
+                // SmartDashboard.putString("intake run type", "START/WHOLE");
+                endEffectorVolts = intakeVoltage(to);
             }
             if (reachedSetpoint) {
                 if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
-                    SmartDashboard.putString("intake run type", "stop cuz not start");
+                    // SmartDashboard.putString("intake run type", "stop cuz not start");
                     endEffectorVolts = 0.0;
                 } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_REACH) {
-                    SmartDashboard.putString("intake run type", "Run on reach");
-                    endEffectorVolts = to.intakeRequest.getVoltage(gamepieceMode);
-                } 
+                    // SmartDashboard.putString("intake run type", "Run on reach");
+                    endEffectorVolts = intakeVoltage(to);
+                }
             }
 
             superStructure.runEndEffector(endEffectorVolts, to.intakeRequest.getCurrentLimit());
@@ -193,9 +209,9 @@ public class StateManager {
         @Override
         public String getName() {
             if (from == null) {
-                return "CmdTransitionState(? -> " + to + "[" + gamepieceMode + "]" + ")";
+                return "CmdTransitionState(? -> " + to + ")";
             } else {
-                return "CmdTransitionState(" + from + " -> " + to + "[" + gamepieceMode + "]" + ")";
+                return "CmdTransitionState(" + from + " -> " + to + ")";
             }
         }
     }

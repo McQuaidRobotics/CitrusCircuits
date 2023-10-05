@@ -45,6 +45,24 @@ public class RobotContainer {
         );
     }
 
+    // [driver]
+    // RightBumber: place position 
+    // LeftBumper: pickup position
+    // RightTrigger: placing standby
+    // LeftTrigger: stow
+    // Start: zero gyro
+    
+    // [operator]
+    // Y: set desired score level to high
+    // B: set desired score level to mid
+    // A: set desired score level to low
+    // X: home/stow
+    // RightBumper: set desired pickup method to ground
+    // LeftBumper: set desired pickup method to shelf
+    // RightTrigger: set desired gamepiece to cube
+    // LeftTrigger: set desired gamepiece to cone
+
+
     private void configureDriverBindings() {
         // Bumpers/Triggers
         driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
@@ -64,24 +82,6 @@ public class RobotContainer {
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
     }
-
-    // [driver]
-    // RightBumber: place position 
-    // LeftBumper: pickup position
-    // RightTrigger: placing standby
-    // LeftTrigger: stow
-    // Start: zero gyro
-    
-    // [operator]
-    // Y: set desired score level to high
-    // B: set desired score level to mid
-    // A: set desired score level to low
-    // X: home/stow
-    // RightBumper: set desired pickup method to ground
-    // LeftBumper: set desired pickup method to shelf
-    // RightTrigger: set desired gamepiece to cube
-    // LeftTrigger: set desired gamepiece to cone
-
 
     private void configureOperatorBindings() {
         // Face buttons

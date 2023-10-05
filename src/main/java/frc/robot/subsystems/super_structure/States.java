@@ -12,7 +12,7 @@ public enum States {
     PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, kElevator.MAX_METERS*0.91, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_MID(kPivot.SCORE_DEGREES, -23.2, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION),
     PLACE_LOW(13.0, 15.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION),
-    PICKUP_GROUND(1.0, 4.5, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH),
+    PICKUP_GROUND(1.0, 4.5, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, 1.2),
     PICKUP_STATION(60.11, -50.0, elevRelative(0.579), IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH);
 
     public final Double pivotDegrees;
@@ -20,6 +20,7 @@ public enum States {
     public final Double elevatorMeters;
     public final IntakeRequest intakeRequest;
     public final IntakeBehavior intakeBehavior;
+    public final Double toleranceMult;
 
     States(
             Double pivotDegrees, Double wristDegrees, Double elevatorMeters,
@@ -29,6 +30,18 @@ public enum States {
         this.elevatorMeters = elevatorMeters;
         this.intakeRequest = intakeRequest;
         this.intakeBehavior = intakeBehavior;
+        this.toleranceMult = 1.0;
+    }
+
+    States(
+            Double pivotDegrees, Double wristDegrees, Double elevatorMeters,
+            IntakeRequest intakeRequest, IntakeBehavior intakeBehavior, Double toleranceMult) {
+        this.pivotDegrees = pivotDegrees;
+        this.wristDegrees = wristDegrees;
+        this.elevatorMeters = elevatorMeters;
+        this.intakeRequest = intakeRequest;
+        this.intakeBehavior = intakeBehavior;
+        this.toleranceMult = toleranceMult;
     }
 
     private static Double elevRelative(Double setpoint) {
@@ -94,10 +107,10 @@ public enum States {
         }
 
         /** Does not check intake */
-        public boolean reachedState(SuperStructurePosition pose) {
-            return Math.abs(pose.pivotDegrees - pivotDegrees) < 0.1 &&
-                    Math.abs(pose.wristDegrees - wristDegrees) < 0.1 &&
-                    Math.abs(pose.elevatorMeters - elevatorMeters) < 0.05;
+        public boolean reachedState(SuperStructurePosition pose, Double toleranceMult) {
+            return Math.abs(pose.pivotDegrees - pivotDegrees) < (kPivot.TOLERANCE * toleranceMult) &&
+                    Math.abs(pose.wristDegrees - wristDegrees) < (kWrist.TOLERANCE * toleranceMult) &&
+                    Math.abs(pose.elevatorMeters - elevatorMeters) < (kElevator.TOLERANCE * toleranceMult);
         }
 
         /** Does not set intake */

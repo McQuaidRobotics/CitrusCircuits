@@ -156,7 +156,7 @@ public class StateManager {
                 this.innerFinish = true;
             }
 
-            if (superStructure.reachedSetpoint() && !this.reachedSetpoint) {
+            if (superStructure.reachedSetpoint(to.toleranceMult) && !this.reachedSetpoint) {
                 this.reachedSetpoint = true;
             }
 

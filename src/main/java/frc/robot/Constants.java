@@ -35,8 +35,8 @@ public final class Constants {
             // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
-            public static final double MAX_VELOCITY = 100;
-            public static final double MAX_ACCELERATION = 750;
+            public static final double MAX_VELOCITY = 70;
+            public static final double MAX_ACCELERATION = 300;
             public static final double MAX_JERK = 5000;
 
             public static final boolean INVERTED = false;
@@ -87,9 +87,9 @@ public final class Constants {
             public static final double MOTOR_kI = 0;
             public static final double MOTOR_kD = 0;
 
-            public static final double MAX_VELOCITY = 100;
-            public static final double MAX_ACCELERATION = 750;
-            public static final double MAX_JERK = 5000;
+            public static final double MAX_VELOCITY = 80;
+            public static final double MAX_ACCELERATION = 700;
+            public static final double MAX_JERK = 3000;
 
             /**
              * Zero is parallel with the floor
@@ -148,9 +148,12 @@ public final class Constants {
 
             public static final boolean INVERTED = true;
 
-            public static final double MAX_VELOCITY = 100;
-            public static final double MAX_ACCELERATION = 750;
-            public static final double MAX_JERK = 5000;
+            public static final double MAX_VELOCITY = 50;
+            public static final double MAX_ACCELERATION = 600;
+            public static final double MAX_JERK = 2000;
+            // public static final double MAX_VELOCITY = 100;
+            // public static final double MAX_ACCELERATION = 750;
+            // public static final double MAX_JERK = 5000;
 
             public static final double MOTOR_TO_MECHANISM_RATIO = 1.0/3.0;
             public static final double MECHANISM_DIAMETER_METERS = 0.042164;
@@ -171,9 +174,8 @@ public final class Constants {
             public static final double WRIST_MASS_GRAMS = 3250;
             public static final double ARM_MASS_GRAMS = 9500;
 
-            public static final double ELEVATOR_MIN_METERS = 0.51562;
-            public static final double ELEVATOR_RANGE_METERS = 0.9438;
-            public static final double ELEVATOR_MAX_METERS = ELEVATOR_RANGE_METERS + ELEVATOR_MIN_METERS;
+            public static final double ELEVATOR_MIN_METERS = 0.565;
+            public static final double ELEVATOR_MAX_METERS = 1.568;
 
             public static final double PIVOT_MIN_ANGLE = -8.0;
             public static final double PIVOT_MAX_ANGLE = 90.0;

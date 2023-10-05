@@ -27,8 +27,8 @@ public class RobotContainer {
     private final int strafeAxis = XboxController.Axis.kLeftX.value;
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
-    private final Swerve swerve = new Swerve();
-    private final SuperStructure superStructure = new SuperStructure();
+    private static final Swerve swerve = new Swerve();
+    private static final SuperStructure superStructure = new SuperStructure();
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
@@ -39,8 +39,8 @@ public class RobotContainer {
         swerve.setDefaultCommand(
                 new TeleopSwerve(
                         swerve,
-                        () -> -driveController.getRawAxis(translationAxis),
-                        () -> -driveController.getRawAxis(strafeAxis),
+                        () -> driveController.getRawAxis(translationAxis),
+                        () -> driveController.getRawAxis(strafeAxis),
                         () -> -driveController.getRawAxis(rotationAxis))
         );
     }
@@ -53,23 +53,23 @@ public class RobotContainer {
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
 
         // used for testing
-        driveController.pov(0).onTrue(new InstantCommand(() -> superStructure.runEndEffector(12.0, false), superStructure));
-        driveController.pov(180).onTrue(new InstantCommand(() -> superStructure.runEndEffector(-12.0, false), superStructure));
-        driveController.pov(90).onTrue(new InstantCommand(() -> superStructure.runEndEffector(0.0, false), superStructure));
-        driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
-        driveController.a().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
-        driveController.b().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
-        driveController.y().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
+        // driveController.pov(0).onTrue(new InstantCommand(() -> superStructure.runEndEffector(12.0, false), superStructure));
+        // driveController.pov(180).onTrue(new InstantCommand(() -> superStructure.runEndEffector(-12.0, false), superStructure));
+        // driveController.pov(90).onTrue(new InstantCommand(() -> superStructure.runEndEffector(0.0, false), superStructure));
+        driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
+        // driveController.a().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
+        // driveController.b().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
+        // driveController.y().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
 
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
     }
 
     // [driver]
-    // RightBumber: pickup position 
-    // LeftBumper: place position
+    // RightBumber: place position 
+    // LeftBumper: pickup position
     // RightTrigger: placing standby
-    // LeftTrigger: home/stow
+    // LeftTrigger: stow
     // Start: zero gyro
     
     // [operator]
@@ -86,22 +86,29 @@ public class RobotContainer {
     private void configureOperatorBindings() {
         // Face buttons
         operatorController.y().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))
+                .ignoringDisable(true));
         operatorController.b().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID)));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))
+                .ignoringDisable(true));
         operatorController.a().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW)));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW))
+                .ignoringDisable(true));
         operatorController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
 
         // Bumpers/Triggers
         operatorController.rightBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.GROUND)));
+                () -> PickupMode.setCurrentMode(PickupMode.GROUND))
+                .ignoringDisable(true));
         operatorController.leftBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.STATION)));
+                () -> PickupMode.setCurrentMode(PickupMode.STATION))
+                .ignoringDisable(true));
         operatorController.leftTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE)));
+                () -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE))
+                .ignoringDisable(true));
         operatorController.rightTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)));
+                () -> GamepieceMode.setCurrentMode(GamepieceMode.CONE))
+                .ignoringDisable(true));
     }
 
     private void driverShuffleboard() {

@@ -7,7 +7,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -75,8 +75,8 @@ public class PivotReal implements Pivot {
         motorCfg.Voltage.PeakForwardVoltage = kPivot.VOLTAGE_COMP;
         motorCfg.Voltage.PeakReverseVoltage = -kPivot.VOLTAGE_COMP;
 
-        motorCfg.MotorOutput.PeakForwardDutyCycle = 0.5;
-        motorCfg.MotorOutput.PeakReverseDutyCycle = -0.5;
+        motorCfg.MotorOutput.PeakForwardDutyCycle = 0.8;
+        motorCfg.MotorOutput.PeakReverseDutyCycle = -0.8;
 
         return motorCfg;
     }
@@ -96,14 +96,14 @@ public class PivotReal implements Pivot {
         // this.leaderMotor.setRotorPosition(
         // mechDegreesToMotorRots(gyro.getYaw())
         // );
+
         // }
 
         isStowed = false;
-        var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
+        var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(degrees - getPivotDegrees()) < kPivot.TOLERANCE;
     }
-
     @Override
     public void manualDriveMechanism(Double percentOut) {
         isStowed = false;

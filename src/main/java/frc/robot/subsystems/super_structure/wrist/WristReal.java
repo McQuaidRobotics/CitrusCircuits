@@ -5,7 +5,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -75,8 +75,8 @@ public class WristReal implements Wrist {
         wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        wristMotorCfg.MotorOutput.PeakForwardDutyCycle = 0.4;
-        wristMotorCfg.MotorOutput.PeakReverseDutyCycle = -0.4;
+        wristMotorCfg.MotorOutput.PeakForwardDutyCycle = 0.7;
+        wristMotorCfg.MotorOutput.PeakReverseDutyCycle = -0.7;
 
         return wristMotorCfg;
     }
@@ -93,10 +93,6 @@ public class WristReal implements Wrist {
         intakeMotorCfg.MotorOutput.Inverted = kIntake.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        intakeMotorCfg.CurrentLimits.SupplyCurrentLimitEnable = kIntake.CURRENT_LIMIT != 0;
-        intakeMotorCfg.CurrentLimits.SupplyCurrentThreshold = kIntake.CURRENT_LIMIT;
-        intakeMotorCfg.CurrentLimits.SupplyTimeThreshold = 0.5;
-
         return intakeMotorCfg;
     }
 
@@ -110,7 +106,7 @@ public class WristReal implements Wrist {
             return false;
         }
         isStowed = false;
-        var posControlRequest = new PositionDutyCycle(mechDegreesToMotorRots(degrees));
+        var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
         return Math.abs(degrees - getMechanismDegrees()) < kWrist.TOLERANCE;
     }
@@ -144,11 +140,12 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void enableIntakeCurrentLimits(Boolean enable) {
+    public void setIntakeCurrentLimits(Double limit) {
         var cfg = new CurrentLimitsConfigs();
-        this.intakeMotor.getConfigurator().refresh(cfg);
-        cfg.SupplyCurrentLimitEnable = enable;
-        this.intakeMotor.getConfigurator().apply(cfg);
+        cfg.SupplyCurrentLimitEnable = true;
+        cfg.SupplyCurrentLimit = limit;
+        cfg.SupplyCurrentThreshold = limit;
+        cfg.SupplyTimeThreshold = 0.2;
     }
 
     @Override
@@ -184,8 +181,7 @@ public class WristReal implements Wrist {
     @Override
     public void periodic() {
         this.cachedWristDegrees = motorRotsToMechDegrees(
-            BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh())
-        );
+                BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh()));
         this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
     }
 }

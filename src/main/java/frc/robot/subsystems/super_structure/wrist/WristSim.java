@@ -44,7 +44,7 @@ public class WristSim implements Wrist {
 
     @Override
     public void runIntake(Double percentOut) {
-        this.intakeVolts = percentOut*12.0;
+        this.intakeVolts = percentOut * 12.0;
     }
 
     @Override
@@ -59,5 +59,6 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public void enableIntakeCurrentLimits(Boolean enable) {}
+    public void setIntakeCurrentLimits(Double limit) {
+    }
 }

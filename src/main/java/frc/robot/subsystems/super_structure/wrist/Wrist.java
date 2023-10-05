@@ -6,6 +6,7 @@ public interface Wrist extends Component {
     /**
      * Abstract from motors, will set the wrist degrees.
      * Parallel to the elevator is 0 degrees
+     * 
      * @return true if degrees has been reached
      */
     public Boolean setMechanismDegrees(Double degrees);
@@ -34,5 +35,5 @@ public interface Wrist extends Component {
     /**
      * @param enable true to enable current limits, false to disable
      */
-    public void enableIntakeCurrentLimits(Boolean enable);
+    public void setIntakeCurrentLimits(Double enable);
 }

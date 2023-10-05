@@ -5,11 +5,11 @@ public enum GamepieceMode {
 
     private static GamepieceMode currentMode = CONE;
 
-    public synchronized static GamepieceMode getCurrentMode() {
+    public static GamepieceMode getCurrentMode() {
         return currentMode;
     }
 
-    public synchronized static void setCurrentMode(GamepieceMode mode) {
+    public static void setCurrentMode(GamepieceMode mode) {
         currentMode = mode;
     }
 }

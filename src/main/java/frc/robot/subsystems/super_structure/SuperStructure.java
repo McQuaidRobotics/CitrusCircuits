@@ -52,8 +52,8 @@ public class SuperStructure extends SubsystemBase {
             return elev && wrist;
         };
         // BooleanSupplier runWristElevatorSeq = () -> {
-        //     return this.wrist.setMechanismDegrees(to.wristDegrees)
-        //         && this.elevator.setMechanismMeters(to.elevatorMeters);
+        // return this.wrist.setMechanismDegrees(to.wristDegrees)
+        // && this.elevator.setMechanismMeters(to.elevatorMeters);
         // };
         BooleanSupplier runPivot = () -> {
             return this.pivot.setPivotDegrees(to.pivotDegrees);
@@ -89,12 +89,12 @@ public class SuperStructure extends SubsystemBase {
         // this will do wrist -> elevator -> pivot
         return this.wrist.stowMechanism(toZero)
                 && this.elevator.stowMechanism(toZero)
-                && this.pivot.stowMechanism(toZero);
+                && this.pivot.stowMechanism(false);
     }
 
-    public void runEndEffector(Double volts, Boolean currentLimits) {
+    public void runEndEffector(Double volts, Double currentLimit) {
         // when outtaking this should be false
-        this.wrist.enableIntakeCurrentLimits(currentLimits);
+        this.wrist.setIntakeCurrentLimits(currentLimit);
         // assume max voltage is 12.0
         this.wrist.runIntake(volts / 12.0);
     }
@@ -106,8 +106,8 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.runIntake(0.0);
     }
 
-    public Boolean reachedSetpoint() {
-        return this.setpoint.reachedState(this.getPose());
+    public Boolean reachedSetpoint(Double toleranceMult) {
+        return this.setpoint.reachedState(this.getPose(), toleranceMult);
     }
 
     public SuperStructurePosition getPose() {
@@ -130,7 +130,7 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.manualDriveMechanism(wristPercent);
         this.pivot.manualDriveMechanism(pivotPercent);
         this.elevator.manualDriveMechanism(elevatorPercent);
-        this.wrist.runIntake(intakePercent);
+        // this.wrist.runIntake(intakePercent);
     }
 
     /** once moved over to TEMPLATE this can be removed */

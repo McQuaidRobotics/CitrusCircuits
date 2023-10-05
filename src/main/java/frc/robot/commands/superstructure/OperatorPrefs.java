@@ -8,11 +8,11 @@ public class OperatorPrefs {
 
         private static PickupMode currentMode = GROUND;
 
-        public synchronized static void setCurrentMode(PickupMode mode) {
+        public static void setCurrentMode(PickupMode mode) {
             currentMode = mode;
         }
 
-        public synchronized static PickupMode getCurrentMode() {
+        public static PickupMode getCurrentMode() {
             return currentMode;
         }
     }
@@ -24,11 +24,11 @@ public class OperatorPrefs {
 
         private static ScoreLevel currentLevel = HIGH;
 
-        public synchronized static void setCurrentLevel(ScoreLevel level) {
+        public static void setCurrentLevel(ScoreLevel level) {
             currentLevel = level;
         }
 
-        public synchronized static ScoreLevel getCurrentLevel() {
+        public static ScoreLevel getCurrentLevel() {
             return currentLevel;
         }
     }

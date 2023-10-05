@@ -9,7 +9,7 @@ public class Helpers {
         return new DoubleSupplier() {
             private final DoubleSupplier inputSupplier = input;
             private final Double deadband = db;
-    
+
             @Override
             public double getAsDouble() {
                 return MathUtil.applyDeadband(inputSupplier.getAsDouble(), deadband);

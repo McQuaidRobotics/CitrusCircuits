@@ -5,7 +5,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -73,8 +73,8 @@ public class ElevatorReal implements Elevator {
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        motorCfg.MotorOutput.PeakForwardDutyCycle *= 0.25;
-        motorCfg.MotorOutput.PeakReverseDutyCycle *= 0.25;
+        motorCfg.MotorOutput.PeakForwardDutyCycle *= 0.4;
+        motorCfg.MotorOutput.PeakReverseDutyCycle *= 0.4;
 
         motorCfg.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
@@ -92,7 +92,7 @@ public class ElevatorReal implements Elevator {
             return false;
         }
         this.isStowed = false;
-        var posControlRequest = new PositionDutyCycle(mechMetersToMotorRots(meters));
+        var posControlRequest = new MotionMagicDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(meters - getMechanismMeters()) < kElevator.TOLERANCE;
     }

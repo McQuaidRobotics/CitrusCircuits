@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,7 +23,7 @@ public class PivotReal implements Pivot {
     private final TalonFX leaderMotor;
     /** Right */
     private final TalonFX followerMotor;
-    // private final PigeonIMU gyro;
+    private final Pigeon2 gyro;
 
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
 
@@ -38,6 +39,8 @@ public class PivotReal implements Pivot {
     }
 
     public PivotReal(Double startingDegrees) {
+        gyro = new Pigeon2(kPivot.PIGEON_ID);
+
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
         followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID);
         leaderMotor.getConfigurator().apply(getMotorConfig());
@@ -54,7 +57,6 @@ public class PivotReal implements Pivot {
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
 
-        // gyro = new PigeonIMU(kPivot.PIGEON_ID);
     }
 
     private TalonFXConfiguration getMotorConfig() {
@@ -92,12 +94,11 @@ public class PivotReal implements Pivot {
         }
 
         // if the last state was stow re seed motor by gyro
-        // if (isStowed) {
-        // this.leaderMotor.setRotorPosition(
-        // mechDegreesToMotorRots(gyro.getYaw())
-        // );
-
-        // }
+        if (isStowed) {
+            this.leaderMotor.setRotorPosition(
+                mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
+            );
+        }
 
         isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));

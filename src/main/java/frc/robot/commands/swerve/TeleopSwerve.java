@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.*;
 
 /** An example command that uses an example subsystem. */
 public class TeleopSwerve extends CommandBase {
@@ -17,6 +18,7 @@ public class TeleopSwerve extends CommandBase {
   private DoubleSupplier translationAxisSup;
   private DoubleSupplier strafeAxisSup;
   private DoubleSupplier rotationAxisSup;
+  private boolean applyDeadband;
 
   public TeleopSwerve(Swerve swerve, DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier rotation) {
     this.swerve = swerve;
@@ -25,13 +27,35 @@ public class TeleopSwerve extends CommandBase {
     this.translationAxisSup = translation;
     this.strafeAxisSup = strafe;
     this.rotationAxisSup = rotation;
+    this.applyDeadband = true;
+  }
+
+  public TeleopSwerve(Swerve swerve, DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier rotation, boolean applyDeadband) {
+    this.swerve = swerve;
+    addRequirements(swerve);
+
+    this.translationAxisSup = translation;
+    this.strafeAxisSup = strafe;
+    this.rotationAxisSup = rotation;
+    this.applyDeadband = applyDeadband;
   }
 
   @Override
   public void execute() {
-    double translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(), 0.1);
-    double strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(), 0.1);
-    double rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), 0.2);
+    double translationVal; 
+    double strafeVal; 
+    double rotationVal;
+
+    if (applyDeadband) {
+      translationVal = MathUtil.applyDeadband(translationAxisSup.getAsDouble(), ControllerConsts.LEFT_DEADBAND);
+      strafeVal = MathUtil.applyDeadband(strafeAxisSup.getAsDouble(), ControllerConsts.LEFT_DEADBAND);
+      rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), ControllerConsts.RIGHT_DEADBAND);
+    }
+    else {
+      translationVal = translationAxisSup.getAsDouble();
+      strafeVal = strafeAxisSup.getAsDouble();
+      rotationVal = rotationAxisSup.getAsDouble();
+    }
 
     swerve.Drive(
         new Translation2d(translationVal, strafeVal).times(Constants.kSwerve.MAX_SPEED),

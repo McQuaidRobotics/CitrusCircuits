@@ -1,5 +1,6 @@
 package frc.robot.commands.swerve;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.swerve.Swerve;
 
@@ -8,6 +9,7 @@ public class commandBalanceSwerve extends CommandBase{
     private Swerve swerve;
     private double forwardDriveStrength;
     private double backwardDriveStrength;
+    private Debouncer balancedDebouncer;
 
     /**
      * @param swerve The swerve subsystem to be used
@@ -28,7 +30,7 @@ public class commandBalanceSwerve extends CommandBase{
 
     @Override
     public void initialize() {
-        
+        this.balancedDebouncer = new Debouncer(0.1);
     }
 
     @Override
@@ -38,14 +40,16 @@ public class commandBalanceSwerve extends CommandBase{
                 swerve, 
                 () -> -1.0 * backwardDriveStrength, 
                 () -> 0.0, 
-                () -> 0.0);
+                () -> 0.0,
+                false);
         }
         else {
             new TeleopSwerve(
                 swerve, 
                 () -> 1.0 * forwardDriveStrength, 
                 () -> 0.0, 
-                () -> 0.0);
+                () -> 0.0,
+                false);
         }
 
         /*
@@ -62,6 +66,6 @@ public class commandBalanceSwerve extends CommandBase{
 
     @Override
     public boolean isFinished() {
-        return Math.abs(swerve.getGyroPitch().getValue()) <= pitchErrorDegrees;
+        return balancedDebouncer.calculate(Math.abs(swerve.getGyroPitch().getValue()) <= pitchErrorDegrees);
     }
 }

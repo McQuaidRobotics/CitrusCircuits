@@ -3,7 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.auto.PIDConstants;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +20,11 @@ public final class Constants {
     public static final double dPlaceholder = 0.0;
     public static final int iPlaceholder = 0;
     public static final boolean bPlaceholder = false;
+
+    public static class ControllerConsts {
+        public static final double LEFT_DEADBAND = 0.1;
+        public static final double RIGHT_DEADBAND = 0.2;
+    }
 
     public static class kSuperStructure {
 

@@ -55,7 +55,8 @@ public class commandDriveTimedDirection extends CommandBase{
             swerve, 
             () -> (direction.x * speedDampenPercent), 
             () -> (direction.y * speedDampenPercent), 
-            () -> 0.0);
+            () -> 0.0,
+            false);
     }
 
     @Override

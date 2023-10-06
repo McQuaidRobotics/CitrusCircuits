@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.PathConstraints;
@@ -18,13 +19,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.kAuto;
 import frc.robot.Constants.kSwerve;
 
@@ -70,12 +68,31 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public Command commandPerpendicularDrives() {
+        return new InstantCommand(() -> {
+            SwerveModuleState[] newModuleStates = {
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0))
+            };
+
+            for (SwerveModule module : mSwerveMods) {
+                module.setAngle(null);
+            }
+        }).withName("commandPerpendicularDrives");
+    }
+
     public Command commandStopDrives() {
-        return new InstantCommand(() -> setModuleStates(new ChassisSpeeds()));
+        return new InstantCommand(() -> setModuleStates(new ChassisSpeeds())).withName("commandStopDrives");
     }
 
     public void zeroGyro() {
         gyro.setYaw(0.0);
+    }
+
+    public StatusSignal<Double> getGyroPitch() {
+        return gyro.getPitch();
     }
 
     public Rotation2d getYaw() {

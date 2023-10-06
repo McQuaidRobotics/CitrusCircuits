@@ -14,10 +14,10 @@ public class commandDriveTimedDirection extends CommandBase{
     private double timeOfInitilization;
 
     public enum Direction {
-        LEFT(-1, 0),
-        RIGHT(1, 0),
-        BACKWARD(0, -1),
-        FORWARD(0, 1);
+        LEFT(-1.0, 0.0),
+        RIGHT(1.0, 0.0),
+        BACKWARD(0.0, -1.0),
+        FORWARD(0.0, 1.0);
 
         public double x, y;
         private Direction(double x, double y) {

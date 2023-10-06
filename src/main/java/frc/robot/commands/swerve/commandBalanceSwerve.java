@@ -1,6 +1,7 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.swerve.Swerve;
 
@@ -57,6 +58,13 @@ public class commandBalanceSwerve extends CommandBase{
         *the drive strength each time the robot switches direction while teetering
         *on the charge station
         */
+
+        SmartDashboard.putNumber("pitchErrorDegreesBalance", pitchErrorDegrees);
+        SmartDashboard.putNumber("forwardDriveStrengthBalance", forwardDriveStrength);
+        SmartDashboard.putNumber("backwardDriveStrengthBalance", backwardDriveStrength);
+        SmartDashboard.putBoolean(
+            "balanced", 
+            balancedDebouncer.calculate(Math.abs(swerve.getGyroPitch().getValue()) <= pitchErrorDegrees));
     }
 
     @Override

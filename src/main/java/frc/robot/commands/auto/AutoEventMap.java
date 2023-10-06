@@ -22,8 +22,9 @@ public class AutoEventMap {
             put("pickUpGround", new StateManager.CmdTransitionState(superStructure, States.PICKUP_GROUND));
             put("pickUpStation", new StateManager.CmdTransitionState(superStructure, States.PICKUP_STATION));
 
-            put("standbyPosition", new StateManager.CmdTransitionState(superStructure, States.STANDBY));
-            put("homePosition", new StateManager.CmdTransitionState(superStructure, States.HOME));
+            put("standbyPos", new StateManager.CmdTransitionState(superStructure, States.STANDBY));
+            put("homePos", new StateManager.CmdTransitionState(superStructure, States.HOME));
+            put("stowPos", new StateManager.CmdTransitionState(superStructure, States.STOW));
 
             put("useConeMode", new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)));
             put("useCubeMode", new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE)));

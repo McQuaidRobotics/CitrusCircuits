@@ -47,11 +47,17 @@ public class commandBalanceSwerve extends CommandBase{
                 () -> 0.0, 
                 () -> 0.0);
         }
+
+        /*
+        *TODO {Maddox} May want some kind of system in place which will decrease
+        *the drive strength each time the robot switches direction while teetering
+        *on the charge station
+        */
     }
 
     @Override
     public void end(boolean interrupted) {
-        //perpendicular swerve drives
+        swerve.commandPerpendicularDrives();
     }
 
     @Override

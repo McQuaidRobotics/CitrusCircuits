@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.auto.PIDConstants;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -196,8 +197,7 @@ public final class Constants {
     }
 
     public static class kAuto {
-        public static final PIDController AUTO_X_PID = new PIDController(0.0, 0.0, 0.0);
-        public static final PIDController AUTO_Y_PID = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(0.0, 0.0, 0.0);
         public static final PIDController AUTO_ANGULAR_PID = new PIDController(0.0, 0.0, 0.0);
     }
 

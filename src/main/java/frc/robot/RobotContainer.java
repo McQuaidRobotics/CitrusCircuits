@@ -52,6 +52,7 @@ public class RobotContainer {
                         () -> -driveController.getRawAxis(rotationAxis))
         );
 
+        Autos.buildAutoEventMap(swerve, superStructure);
     }
 
     // [driver]

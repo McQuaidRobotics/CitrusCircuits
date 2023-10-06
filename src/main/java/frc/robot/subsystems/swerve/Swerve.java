@@ -6,6 +6,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.kAuto;
 import frc.robot.Constants.kSwerve;
+import frc.robot.commands.auto.AutoEventMap;
+import frc.robot.subsystems.super_structure.SuperStructure;
 
 public class Swerve extends SubsystemBase {
     private SwerveDriveOdometry swerveOdometry;
@@ -71,14 +75,14 @@ public class Swerve extends SubsystemBase {
     public Command commandPerpendicularDrives() {
         return new InstantCommand(() -> {
             SwerveModuleState[] newModuleStates = {
-                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-                new SwerveModuleState(0.0, Rotation2d.fromDegrees(0))
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(270)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(270)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(90)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(90))
             };
 
             for (SwerveModule module : mSwerveMods) {
-                module.setAngle(null);
+                module.setAngle(newModuleStates[module.moduleNumber]);
             }
         }).withName("commandPerpendicularDrives");
     }
@@ -153,14 +157,35 @@ public class Swerve extends SubsystemBase {
                 autoPath,
                 this::getPose,
                 kSwerve.SWERVE_KINEMATICS,
-                kAuto.AUTO_X_PID,
-                kAuto.AUTO_Y_PID,
+                kAuto.AUTO_TRANSLATION_PID,
+                kAuto.AUTO_TRANSLATION_PID,
                 kAuto.AUTO_ANGULAR_PID,
                 this::setModuleStates,
+                true,
                 this
             ),
             commandStopDrives()
         ).withName("commandRunPath: " + autoPathFileName);
+    }
+
+    public Command commandRunPathWithEvents(String autoPathFileName, AutoEventMap autoEventMap) {
+        if (autoEventMap == null) throw new NullPointerException("AutoEventMap is null, make sure to call 'Autos.buildAutoEventMap' to ensure the construction of the event marker map.");
+        PathPlannerTrajectory autoPath = openFilePath(autoPathFileName);
+        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+            this::getPose, 
+            this::resetOdometry, 
+            new PIDConstants(
+                kAuto.AUTO_TRANSLATION_PID.getP(), 
+                kAuto.AUTO_TRANSLATION_PID.getI(), 
+                kAuto.AUTO_TRANSLATION_PID.getD()), 
+            new PIDConstants(
+                kAuto.AUTO_ANGULAR_PID.getP(), 
+                kAuto.AUTO_ANGULAR_PID.getI(), 
+                kAuto.AUTO_ANGULAR_PID.getD()), 
+            this::setModuleStates, 
+            autoEventMap.getMap(), 
+            this);
+        return autoBuilder.fullAuto(autoPath).withName("commandRunPathWithEvents: " + autoPathFileName);
     }
 
     @Override

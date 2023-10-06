@@ -12,6 +12,12 @@ import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class Autos {
+    private static AutoEventMap autoEventMap;
+
+    public static void buildAutoEventMap(Swerve swerve, SuperStructure superStructure) {
+        autoEventMap = new AutoEventMap(swerve, superStructure);
+    }
+
     public enum AutoRoutines {
         NOTHING,
         THREE_GAME_PIECE,
@@ -69,6 +75,7 @@ public class Autos {
     } 
 
     private static Command commandTwoGamePieceChargeStation(Swerve swerve, SuperStructure superStructure) {
-        return new InstantCommand().withName("commandTwoGamePieceChargeStation");
+        // return new InstantCommand().withName("commandTwoGamePieceChargeStation");
+        return swerve.commandRunPathWithEvents(null, autoEventMap);
     }
 }

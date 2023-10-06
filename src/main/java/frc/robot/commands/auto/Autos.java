@@ -24,9 +24,9 @@ public class Autos {
         TWO_GAME_PIECE_CHARGE_STATION
     }
 
-    public static Command getAutoRoutineCommand(AutoRoutines autoPath, Swerve swerve, SuperStructure superStructure) {
+    public static Command getAutoRoutineCommand(AutoRoutines autoRoutine, Swerve swerve, SuperStructure superStructure) {
         Command autoCommand = new InstantCommand();
-        switch (autoPath) {
+        switch (autoRoutine) {
             case THREE_GAME_PIECE: autoCommand = commandThreeGamePiece(swerve, superStructure);
             case TWO_GAME_PIECE_CHARGE_STATION: autoCommand = commandTwoGamePieceChargeStation(swerve, superStructure);
             case NOTHING:

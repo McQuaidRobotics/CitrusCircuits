@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
     }
     m_robotContainer.driverTab.add("Autonomous Routine", autoRoutineChooser)
       .withSize(2, 1)
-      .withPosition(2, 0);
+      .withPosition(0, 0);
   }
 
   @Override

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -19,7 +20,7 @@ public class WristReal implements Wrist {
     private final TalonFX wristMotor, intakeMotor;
 
     private final StatusSignal<Double> wristMotorRots, wristMotorVelo, wristMotorAmps, wristMotorVolts;
-    private final StatusSignal<Double> intakeMotorAmps, intakeMotorVolts;
+    private final StatusSignal<Double> intakeMotorAmps, intakeMotorVolts, intakeMotorVelo;
 
     private Boolean isStowed = false;
     private Double cachedWristDegrees, cachedIntakeVolts = 0.0;
@@ -41,6 +42,7 @@ public class WristReal implements Wrist {
 
         intakeMotorAmps = intakeMotor.getStatorCurrent();
         intakeMotorVolts = intakeMotor.getSupplyVoltage();
+        intakeMotorVelo = intakeMotor.getVelocity();
     }
 
     private Double mechDegreesToMotorRots(Double mechanismDegrees) {
@@ -183,5 +185,10 @@ public class WristReal implements Wrist {
         this.cachedWristDegrees = motorRotsToMechDegrees(
                 BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh()));
         this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
+        if (intakeMotorVolts.refresh().getValue() > 8.0) {
+            if (intakeMotorVelo.refresh().getValue() < 10.0) {
+                DriverStation.reportWarning("wouldve aquired gamepiece", false);
+            }
+        }
     }
 }

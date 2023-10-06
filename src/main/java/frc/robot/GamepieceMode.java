@@ -3,13 +3,22 @@ package frc.robot;
 public enum GamepieceMode {
     CONE, CUBE;
 
-    private static GamepieceMode currentMode = CONE;
+    private static GamepieceMode desiredPiece = CONE;
+    private static GamepieceMode heldPiece = null;
 
-    public static GamepieceMode getCurrentMode() {
-        return currentMode;
+    public static GamepieceMode getDesiredPiece() {
+        return desiredPiece;
     }
 
-    public static void setCurrentMode(GamepieceMode mode) {
-        currentMode = mode;
+    public static void setDesiredPiece(GamepieceMode mode) {
+        desiredPiece = mode;
+    }
+
+    public static GamepieceMode getHeldPiece() {
+        return heldPiece;
+    }
+
+    public static void setHeldPiece(GamepieceMode heldPiece) {
+        GamepieceMode.heldPiece = heldPiece;
     }
 }

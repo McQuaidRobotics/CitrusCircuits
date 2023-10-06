@@ -25,8 +25,8 @@ public class AutoEventMap {
             put("standbyPosition", new StateManager.CmdTransitionState(superStructure, States.STANDBY));
             put("homePosition", new StateManager.CmdTransitionState(superStructure, States.HOME));
 
-            put("useConeMode", new InstantCommand(() -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)));
-            put("useCubeMode", new InstantCommand(() -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE)));
+            put("useConeMode", new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)));
+            put("useCubeMode", new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE)));
         }}};
     }
 

@@ -49,19 +49,18 @@ public class RobotContainer {
                         swerve,
                         () -> driveController.getRawAxis(translationAxis),
                         () -> driveController.getRawAxis(strafeAxis),
-                        () -> -driveController.getRawAxis(rotationAxis))
-        );
+                        () -> -driveController.getRawAxis(rotationAxis)));
 
         Autos.buildAutoEventMap(swerve, superStructure);
     }
 
     // [driver]
-    // RightBumber: place position 
+    // RightBumber: place position
     // LeftBumper: pickup position
     // RightTrigger: placing standby
     // LeftTrigger: stow
     // Start: zero gyro
-    
+
     // [operator]
     // Y: set desired score level to high
     // B: set desired score level to mid
@@ -72,7 +71,6 @@ public class RobotContainer {
     // RightTrigger: set desired gamepiece to cube
     // LeftTrigger: set desired gamepiece to cone
 
-
     private void configureDriverBindings() {
         // Bumpers/Triggers
         driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
@@ -81,13 +79,19 @@ public class RobotContainer {
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
 
         // used for testing
-        // driveController.pov(0).onTrue(new InstantCommand(() -> superStructure.runEndEffector(12.0, false), superStructure));
-        // driveController.pov(180).onTrue(new InstantCommand(() -> superStructure.runEndEffector(-12.0, false), superStructure));
-        // driveController.pov(90).onTrue(new InstantCommand(() -> superStructure.runEndEffector(0.0, false), superStructure));
+        // driveController.pov(0).onTrue(new InstantCommand(() ->
+        // superStructure.runEndEffector(12.0, false), superStructure));
+        // driveController.pov(180).onTrue(new InstantCommand(() ->
+        // superStructure.runEndEffector(-12.0, false), superStructure));
+        // driveController.pov(90).onTrue(new InstantCommand(() ->
+        // superStructure.runEndEffector(0.0, false), superStructure));
         driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
-        // driveController.a().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
-        // driveController.b().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
-        // driveController.y().onTrue(new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
+        // driveController.a().onTrue(new
+        // StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
+        // driveController.b().onTrue(new
+        // StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
+        // driveController.y().onTrue(new
+        // StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
 
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
@@ -114,37 +118,50 @@ public class RobotContainer {
                 () -> PickupMode.setCurrentMode(PickupMode.STATION))
                 .ignoringDisable(true));
         operatorController.leftTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE))
+                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))
                 .ignoringDisable(true));
         operatorController.rightTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setCurrentMode(GamepieceMode.CONE))
+                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))
                 .ignoringDisable(true));
+
+        // used for testing
+        driveController.pov(0).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE)));
+        driveController.pov(180).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE)));
+        driveController.pov(270).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(null)));
     }
 
     private void configureDriverTabShuffleboard() {
         driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
-            .withSize(2, 1)
-            .withPosition(4, 0)
-            .withProperties(Map.of("colorWhenTrue", "Blue", "colorWhenFalse", "Black"));
+                .withSize(2, 1)
+                .withPosition(6, 0)
+                .withProperties(Map.of("colorWhenTrue", "Blue", "colorWhenFalse", "Black"));
         driverTab.addBoolean("Middle", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.MID)
-            .withSize(2, 1)
-            .withPosition(4, 1)
-            .withProperties(Map.of("colorWhenTrue", "Magenta", "colorWhenFalse", "Black"));
+                .withSize(2, 1)
+                .withPosition(6, 1)
+                .withProperties(Map.of("colorWhenTrue", "Magenta", "colorWhenFalse", "Black"));
         driverTab.addBoolean("Low", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW)
-            .withSize(2, 1)
-            .withPosition(4, 2)
-            .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
+                .withSize(2, 1)
+                .withPosition(6, 2)
+                .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
         var pickup = driverTab.getLayout("Pickup Mode", BuiltInLayouts.kList)
-            .withSize(2, 2)
-            .withPosition(0, 2);
+                .withSize(2, 2)
+                .withPosition(3, 0);
         pickup.addBoolean("GROUND", () -> PickupMode.getCurrentMode() == PickupMode.GROUND);
         pickup.addBoolean("STATION", () -> PickupMode.getCurrentMode() == PickupMode.STATION);
 
-        driverTab.addBoolean("Gampiece Mode", () -> GamepieceMode.getCurrentMode() == GamepieceMode.CUBE)
-            .withSize(2, 2)
-            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
-            .withPosition(0, 0);
+        driverTab.addBoolean("Desired Gamepiece", () -> GamepieceMode.getDesiredPiece() == GamepieceMode.CUBE)
+                .withSize(2, 2)
+                .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
+                .withPosition(8, 0);
+
+        driverTab.addString("Held Gamepiece", () -> {
+            var held = GamepieceMode.getHeldPiece();
+            return held == null ? "NONE" : held.toString();
+        }).withSize(1, 1).withPosition(0, 1);
     }
 
     public Command getAutonomousCommand(AutoRoutines autoPath) {

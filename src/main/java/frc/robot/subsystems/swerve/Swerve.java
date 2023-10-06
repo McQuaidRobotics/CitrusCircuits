@@ -183,7 +183,8 @@ public class Swerve extends SubsystemBase {
                 kAuto.AUTO_ANGULAR_PID.getI(), 
                 kAuto.AUTO_ANGULAR_PID.getD()), 
             this::setModuleStates, 
-            autoEventMap.getMap(), 
+            autoEventMap.getMap(),
+            true,
             this);
         return autoBuilder.fullAuto(autoPath).withName("commandRunPathWithEvents: " + autoPathFileName);
     }

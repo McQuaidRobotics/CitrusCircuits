@@ -36,7 +36,7 @@ public class Autos {
 
     private static Command commandThreeGamePiece(Swerve swerve, SuperStructure superStructure) {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)),
+            new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)),
             new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH),
 
             new ParallelCommandGroup(
@@ -46,7 +46,7 @@ public class Autos {
                     new StateManager.CmdTransitionState(superStructure, States.PICKUP_GROUND),
                     Commands.waitSeconds(1),
                     new StateManager.CmdTransitionState(superStructure, States.STANDBY),
-                    new InstantCommand(() -> GamepieceMode.setCurrentMode(GamepieceMode.CUBE))
+                    new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))
                 ),
                 swerve.commandRunPath("3gp pathStage1", true)
             ),
@@ -56,7 +56,7 @@ public class Autos {
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new StateManager.CmdTransitionState(superStructure, States.HOME),
-                    new InstantCommand(() -> GamepieceMode.setCurrentMode(GamepieceMode.CONE)),
+                    new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)),
                     Commands.waitSeconds(2),
                     new StateManager.CmdTransitionState(superStructure, States.PICKUP_GROUND),
                     Commands.waitSeconds(1),
@@ -75,7 +75,6 @@ public class Autos {
     } 
 
     private static Command commandTwoGamePieceChargeStation(Swerve swerve, SuperStructure superStructure) {
-        // return new InstantCommand().withName("commandTwoGamePieceChargeStation");
-        return swerve.commandRunPathWithEvents(null, autoEventMap);
+        return new InstantCommand().withName("commandTwoGamePieceChargeStation");
     }
 }

@@ -16,4 +16,10 @@ public class Helpers {
             }
         };
     }
+
+    public static double clamp(Double value, Double min, Double max) {
+        if (value < min) return min;
+        else if (value > max) return max;
+        return value;
+    }
 }

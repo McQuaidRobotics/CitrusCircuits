@@ -16,8 +16,4 @@ public interface Pivot extends Component {
      * @return the current angle of the mechanism
      */
     public Double getPivotDegrees();
-
-    default public void hold() {
-        setPivotDegrees(getPivotDegrees());
-    }
 }

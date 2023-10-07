@@ -5,14 +5,14 @@ import frc.robot.GamepieceMode;
 
 
 public enum States {
-    HOME(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
-    STOW(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES-3.0, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
-    STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
-    PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, kElevator.MAX_METERS*0.95, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
-    PLACE_MID(kPivot.SCORE_DEGREES, -33.0, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
+    HOME(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME, true),
+    STOW(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES-7.0, kElevator.HOME_METERS, IntakeRequest.HOLD_TIGHT, IntakeBehavior.RUN_ON_START, true),
+    STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_WHOLE_TIME, true),
+    PLACE_HIGH(kPivot.SCORE_DEGREES, -24.0, kElevator.MAX_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
+    PLACE_MID(kPivot.SCORE_DEGREES, -33.0, 1.04, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
     PLACE_LOW(13.0, 15.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION, true),
-    PICKUP_GROUND(kPivot.HOME_DEGREES, 30.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false, 1.3),
-    PICKUP_STATION(61.1, -40.5, 1.1, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false);
+    PICKUP_GROUND(kPivot.HOME_DEGREES, 13.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false, 1.3),
+    PICKUP_STATION(61.1, -54.0, 1.01, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false);
 
     public final Double pivotDegrees;
     public final Double wristDegrees;
@@ -48,16 +48,13 @@ public enum States {
         this.toleranceMult = toleranceMult;
     }
 
-    private static Double elevRelative(Double setpoint) {
-        return setpoint + kElevator.MIN_METERS;
-    }
-
     public enum IntakeRequest {
         IDLE(0.0, 0.0, 0.0),
         INTAKING(12.0, -12.0, 100.0),
         OUTTAKING(-12.0, 12.0, 100.0),
         SPIT(-8.0, 8.0, 40.0),
-        HOLD(1.5, -1.5, 10.0);
+        HOLD_TIGHT(2.5, -2.5, 15.0),
+        HOLD(1.2, -1.2, 7.5);
 
         public final double voltageCone, voltageCube, maxCurrent;
 

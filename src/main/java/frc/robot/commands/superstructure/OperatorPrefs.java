@@ -33,4 +33,6 @@ public class OperatorPrefs {
         }
     }
 
+    public static Boolean NEED_HOME = false;
+
 }

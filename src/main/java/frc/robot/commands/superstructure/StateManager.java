@@ -171,21 +171,23 @@ public class StateManager {
                 this.innerFinish = true;
             }
 
-            if (superStructure.reachedSetpoint(to.toleranceMult) && !this.reachedSetpoint) {
+            if (!this.reachedSetpoint && superStructure.reachedSetpoint(to.toleranceMult)) {
                 this.reachedSetpoint = true;
             }
 
             // solving intake behavior
             Double endEffectorVolts = 0.0;
+            Double endEffrctorAmps = 0.0;
 
             if (to.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION) {
-                endEffectorVolts = intakeVoltage(IntakeRequest.HOLD, to.useHeldGamepiece);
+                endEffrctorAmps = 15.0;
             }
 
             if (to.intakeBehavior == IntakeBehavior.RUN_WHOLE_TIME
-                    || to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
+                    || (to.intakeBehavior == IntakeBehavior.RUN_ON_START && !this.reachedSetpoint)) {
                 // SmartDashboard.putString("intake run type", "START/WHOLE");
                 endEffectorVolts = intakeVoltage(to);
+                endEffrctorAmps = to.intakeRequest.maxCurrent;
             }
             if (reachedSetpoint) {
                 if (to.intakeBehavior == IntakeBehavior.RUN_ON_START) {
@@ -194,10 +196,15 @@ public class StateManager {
                 } else if (to.intakeBehavior == IntakeBehavior.RUN_ON_REACH) {
                     // SmartDashboard.putString("intake run type", "Run on reach");
                     endEffectorVolts = intakeVoltage(to);
+                    endEffrctorAmps = to.intakeRequest.maxCurrent;
                 }
             }
 
-            superStructure.runEndEffector(endEffectorVolts, to.intakeRequest.getCurrentLimit());
+            if (endEffectorVolts == 0.0) {
+                endEffectorVolts = intakeVoltage(IntakeRequest.HOLD, to.useHeldGamepiece);
+            }
+
+            superStructure.runEndEffector(endEffectorVolts, endEffrctorAmps);
         }
 
         @Override

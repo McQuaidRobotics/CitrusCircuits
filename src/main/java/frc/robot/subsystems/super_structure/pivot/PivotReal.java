@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -27,6 +28,9 @@ public class PivotReal implements Pivot {
 
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
     private final StatusSignal<Double> gyroPitch;
+
+    private final LinearFilter ampWindow = LinearFilter.movingAverage(25);
+    private Double ampWindowVal = 0.0;
 
     private Boolean isStowed = false;
     private Double cachedPivotDegrees;
@@ -58,8 +62,6 @@ public class PivotReal implements Pivot {
         motorVelo = leaderMotor.getRotorVelocity();
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
-
-
     }
 
     private TalonFXConfiguration getMotorConfig() {
@@ -98,9 +100,9 @@ public class PivotReal implements Pivot {
 
         // if the last state was stow re seed motor by gyro
         // if (isStowed) {
-        //     this.leaderMotor.setRotorPosition(
-        //         mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
-        //     );
+        // this.leaderMotor.setRotorPosition(
+        // mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
+        // );
         // }
 
         isStowed = false;
@@ -108,8 +110,9 @@ public class PivotReal implements Pivot {
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(degrees - getPivotDegrees()) < kPivot.TOLERANCE;
     }
+
     @Override
-    public void manualDriveMechanism(Double percentOut) {
+    public void manualDriveWrist(Double percentOut) {
         isStowed = false;
         var percentControlRequest = new DutyCycleOut(percentOut);
         this.leaderMotor.setControl(percentControlRequest);
@@ -126,30 +129,44 @@ public class PivotReal implements Pivot {
     }
 
     private Double getPivotDegreesPigeon() {
-        return gyroPitch.refresh().getValue() - 1.85;
+        return gyroPitch.waitForUpdate(50).getValue() - 1.85;
+    }
+
+    private void seedPivot() {
+        var pigeonDegrees = mechDegreesToMotorRots(getPivotDegreesPigeon());
+        leaderMotor.setRotorPosition(pigeonDegrees);
+        cachedPivotDegrees = pigeonDegrees;
     }
 
     @Override
-    public Boolean stowMechanism(Boolean toZero) {
+    public Boolean homeMechanism() {
         if (isStowed) {
             return true;
         }
-        this.manualDriveMechanism(-0.15);
-        if (motorAmps.refresh().getValue() > kPivot.CURRENT_PEAK_FOR_ZERO) {
+
+        var reached = this.setPivotDegrees(kPivot.HOME_DEGREES);
+        if (reached) {
+            seedPivot();
+            isStowed = true;
+        } else if (motorAmps.getValue() > kPivot.CURRENT_PEAK_FOR_HOME) {
             this.stopMechanism();
-            if (toZero) {
-                this.leaderMotor.setRotorPosition(mechDegreesToMotorRots(kPivot.HOME_DEGREES));
-            }
+            seedPivot();
             isStowed = true;
         }
+
         return isStowed;
+    }
+
+    @Override
+    public Double getRecentCurrent() {
+        return ampWindowVal;
     }
 
     @Override
     public void setupShuffleboard(ShuffleboardContainer tab) {
         tab.addNumber("Pivot Motor Rots", () -> motorRots.refresh().getValue());
         tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addNumber("Pivot Motor Amps", () -> motorAmps.refresh().getValue());
+        tab.addNumber("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
         tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
         // tab.addNumber("Pivot Gyro Yaw", () -> gyro.getYaw().getValue());
         // tab.addNumber("Pivot Gyro Roll", () -> gyro.getRoll().getValue());
@@ -161,7 +178,8 @@ public class PivotReal implements Pivot {
     @Override
     public void periodic() {
         cachedPivotDegrees = motorRotsToMechDegrees(
-            BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
-        );
+                BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
+
+        ampWindowVal = ampWindow.calculate(motorAmps.refresh().getValue());
     }
 }

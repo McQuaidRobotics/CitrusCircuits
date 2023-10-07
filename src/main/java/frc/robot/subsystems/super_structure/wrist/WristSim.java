@@ -15,7 +15,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Boolean setMechanismDegrees(Double degrees) {
+    public Boolean setWristDegrees(Double degrees) {
         if (degrees > kWrist.MAX_DEGREES) {
             new SetpointTooHigh(kWrist.MAX_DEGREES, degrees).log();
             return false;
@@ -28,7 +28,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public void manualDriveMechanism(Double percentOut) {
+    public void manualDriveWrist(Double percentOut) {
         wristDegrees.setTargetVelocity(maxVelo * percentOut);
     }
 
@@ -38,7 +38,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Double getMechanismDegrees() {
+    public Double getWristDegrees() {
         return wristDegrees.getPose();
     }
 
@@ -53,12 +53,17 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Boolean stowMechanism(Boolean toZero) {
+    public Boolean homeMechanism() {
         wristDegrees.setTargetPosition(kWrist.HOME_DEGREES);
         return Math.abs(wristDegrees.getPose() - kWrist.HOME_DEGREES) < 0.1;
     }
 
     @Override
     public void setIntakeCurrentLimits(Double limit) {
+    }
+
+    @Override
+    public Double getRecentCurrent() {
+        return 0.0;
     }
 }

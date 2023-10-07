@@ -28,7 +28,7 @@ public class SuperStructure extends SubsystemBase {
     public SuperStructure() {
         if (Robot.isReal()) {
             this.wrist = new WristReal(setpoint.wristDegrees);
-            this.pivot = new PivotReal(/*uses pigeon */);
+            this.pivot = new PivotReal(/* uses pigeon */);
             this.elevator = new ElevatorReal(setpoint.elevatorMeters);
         } else {
             this.wrist = new WristSim(setpoint.wristDegrees);
@@ -47,15 +47,8 @@ public class SuperStructure extends SubsystemBase {
 
         // only pivot or wrist+elevator should run at a time
         BooleanSupplier runWristElevatorParallel = () -> {
-            // var wrist = false;
-            // if (this.pivot.getPivotDegrees() < -1.0) {
-            //     wrist = this.wrist.setMechanismDegrees(Math.max(to.wristDegrees, 33.0));
-            // } else {
-            //     wrist = this.wrist.setMechanismDegrees(to.wristDegrees);
-            // }
-
-            var wrist = this.wrist.setMechanismDegrees(to.wristDegrees);
-            var elev = this.elevator.setMechanismMeters(to.elevatorMeters);
+            var wrist = this.wrist.setWristDegrees(to.wristDegrees);
+            var elev = this.elevator.setElevatorMeters(to.elevatorMeters);
             return elev && wrist;
         };
         BooleanSupplier runPivot = () -> {
@@ -72,7 +65,7 @@ public class SuperStructure extends SubsystemBase {
         // extension
         // is greater than set pose we move elevator first
 
-        if (this.elevator.getMechanismMeters() > to.elevatorMeters) {
+        if (this.elevator.getElevatorMeters() > to.elevatorMeters) {
             // check if wrist and elevator have reached their setpoints
             // if they have, run pivot
             if (runWristElevatorParallel.getAsBoolean()) {
@@ -86,13 +79,13 @@ public class SuperStructure extends SubsystemBase {
         return false;
     }
 
-    public Boolean stow(Boolean toZero) {
+    public Boolean home() {
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot
-        return this.wrist.stowMechanism(toZero)
-                && this.elevator.stowMechanism(toZero)
-                && this.pivot.stowMechanism(false);
+        return this.wrist.homeMechanism()
+                && this.elevator.homeMechanism()
+                && this.pivot.homeMechanism();
     }
 
     public void runEndEffector(Double volts, Double currentLimit) {
@@ -115,9 +108,9 @@ public class SuperStructure extends SubsystemBase {
 
     public SuperStructurePosition getPose() {
         return new SuperStructurePosition(
-                this.wrist.getMechanismDegrees(),
+                this.wrist.getWristDegrees(),
                 this.pivot.getPivotDegrees(),
-                this.elevator.getMechanismMeters(),
+                this.elevator.getElevatorMeters(),
                 this.wrist.getIntakeVoltage());
     }
 
@@ -130,10 +123,23 @@ public class SuperStructure extends SubsystemBase {
      * @param elevatorPercent of the elevator mechanisms motors
      */
     public void manualControl(Double wristPercent, Double pivotPercent, Double elevatorPercent, Double intakePercent) {
-        this.wrist.manualDriveMechanism(wristPercent);
-        this.pivot.manualDriveMechanism(pivotPercent);
-        this.elevator.manualDriveMechanism(elevatorPercent);
-        // this.wrist.runIntake(intakePercent);
+        this.wrist.manualDriveWrist(wristPercent);
+        this.pivot.manualDriveWrist(pivotPercent);
+        this.elevator.manualDriveWrist(elevatorPercent);
+        this.wrist.runIntake(intakePercent);
+    }
+
+    /**
+     * The average current over the past .5 seconds for all components
+     * 
+     * @return Double[] of the current for [wrist, pivot, elevator]
+     */
+    public Double[] getComponentAmps() {
+        return new Double[] {
+                this.wrist.getRecentCurrent(),
+                this.pivot.getRecentCurrent(),
+                this.elevator.getRecentCurrent()
+        };
     }
 
     /** once moved over to TEMPLATE this can be removed */
@@ -146,11 +152,11 @@ public class SuperStructure extends SubsystemBase {
         tab.addDouble("Elevator Setpoint Meters", () -> this.setpoint.elevatorMeters)
                 .withSize(2, 1);
 
-        tab.addDouble("Wrist Current Degrees", () -> this.wrist.getMechanismDegrees())
+        tab.addDouble("Wrist Current Degrees", () -> this.wrist.getWristDegrees())
                 .withSize(2, 1);
         tab.addDouble("Pivot Current Degrees", () -> this.pivot.getPivotDegrees())
                 .withSize(2, 1);
-        tab.addDouble("Elevator Current Meters", () -> this.elevator.getMechanismMeters())
+        tab.addDouble("Elevator Current Meters", () -> this.elevator.getElevatorMeters())
                 .withSize(2, 1);
 
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")

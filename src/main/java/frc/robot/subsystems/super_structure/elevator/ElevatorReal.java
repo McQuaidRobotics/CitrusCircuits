@@ -7,10 +7,12 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -21,6 +23,9 @@ public class ElevatorReal implements Elevator {
     /** Left */
     private final TalonFX followerMotor;
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
+
+    private final LinearFilter ampWindow = LinearFilter.movingAverage(25);
+    private Double ampWindowVal = 0.0;
 
     private Boolean isStowed = false;
     private Double cachedElevatorMeters;
@@ -71,6 +76,10 @@ public class ElevatorReal implements Elevator {
         motorCfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         motorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
+        motorCfg.HardwareLimitSwitch.ReverseLimitEnable = true;
+        motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+        motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0.0;
+
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         motorCfg.MotorOutput.PeakForwardDutyCycle *= 0.4;
@@ -83,7 +92,7 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Boolean setMechanismMeters(Double meters) {
+    public Boolean setElevatorMeters(Double meters) {
         if (meters < Specs.ELEVATOR_MIN_METERS) {
             new SetpointTooLow(Specs.ELEVATOR_MIN_METERS, meters).log();
             return false;
@@ -94,16 +103,16 @@ public class ElevatorReal implements Elevator {
         this.isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
-        return Math.abs(meters - getMechanismMeters()) < kElevator.TOLERANCE;
+        return Math.abs(meters - getElevatorMeters()) < kElevator.TOLERANCE;
     }
 
     @Override
-    public Double getMechanismMeters() {
+    public Double getElevatorMeters() {
         return cachedElevatorMeters;
     }
 
     @Override
-    public void manualDriveMechanism(Double percentOut) {
+    public void manualDriveWrist(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
         this.isStowed = false;
@@ -117,26 +126,29 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Boolean isLimitSwitchHit() {
-        if (leaderMotor.getReverseLimit().refresh().getValue() == ReverseLimitValue.ClosedToGround) {
+        if (leaderMotor.getForwardLimit().getValue() == ForwardLimitValue.ClosedToGround
+                || leaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
             return true;
         }
         return false;
     }
 
     @Override
-    public Boolean stowMechanism(Boolean toZero) {
+    public Boolean homeMechanism() {
         if (this.isStowed) {
             return true;
         }
-        this.manualDriveMechanism(-0.15);
+        this.manualDriveWrist(-0.2);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
-            if (toZero) {
-                this.leaderMotor.setRotorPosition(0.0);
-            }
             this.isStowed = true;
         }
         return this.isLimitSwitchHit();
+    }
+
+    @Override
+    public Double getRecentCurrent() {
+        return ampWindowVal;
     }
 
     @Override
@@ -151,7 +163,8 @@ public class ElevatorReal implements Elevator {
     @Override
     public void periodic() {
         cachedElevatorMeters = motorRotsToMechMeters(
-            BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo)
-        );
+                BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
+
+        ampWindowVal = ampWindow.calculate(motorAmps.getValue());
     }
 }

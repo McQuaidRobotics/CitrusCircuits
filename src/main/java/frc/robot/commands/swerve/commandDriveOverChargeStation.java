@@ -2,6 +2,7 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.Helpers;
 import frc.robot.subsystems.swerve.Swerve;
@@ -38,6 +39,7 @@ public class commandDriveOverChargeStation extends CommandBase{
         this.leftGroundErrorDegrees = leftGroundErrorDegrees;
         this.returnedToGroundErrorDegrees = returnedToGroundErrorDegrees;
         this.driveStrengthPercent = Helpers.clamp(driveStrengthPercent, 0.0, 1.0);
+        addRequirements(swerve);
     }
 
     @Override
@@ -56,6 +58,12 @@ public class commandDriveOverChargeStation extends CommandBase{
             () -> 1 * driveStrengthPercent, 
             () -> 0.0,
             false);
+
+            SmartDashboard.putBoolean(
+            "returnedToGroundDebouncer | OverChargeStation", 
+            returnedToGroundDebouncer.calculate(
+            hasLeftGround && 
+            (swerve.getRoll() >= -1.0 * Math.abs(returnedToGroundErrorDegrees))));
         }
         else {
             hasLeftGround = leftGroundDebouncer.calculate(swerve.getRoll() <= -1.0 * Math.abs(leftGroundErrorDegrees));
@@ -65,7 +73,19 @@ public class commandDriveOverChargeStation extends CommandBase{
             () -> -1 * driveStrengthPercent, 
             () -> 0.0,
             false);
+
+            SmartDashboard.putBoolean(
+            "returnedToGroundDebouncer | OverChargeStation", 
+            returnedToGroundDebouncer.calculate(
+            hasLeftGround && 
+            (swerve.getRoll() <= Math.abs(returnedToGroundErrorDegrees))));
         }
+
+        SmartDashboard.putBoolean("towardCommunity | OverChargeStation", towardsCommunity);
+        SmartDashboard.putBoolean("hasLeftGround | OverChargeStation", hasLeftGround);
+        SmartDashboard.putNumber("leftGroundErrorDegrees | OverChargeStation", leftGroundErrorDegrees);
+        SmartDashboard.putNumber("returnedToGroundErrorDegrees | OverChargeStation", returnedToGroundErrorDegrees);
+        SmartDashboard.putNumber("driveStrengthPercent | OverChargeStation", driveStrengthPercent);
     }
 
     @Override

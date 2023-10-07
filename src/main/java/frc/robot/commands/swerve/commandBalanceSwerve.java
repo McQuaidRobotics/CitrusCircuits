@@ -27,7 +27,6 @@ public class commandBalanceSwerve extends CommandBase{
         this.pitchErrorDegrees = pitchErrorDegrees;
         this.forwardDriveStrengthPercent = Helpers.clamp(initialStrengthPercent, 0.0, 1.0);
         this.backwardDriveStrengthPercent = Helpers.clamp(initialStrengthPercent, 0.0, 1.0);
-
         addRequirements(swerve);
     }
 
@@ -61,11 +60,11 @@ public class commandBalanceSwerve extends CommandBase{
         *on the charge station
         */
 
-        SmartDashboard.putNumber("pitchErrorDegreesBalance", pitchErrorDegrees);
-        SmartDashboard.putNumber("forwardDriveStrengthBalance", forwardDriveStrengthPercent);
-        SmartDashboard.putNumber("backwardDriveStrengthBalance", backwardDriveStrengthPercent);
+        SmartDashboard.putNumber("pitchErrorDegrees | Balance", pitchErrorDegrees);
+        SmartDashboard.putNumber("forwardDriveStrength | Balance", forwardDriveStrengthPercent);
+        SmartDashboard.putNumber("backwardDriveStrength | Balance", backwardDriveStrengthPercent);
         SmartDashboard.putBoolean(
-            "balanced", 
+            "balanced | Balance", 
             balancedDebouncer.calculate(Math.abs(swerve.getPitch()) <= pitchErrorDegrees));
     }
 

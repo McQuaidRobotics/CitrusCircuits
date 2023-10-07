@@ -1,45 +1,47 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.Helpers;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class commandBalanceSwerve extends CommandBase{
     private double pitchErrorDegrees;
     private Swerve swerve;
-    private double forwardDriveStrength;
-    private double backwardDriveStrength;
+    private double forwardDriveStrengthPercent;
+    private double backwardDriveStrengthPercent;
     private Debouncer balancedDebouncer;
 
     /**
      * @param swerve The swerve subsystem to be used
      * @param pitchErrorDegrees The max error in degrees that is allowed
      * before being considered balanced
-     * @param initalStrength The initial strength of the motors in percent from 0 to 1:
-     *  EX: (1 = Max speed, 0.5 = Half of max speed)
+     * @param initalStrength The percentage of max speed to drive between 0 and 1:
+     * EX: (1 = Max speed, 0.5 = Half of max speed)
      */
 
-    public commandBalanceSwerve(Swerve swerve, Double pitchErrorDegrees, Double initialStrength) {
+    public commandBalanceSwerve(Swerve swerve, Double pitchErrorDegrees, Double initialStrengthPercent) {
         this.swerve = swerve;
         this.pitchErrorDegrees = pitchErrorDegrees;
-        this.forwardDriveStrength = initialStrength;
-        this.backwardDriveStrength = initialStrength;
+        this.forwardDriveStrengthPercent = Helpers.clamp(initialStrengthPercent, 0.0, 1.0);
+        this.backwardDriveStrengthPercent = Helpers.clamp(initialStrengthPercent, 0.0, 1.0);
 
         addRequirements(swerve);
     }
 
     @Override
     public void initialize() {
-        this.balancedDebouncer = new Debouncer(0.1);
+        this.balancedDebouncer = new Debouncer(0.1, DebounceType.kRising);
     }
 
     @Override
     public void execute() {
-        if (swerve.getGyroPitch().getValue() > 0) {
+        if (swerve.getPitch() > 0) {
             new TeleopSwerve(
                 swerve, 
-                () -> -1.0 * backwardDriveStrength, 
+                () -> -1.0 * backwardDriveStrengthPercent, 
                 () -> 0.0, 
                 () -> 0.0,
                 false);
@@ -47,7 +49,7 @@ public class commandBalanceSwerve extends CommandBase{
         else {
             new TeleopSwerve(
                 swerve, 
-                () -> 1.0 * forwardDriveStrength, 
+                () -> 1.0 * forwardDriveStrengthPercent, 
                 () -> 0.0, 
                 () -> 0.0,
                 false);
@@ -60,11 +62,11 @@ public class commandBalanceSwerve extends CommandBase{
         */
 
         SmartDashboard.putNumber("pitchErrorDegreesBalance", pitchErrorDegrees);
-        SmartDashboard.putNumber("forwardDriveStrengthBalance", forwardDriveStrength);
-        SmartDashboard.putNumber("backwardDriveStrengthBalance", backwardDriveStrength);
+        SmartDashboard.putNumber("forwardDriveStrengthBalance", forwardDriveStrengthPercent);
+        SmartDashboard.putNumber("backwardDriveStrengthBalance", backwardDriveStrengthPercent);
         SmartDashboard.putBoolean(
             "balanced", 
-            balancedDebouncer.calculate(Math.abs(swerve.getGyroPitch().getValue()) <= pitchErrorDegrees));
+            balancedDebouncer.calculate(Math.abs(swerve.getPitch()) <= pitchErrorDegrees));
     }
 
     @Override
@@ -74,6 +76,6 @@ public class commandBalanceSwerve extends CommandBase{
 
     @Override
     public boolean isFinished() {
-        return balancedDebouncer.calculate(Math.abs(swerve.getGyroPitch().getValue()) <= pitchErrorDegrees);
+        return balancedDebouncer.calculate(Math.abs(swerve.getPitch()) <= pitchErrorDegrees);
     }
 }

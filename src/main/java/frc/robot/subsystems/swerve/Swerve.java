@@ -99,8 +99,12 @@ public class Swerve extends SubsystemBase {
         gyro.setYaw(0.0);
     }
 
-    public StatusSignal<Double> getGyroPitch() {
-        return gyro.getPitch();
+    public Double getPitch() {
+        return gyro.getPitch().getValue();
+    }
+
+    public Double getRoll() {
+        return gyro.getRoll().getValue();
     }
 
     public Rotation2d getYaw() {

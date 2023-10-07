@@ -115,12 +115,15 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
         // used for testing
-        driveController.pov(0).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE)));
-        driveController.pov(180).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE)));
-        driveController.pov(270).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(null)));
+        operatorController.pov(0).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))
+            .ignoringDisable(true));
+        operatorController.pov(180).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))
+            .ignoringDisable(true));
+        operatorController.pov(270).onTrue(new InstantCommand(
+            () -> GamepieceMode.setHeldPiece(null))
+            .ignoringDisable(true));
     }
 
     private void driverShuffleboard() {

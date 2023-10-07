@@ -23,12 +23,12 @@ public class SuperStructure extends SubsystemBase {
 
     private final Visualizer visualizer = new Visualizer();
 
-    private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.START);
+    private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.STOW);
 
     public SuperStructure() {
         if (Robot.isReal()) {
             this.wrist = new WristReal(setpoint.wristDegrees);
-            this.pivot = new PivotReal(setpoint.pivotDegrees);
+            this.pivot = new PivotReal(/*uses pigeon */);
             this.elevator = new ElevatorReal(setpoint.elevatorMeters);
         } else {
             this.wrist = new WristSim(setpoint.wristDegrees);
@@ -47,14 +47,17 @@ public class SuperStructure extends SubsystemBase {
 
         // only pivot or wrist+elevator should run at a time
         BooleanSupplier runWristElevatorParallel = () -> {
+            // var wrist = false;
+            // if (this.pivot.getPivotDegrees() < -1.0) {
+            //     wrist = this.wrist.setMechanismDegrees(Math.max(to.wristDegrees, 33.0));
+            // } else {
+            //     wrist = this.wrist.setMechanismDegrees(to.wristDegrees);
+            // }
+
             var wrist = this.wrist.setMechanismDegrees(to.wristDegrees);
             var elev = this.elevator.setMechanismMeters(to.elevatorMeters);
             return elev && wrist;
         };
-        // BooleanSupplier runWristElevatorSeq = () -> {
-        // return this.wrist.setMechanismDegrees(to.wristDegrees)
-        // && this.elevator.setMechanismMeters(to.elevatorMeters);
-        // };
         BooleanSupplier runPivot = () -> {
             return this.pivot.setPivotDegrees(to.pivotDegrees);
         };

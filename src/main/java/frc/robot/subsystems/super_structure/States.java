@@ -5,15 +5,14 @@ import frc.robot.GamepieceMode;
 
 
 public enum States {
-    START(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.IDLE, IntakeBehavior.RUN_WHOLE_TIME, false),
     HOME(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
-    STOW(kPivot.HOME_DEGREES+2.0, kWrist.HOME_DEGREES-3.0, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
+    STOW(kPivot.HOME_DEGREES, kWrist.HOME_DEGREES-3.0, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
     STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD, IntakeBehavior.RUN_ON_START, true),
     PLACE_HIGH(kPivot.SCORE_DEGREES, -17.2, kElevator.MAX_METERS*0.95, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
-    PLACE_MID(kPivot.SCORE_DEGREES, -23.2, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
+    PLACE_MID(kPivot.SCORE_DEGREES, -33.0, elevRelative(0.556), IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
     PLACE_LOW(13.0, 15.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION, true),
-    PICKUP_GROUND(1.0, 4.5, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false, 1.2),
-    PICKUP_STATION(60.11, -50.0, elevRelative(0.579), IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false);
+    PICKUP_GROUND(kPivot.HOME_DEGREES, 30.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false, 1.3),
+    PICKUP_STATION(61.1, -40.5, 1.1, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false);
 
     public final Double pivotDegrees;
     public final Double wristDegrees;

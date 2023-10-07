@@ -26,6 +26,7 @@ public class PivotReal implements Pivot {
     private final Pigeon2 gyro;
 
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
+    private final StatusSignal<Double> gyroPitch;
 
     private Boolean isStowed = false;
     private Double cachedPivotDegrees;
@@ -38,8 +39,9 @@ public class PivotReal implements Pivot {
         return motorRots * 360.0 * kPivot.MOTOR_TO_MECHANISM_RATIO;
     }
 
-    public PivotReal(Double startingDegrees) {
+    public PivotReal() {
         gyro = new Pigeon2(kPivot.PIGEON_ID);
+        gyroPitch = gyro.getPitch();
 
         leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
         followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID);
@@ -49,13 +51,14 @@ public class PivotReal implements Pivot {
         followerMotor.setControl(
                 new Follower(kPivot.LEFT_MOTOR_ID, true));
 
-        leaderMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
-        cachedPivotDegrees = startingDegrees;
+        leaderMotor.setRotorPosition(mechDegreesToMotorRots(getPivotDegreesPigeon()));
+        cachedPivotDegrees = getPivotDegreesPigeon();
 
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
+
 
     }
 
@@ -94,11 +97,11 @@ public class PivotReal implements Pivot {
         }
 
         // if the last state was stow re seed motor by gyro
-        if (isStowed) {
-            this.leaderMotor.setRotorPosition(
-                mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
-            );
-        }
+        // if (isStowed) {
+        //     this.leaderMotor.setRotorPosition(
+        //         mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
+        //     );
+        // }
 
         isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
@@ -120,6 +123,10 @@ public class PivotReal implements Pivot {
     @Override
     public Double getPivotDegrees() {
         return cachedPivotDegrees;
+    }
+
+    private Double getPivotDegreesPigeon() {
+        return gyroPitch.refresh().getValue() - 1.85;
     }
 
     @Override
@@ -144,9 +151,10 @@ public class PivotReal implements Pivot {
         tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
         tab.addNumber("Pivot Motor Amps", () -> motorAmps.refresh().getValue());
         tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
-        // tab.addNumber("Pivot Gyro Yaw", gyro::getYaw);
-        // tab.addNumber("Pivot Gyro Roll", gyro::getRoll);
-        // tab.addNumber("Pivot Gyro Pitch", gyro::getPitch);
+        // tab.addNumber("Pivot Gyro Yaw", () -> gyro.getYaw().getValue());
+        // tab.addNumber("Pivot Gyro Roll", () -> gyro.getRoll().getValue());
+        // tab.addNumber("Pivot Gyro Pitch", () -> gyro.getPitch().getValue());
+        tab.addNumber("Pivot Degrees Gyro", this::getPivotDegreesPigeon);
         tab.addBoolean("Pivot Homed", () -> isStowed);
     }
 

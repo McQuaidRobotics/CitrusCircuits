@@ -10,7 +10,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.*;
 import frc.robot.subsystems.super_structure.Errors.*;
@@ -185,10 +184,5 @@ public class WristReal implements Wrist {
         this.cachedWristDegrees = motorRotsToMechDegrees(
                 BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh()));
         this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
-        if (intakeMotorVolts.refresh().getValue() > 8.0) {
-            if (intakeMotorVelo.refresh().getValue() < 10.0) {
-                DriverStation.reportWarning("wouldve aquired gamepiece", false);
-            }
-        }
     }
 }

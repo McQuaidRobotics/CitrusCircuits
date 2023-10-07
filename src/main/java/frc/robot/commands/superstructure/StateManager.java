@@ -27,7 +27,7 @@ public class StateManager {
      * Is essential for determining transitions,
      * can only be mutated by {@link CmdTransitionState}
      */
-    private static States lastState = States.START;
+    private static States lastState = States.STOW;
 
     @SuppressWarnings("unused")
     /**

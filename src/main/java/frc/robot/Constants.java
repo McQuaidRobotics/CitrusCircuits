@@ -35,9 +35,9 @@ public final class Constants {
             // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
-            public static final double MAX_VELOCITY = 70;
+            public static final double MAX_VELOCITY = 80;
             public static final double MAX_ACCELERATION = 300;
-            public static final double MAX_JERK = 5000;
+            public static final double MAX_JERK = 2000;
 
             public static final boolean INVERTED = false;
 
@@ -81,15 +81,15 @@ public final class Constants {
         public static final class kPivot {
             public static final int LEFT_MOTOR_ID = 13;
             public static final int RIGHT_MOTOR_ID = 14;
-            public static final int PIGEON_ID = 35;
+            public static final int PIGEON_ID = 31;
 
             public static final double MOTOR_kP = 1.0;
             public static final double MOTOR_kI = 0;
             public static final double MOTOR_kD = 0;
 
-            public static final double MAX_VELOCITY = 80;
+            public static final double MAX_VELOCITY = 105;
             public static final double MAX_ACCELERATION = 700;
-            public static final double MAX_JERK = 3000;
+            public static final double MAX_JERK = 10000;//effectively infinite
 
             /**
              * Zero is parallel with the floor
@@ -104,8 +104,7 @@ public final class Constants {
              */
             public static final double MAX_DEGREES = Specs.PIVOT_MAX_ANGLE;
 
-            /** Alias for {@link Specs#PIVOT_MIN_ANGLE} */
-            public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE;
+            public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE + 2.0;
             public static final double HARD_OFFSET = 2.0;
 
             public final static double SCORE_DEGREES = 46.0;
@@ -148,9 +147,9 @@ public final class Constants {
 
             public static final boolean INVERTED = true;
 
-            public static final double MAX_VELOCITY = 50;
-            public static final double MAX_ACCELERATION = 600;
-            public static final double MAX_JERK = 2000;
+            public static final double MAX_VELOCITY = 33;
+            public static final double MAX_ACCELERATION = 250;
+            public static final double MAX_JERK = 750;
             // public static final double MAX_VELOCITY = 100;
             // public static final double MAX_ACCELERATION = 750;
             // public static final double MAX_JERK = 5000;

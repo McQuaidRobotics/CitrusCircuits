@@ -1,5 +1,9 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -147,6 +151,13 @@ public class Swerve extends SubsystemBase {
         return autoPath;
     }
 
+    public ArrayList<PathPlannerTrajectory> openFilePathIntoGroup(String autoPathFile, List<PathConstraints> constraints) {
+        ArrayList<PathPlannerTrajectory> autoPathGroup = (ArrayList<PathPlannerTrajectory>) PathPlanner.loadPathGroup(
+            autoPathFile, 
+            constraints);
+        return autoPathGroup;
+    }
+
     public Command commandRunPath(String autoPathFileName, boolean resetOdometry) {
         PathPlannerTrajectory autoPath = openFilePath(autoPathFileName);
         return new SequentialCommandGroup(
@@ -187,6 +198,28 @@ public class Swerve extends SubsystemBase {
             true,
             this);
         return autoBuilder.fullAuto(autoPath).withName("commandRunPathWithEvents: " + autoPathFileName);
+    }
+
+    public Command commandRunPathGroupWithEvents(String autoPathFileName, AutoEventMap autoEventMap, PathConstraints... pathContraints) {
+        if (autoEventMap == null) throw new NullPointerException("AutoEventMap is null, make sure to call 'Autos.buildAutoEventMap' to ensure the construction of the event marker map.");
+        List<PathConstraints> constraintList = Arrays.asList(pathContraints);
+        ArrayList<PathPlannerTrajectory> autoPathGroup = openFilePathIntoGroup(autoPathFileName, constraintList);
+        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+            this::getPose, 
+            this::resetOdometry, 
+            new PIDConstants(
+                kAuto.AUTO_TRANSLATION_PID.getP(), 
+                kAuto.AUTO_TRANSLATION_PID.getI(), 
+                kAuto.AUTO_TRANSLATION_PID.getD()), 
+            new PIDConstants(
+                kAuto.AUTO_ANGULAR_PID.getP(), 
+                kAuto.AUTO_ANGULAR_PID.getI(), 
+                kAuto.AUTO_ANGULAR_PID.getD()), 
+            this::setModuleStates, 
+            autoEventMap.getMap(),
+            true,
+            this);
+        return autoBuilder.fullAuto(autoPathGroup).withName("commandRunPathGroupWithEvents: " + autoPathFileName);
     }
 
     @Override

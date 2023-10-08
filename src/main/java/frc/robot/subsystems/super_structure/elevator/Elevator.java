@@ -6,21 +6,18 @@ import frc.robot.Constants.kSuperStructure.kElevator;
 public interface Elevator extends Component {
     /**
      * Abstract from motors, will set the elevator meters.
+     * 
      * @param meters from pivot
-     * (min: {@link kElevator#ELEVATOR_MIN_METERS},
-     * max: {@link kElevator#ELEVATOR_MAX_METERS})
+     *               (min: {@link kElevator#ELEVATOR_MIN_METERS},
+     *               max: {@link kElevator#ELEVATOR_MAX_METERS})
      * @return true if meters has been reached
      */
-    public Boolean setMechanismMeters(Double meters);
+    public Boolean setElevatorMeters(Double meters);
 
-    public Double getMechanismMeters();
+    public Double getElevatorMeters();
 
     /**
      * @return if the reverse limit switch is activated
      */
     public Boolean isLimitSwitchHit();
-
-    default public void hold() {
-        setMechanismMeters(getMechanismMeters());
-    }
 }

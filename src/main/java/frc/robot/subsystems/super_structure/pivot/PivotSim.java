@@ -28,7 +28,7 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public void manualDriveMechanism(Double percentOut) {
+    public void manualDriveWrist(Double percentOut) {
         pivotDegrees.setTargetVelocity(percentOut * maxVelo);
     }
 
@@ -43,9 +43,13 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Boolean stowMechanism(Boolean toZero) {
+    public Boolean homeMechanism() {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
         return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }
 
+    @Override
+    public Double getRecentCurrent() {
+        return 0.0;
+    }
 }

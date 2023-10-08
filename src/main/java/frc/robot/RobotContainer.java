@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
+import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.auto.Autos;
 import frc.robot.commands.auto.Autos.AutoRoutines;
@@ -68,15 +69,15 @@ public class RobotContainer {
     // X: home/stow
     // RightBumper: set desired pickup method to ground
     // LeftBumper: set desired pickup method to shelf
-    // RightTrigger: set desired gamepiece to cube
-    // LeftTrigger: set desired gamepiece to cone
+    // RightTrigger: set desired gamepiece to cone
+    // LeftTrigger: set desired gamepiece to cube
 
     private void configureDriverBindings() {
         // Bumpers/Triggers
         driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
         driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
-        driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
+        driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
         // used for testing
         // driveController.pov(0).onTrue(new InstantCommand(() ->
@@ -85,7 +86,8 @@ public class RobotContainer {
         // superStructure.runEndEffector(-12.0, false), superStructure));
         // driveController.pov(90).onTrue(new InstantCommand(() ->
         // superStructure.runEndEffector(0.0, false), superStructure));
-        driveController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
+        // driveController.x().onTrue(new
+        // StateManager.CmdTransitionState(superStructure, States.STOW));
         // driveController.a().onTrue(new
         // StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
         // driveController.b().onTrue(new
@@ -125,12 +127,15 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
         // used for testing
-        driveController.pov(0).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE)));
-        driveController.pov(180).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE)));
-        driveController.pov(270).onTrue(new InstantCommand(
-            () -> GamepieceMode.setHeldPiece(null)));
+        // operatorController.pov(0).onTrue(new InstantCommand(
+        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))
+        // .ignoringDisable(true));
+        // operatorController.pov(180).onTrue(new InstantCommand(
+        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))
+        // .ignoringDisable(true));
+        // operatorController.pov(270).onTrue(new InstantCommand(
+        // () -> GamepieceMode.setHeldPiece(null))
+        // .ignoringDisable(true));
     }
 
     private void configureDriverTabShuffleboard() {
@@ -161,7 +166,7 @@ public class RobotContainer {
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
-        }).withSize(1, 1).withPosition(0, 1);
+        });
     }
 
     public Command getAutonomousCommand(AutoRoutines autoPath) {

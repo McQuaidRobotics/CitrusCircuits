@@ -3,9 +3,10 @@ package frc.robot.subsystems.super_structure.elevator;
 import frc.robot.Constants.kSuperStructure.kElevator;
 import frc.robot.util.SimHelper.SimplePoseSim;;
 
-public class ElevatorSim implements Elevator{
+public class ElevatorSim implements Elevator {
 
-    private final Double maxVelo = (112.0 * kElevator.MOTOR_TO_MECHANISM_RATIO) * (kElevator.MECHANISM_DIAMETER_METERS * Math.PI);
+    private final Double maxVelo = (112.0 * kElevator.MOTOR_TO_MECHANISM_RATIO)
+            * (kElevator.MECHANISM_DIAMETER_METERS * Math.PI);
     private final SimplePoseSim elevatorMeters = new SimplePoseSim(maxVelo);
 
     public ElevatorSim(Double startingMeters) {
@@ -13,18 +14,18 @@ public class ElevatorSim implements Elevator{
     }
 
     @Override
-    public Boolean setMechanismMeters(Double meters) {
+    public Boolean setElevatorMeters(Double meters) {
         elevatorMeters.setTargetPosition(meters);
         return Math.abs(elevatorMeters.getPose() - meters) < 0.1;
     }
 
     @Override
-    public Double getMechanismMeters() {
+    public Double getElevatorMeters() {
         return elevatorMeters.getPose();
     }
 
     @Override
-    public void manualDriveMechanism(Double percentOut) {
+    public void manualDriveWrist(Double percentOut) {
         elevatorMeters.setTargetVelocity(percentOut * maxVelo);
     }
 
@@ -39,8 +40,13 @@ public class ElevatorSim implements Elevator{
     }
 
     @Override
-    public Boolean stowMechanism(Boolean toZero) {
+    public Boolean homeMechanism() {
         elevatorMeters.setTargetPosition(kElevator.HOME_METERS);
         return isLimitSwitchHit();
+    }
+
+    @Override
+    public Double getRecentCurrent() {
+        return 0.0;
     }
 }

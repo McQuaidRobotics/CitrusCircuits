@@ -29,7 +29,7 @@ public interface Component {
      * 
      * @param percentOut of the mechanisms motors
      */
-    public void manualDriveMechanism(Double percentOut);
+    public void manualDriveWrist(Double percentOut);
 
     /**
      * Stops the mechanism
@@ -42,5 +42,8 @@ public interface Component {
      * 
      * @return true if the mcahnism has reached home
      */
-    public Boolean stowMechanism(Boolean toZero);
+    public Boolean homeMechanism();
+
+    /** Returns the average current over the past .5 seconds */
+    public Double getRecentCurrent();
 }

@@ -9,16 +9,12 @@ public interface Wrist extends Component {
      * 
      * @return true if degrees has been reached
      */
-    public Boolean setMechanismDegrees(Double degrees);
+    public Boolean setWristDegrees(Double degrees);
 
     /**
      * @return the current angle of the mechanism
      */
-    public Double getMechanismDegrees();
-
-    default public void hold() {
-        setMechanismDegrees(getMechanismDegrees());
-    }
+    public Double getWristDegrees();
 
     /**
      * Runs the intake at a given percent output

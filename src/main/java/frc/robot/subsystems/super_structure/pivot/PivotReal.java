@@ -82,9 +82,6 @@ public class PivotReal implements Pivot {
         motorCfg.Voltage.PeakForwardVoltage = kPivot.VOLTAGE_COMP;
         motorCfg.Voltage.PeakReverseVoltage = -kPivot.VOLTAGE_COMP;
 
-        motorCfg.MotorOutput.PeakForwardDutyCycle = 0.8;
-        motorCfg.MotorOutput.PeakReverseDutyCycle = -0.8;
-
         return motorCfg;
     }
 

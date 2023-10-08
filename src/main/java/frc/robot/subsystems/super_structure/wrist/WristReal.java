@@ -79,8 +79,6 @@ public class WristReal implements Wrist {
         wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
-        wristMotorCfg.MotorOutput.PeakForwardDutyCycle = 0.7;
-        wristMotorCfg.MotorOutput.PeakReverseDutyCycle = -0.7;
 
         return wristMotorCfg;
     }

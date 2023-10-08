@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.Helpers;
+import frc.robot.commands.superstructure.StateManager.CmdTransitionState;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 
@@ -44,7 +45,7 @@ public class SuperstructureCommands {
      */
     public static class TransitionToPlace extends CommandBase {
         private final SuperStructure superStructure;
-        private Command placeCmd;
+        private CmdTransitionState placeCmd;
 
         public TransitionToPlace(final SuperStructure superStructure) {
             this.superStructure = superStructure;
@@ -96,6 +97,11 @@ public class SuperstructureCommands {
             if (placeCmd == null)
                 return "TransitionToPlace(null)";
             return "TransitionToPlace(" + placeCmd.getName() + ")";
+        }
+
+        public TransitionToPlace canFinish() {
+            placeCmd = placeCmd.canFinish();
+            return this;
         }
     }
 

@@ -45,12 +45,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 0.7709090909090786,
-      "names": [
-        "pickupGround"
-      ]
-    }
-  ]
+  "markers": []
 }

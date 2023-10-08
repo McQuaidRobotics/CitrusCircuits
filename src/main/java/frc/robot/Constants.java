@@ -200,8 +200,8 @@ public final class Constants {
     }
 
     public static class kAuto {
-        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(0.0, 0.0, 0.0);
-        public static final PIDController AUTO_ANGULAR_PID = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(1.0, 0.0, 0.0);
+        public static final PIDController AUTO_ANGULAR_PID = new PIDController(1.0, 0.0, 0.0);
     }
 
     public static class kSwerve {

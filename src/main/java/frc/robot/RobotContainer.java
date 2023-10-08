@@ -12,6 +12,7 @@ import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,8 +32,8 @@ public class RobotContainer {
     private final int strafeAxis = XboxController.Axis.kLeftX.value;
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
-    private static final Swerve swerve = new Swerve();
-    private static final SuperStructure superStructure = new SuperStructure();
+    public static final Swerve swerve = new Swerve();
+    public static final SuperStructure superStructure = new SuperStructure();
 
     public final ShuffleboardTab driverTab;
 
@@ -51,8 +52,6 @@ public class RobotContainer {
                         () -> driveController.getRawAxis(translationAxis),
                         () -> driveController.getRawAxis(strafeAxis),
                         () -> -driveController.getRawAxis(rotationAxis)));
-
-        Autos.buildAutoEventMap(swerve, superStructure);
     }
 
     // [driver]

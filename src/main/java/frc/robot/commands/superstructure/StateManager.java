@@ -115,6 +115,7 @@ public class StateManager {
         private final States to;
         private States from;
         private Command innerCmd;
+        private Boolean canFinish = false;
 
         /**
          * Can only be set in initialize, will skip x many cycles,
@@ -209,8 +210,19 @@ public class StateManager {
 
         @Override
         public void end(boolean interrupted) {
+            if (!innerFinish) {
+                this.innerCmd.end(interrupted);
+            }
             superStructure.stopAll();
             from = null;
+        }
+
+        @Override
+        public boolean isFinished() {
+            if (canFinish) {
+                return superStructure.reachedSetpoint(1.0);
+            }
+            return false;
         }
 
         @Override
@@ -221,5 +233,20 @@ public class StateManager {
                 return "CmdTransitionState(" + from + " -> " + to + ")";
             }
         }
+
+        public CmdTransitionState canFinish() {
+            this.canFinish = true;
+            return this;
+        }
+    }
+
+    public static Command dispellGamepiece(SuperStructure superStructure) {
+        return superStructure.startEnd(
+            () -> superStructure.runEndEffector(intakeVoltage(lastState), lastState.intakeRequest.maxCurrent),
+            () -> {
+                superStructure.runEndEffector(0.0, 0.0);
+                lastState = States.HOME; //idk
+            }
+        ).withTimeout(0.4);
     }
 }

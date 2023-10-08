@@ -1,22 +1,14 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.GamepieceMode;
-import frc.robot.commands.superstructure.StateManager;
-import frc.robot.subsystems.super_structure.States;
+import frc.robot.commands.auto.Blocks.Block;
+import frc.robot.commands.auto.Blocks.Cmds;
+import frc.robot.commands.auto.Blocks.Paths;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class Autos {
-    private static AutoEventMap autoEventMap;
-
-    public static void buildAutoEventMap(Swerve swerve, SuperStructure superStructure) {
-        autoEventMap = new AutoEventMap(swerve, superStructure);
-    }
 
     public enum AutoRoutines {
         NOTHING,
@@ -27,54 +19,28 @@ public class Autos {
     public static Command getAutoRoutineCommand(AutoRoutines autoRoutine, Swerve swerve, SuperStructure superStructure) {
         Command autoCommand = new InstantCommand();
         switch (autoRoutine) {
-            case THREE_GAME_PIECE: autoCommand = commandThreeGamePiece(swerve, superStructure);
-            case TWO_GAME_PIECE_CHARGE_STATION: autoCommand = commandTwoGamePieceChargeStation(swerve, superStructure);
+            // case THREE_GAME_PIECE: autoCommand = commandThreeGamePiece(swerve, superStructure);
+            // case TWO_GAME_PIECE_CHARGE_STATION: autoCommand = commandTwoGamePieceChargeStation(swerve, superStructure);
             case NOTHING:
         };
         return autoCommand;
     }
 
-    private static Command commandThreeGamePiece(Swerve swerve, SuperStructure superStructure) {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)),
-            new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH),
-
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    new StateManager.CmdTransitionState(superStructure, States.HOME),
-                    Commands.waitSeconds(2),
-                    new StateManager.CmdTransitionState(superStructure, States.PICKUP_GROUND),
-                    Commands.waitSeconds(1),
-                    new StateManager.CmdTransitionState(superStructure, States.STANDBY),
-                    new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))
-                ),
-                swerve.commandRunPath("3gp pathStage1", true)
-            ),
-
-            new StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH),
-
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    new StateManager.CmdTransitionState(superStructure, States.HOME),
-                    new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)),
-                    Commands.waitSeconds(2),
-                    new StateManager.CmdTransitionState(superStructure, States.PICKUP_GROUND),
-                    Commands.waitSeconds(1),
-                    new StateManager.CmdTransitionState(superStructure, States.STANDBY)
-                ),
-                swerve.commandRunPath("3gp pathStage2", false)
-            ),
-
-            new StateManager.CmdTransitionState(superStructure, States.PLACE_LOW),
-            
-            new ParallelCommandGroup(
-                new StateManager.CmdTransitionState(superStructure, States.HOME),
-                swerve.commandRunPath("3gp pathStage3", false)
-            )
-        ).withName("commandThreeGamePiece");
-    } 
-
-    private static Command commandTwoGamePieceChargeStation(Swerve swerve, SuperStructure superStructure) {
-        return new InstantCommand().withName("commandTwoGamePieceChargeStation");
-    }
+    public static final Block[] THREE_GAME_PIECE = Blocks.groupBlocks(
+        Cmds.PLACE_HIGH,
+        Paths.PLACE9_FLAT.merge(Cmds.HOME, Cmds.DESIRE_CUBE),
+        // Paths.FLAT_PICKUP4.merge(0.8, Cmds.PICKUP_GROUND),
+        // Paths.PICKUP4_FLAT.merge(Cmds.STOW),
+        Paths.FLAT_SWOOP4
+            .merge(0.45, Cmds.PICKUP_GROUND)
+            .merge(0.6, Cmds.STOW),
+        Paths.FLAT_PLACE8,
+        Cmds.PLACE_HIGH,
+        Paths.PLACE8_FLAT.merge(Cmds.STOW, Cmds.DESIRE_CONE),
+        Paths.FLAT_PICKUP3.merge(0.8, Cmds.PICKUP_GROUND),
+        Paths.PICKUP3_FLAT.merge(Cmds.STOW),
+        Paths.FLAT_PLACE7,
+        Cmds.PLACE_HIGH,
+        Paths.PLACE7_FLAT.merge(Cmds.STOW)
+    );
 }

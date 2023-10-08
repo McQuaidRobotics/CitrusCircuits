@@ -167,6 +167,11 @@ public class RobotContainer {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
         });
+
+        driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
+                .withPosition(3, 3)
+                .withSize(2, 1)
+                .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
     }
 
     public Command getAutonomousCommand(AutoRoutines autoPath) {

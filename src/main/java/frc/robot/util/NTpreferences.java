@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import java.util.HashMap;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.Robot;
 
@@ -34,11 +35,11 @@ public class NTpreferences {
         return loadedCorrectly;
     }
 
-    public static Double getRotationOffset(Module module) {
-        if (module == Module.u3) return findCoterminalAngle((universalOffsets.get("3U") * 360) + 225) / 360;
-        else if (module == Module.u0) return findCoterminalAngle((universalOffsets.get("0U") * 360) + 315) / 360;
-        else if (module == Module.u2) return findCoterminalAngle((universalOffsets.get("2U") * 360) + 125) / 360;
-        else if (module == Module.u1) return findCoterminalAngle((universalOffsets.get("1U") * 360) + 45) / 360;
+    public static Rotation2d getRotationOffset(Module module) {
+        if (module == Module.u3) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("3U") + 225));
+        else if (module == Module.u0) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("0U") + 315));
+        else if (module == Module.u2) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("2U") + 125));
+        else if (module == Module.u1) return Rotation2d.fromDegrees(findCoterminalAngle(universalOffsets.get("1U") + 45));
         throw new IllegalArgumentException("Module not found");
     }
 

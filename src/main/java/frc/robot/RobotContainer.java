@@ -12,7 +12,6 @@ import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;

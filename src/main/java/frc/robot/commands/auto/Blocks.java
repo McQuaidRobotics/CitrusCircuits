@@ -129,7 +129,7 @@ public class Blocks {
 
         @Override
         public Command getCommand(SwerveAutoBuilder builder) {
-            return builder.followPathWithEvents(traj);
+            return builder.followPath(traj);
         }
 
         @Override
@@ -138,11 +138,11 @@ public class Blocks {
         }
 
         public CustomPath merge(Double percentThrough, Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, percentThrough, block, blocks);
+            return Blocks.merge(this.traj, percentThrough, true, block, blocks);
         }
 
         public CustomPath merge(Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, 0.0, block, blocks);
+            return Blocks.merge(this.traj, 0.0, true, block, blocks);
         }
     }
 
@@ -164,20 +164,23 @@ public class Blocks {
         }
 
         public CustomPath merge(Double percentThrough, Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, percentThrough, block, blocks);
+            return Blocks.merge(this.traj, percentThrough, false, block, blocks);
         }
 
         public CustomPath merge(Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, 0.0, block, blocks);
+            return Blocks.merge(this.traj, 0.0, false, block, blocks);
         }
     }
 
-    private static CustomPath merge(PathPlannerTrajectory traj, Double percentThrough, Cmds block, Cmds... blocks) {
-        var newMarkers = traj.getMarkers();
+    private static CustomPath merge(PathPlannerTrajectory traj, Double percentThrough, Boolean eraseOld, Cmds block, Cmds... blocks) {
         List<String> names = new ArrayList<>();
         names.add(ScreamingSnakeToCamal(block.name()));
         for (Cmds blk : blocks) {
             names.add(ScreamingSnakeToCamal(blk.name()));
+        }
+        List<EventMarker> newMarkers = new ArrayList<>();
+        if (!eraseOld) {
+            newMarkers.addAll(traj.getMarkers());
         }
         newMarkers.add(
             EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough)

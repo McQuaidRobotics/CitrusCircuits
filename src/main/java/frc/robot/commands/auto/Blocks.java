@@ -41,15 +41,15 @@ public class Blocks {
         return camal;
     }
 
-    public enum Cmds implements Block {
+    public static enum Cmds implements Block {
         HOME(new CmdTransitionState(RobotContainer.superStructure, States.HOME)),
         STOW(new CmdTransitionState(RobotContainer.superStructure, States.STOW)),
 
-        PLACE(new TransitionToPlace(RobotContainer.superStructure).canFinish().andThen(STOW.command)),
+        PLACE(new TransitionToPlace(RobotContainer.superStructure).canFinish()/*.andThen(STOW.command)*/),
         PLACE_STANDBY(new CmdTransitionState(RobotContainer.superStructure, States.STANDBY).canFinish()),
-        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish().andThen(STOW.command)),
-        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish().andThen(STOW.command)),
-        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW).canFinish().andThen(STOW.command)),
+        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()/*.andThen(STOW.command)*/),
+        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()/*.andThen(STOW.command)*/),
+        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW).canFinish()/*.andThen(STOW.command)*/),
 
         WANT_HIGH(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))),
         WANT_MID(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))),
@@ -88,7 +88,7 @@ public class Blocks {
         }
     }
 
-    public enum Paths implements Block {
+    public static enum Paths implements Block {
         ONE_METER(PathLoader.openFilePath("1M")),
         FLAT_BALANCE_SETUP(PathLoader.openFilePath("FLAT_BALANCE_SETUP")),
         FLAT_PICKUP3(PathLoader.openFilePath("FLAT_PICKUP3")),
@@ -99,12 +99,10 @@ public class Blocks {
         FLAT_SWOOP4(PathLoader.openFilePath("FLAT_SWOOP4")),
         PICKUP1_WIRE(PathLoader.openFilePath("PICKUP1_WIRE")),
         PICKUP2_WIRE(PathLoader.openFilePath("PICKUP2_WIRE")),
-        PICKUP3_CHRG(PathLoader.openFilePath("PICKUP3_CHRG")),
         PICKUP3_FLAT(PathLoader.openFilePath("PICKUP3_FLAT")),
         PICKUP4_FLAT(PathLoader.openFilePath("PICKUP4_FLAT")),
         PLACE1_WIRE(PathLoader.openFilePath("PLACE1_WIRE")),
         PLACE2_WIRE(PathLoader.openFilePath("PLACE2_WIRE")),
-        PLACE3_CHRG(PathLoader.openFilePath("PLACE3_CHRG")),
         PLACE7_FLAT(PathLoader.openFilePath("PLACE7_FLAT")),
         PLACE8_FLAT(PathLoader.openFilePath("PLACE8_FLAT")),
         PLACE9_FLAT(PathLoader.openFilePath("PLACE9_FLAT")),

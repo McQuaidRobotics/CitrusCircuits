@@ -46,6 +46,7 @@ public class SuperstructureCommands {
     public static class TransitionToPlace extends CommandBase {
         private final SuperStructure superStructure;
         private CmdTransitionState placeCmd;
+        private Boolean canFinish = false;
 
         public TransitionToPlace(final SuperStructure superStructure) {
             this.superStructure = superStructure;
@@ -70,6 +71,9 @@ public class SuperstructureCommands {
                             superStructure,
                             States.PLACE_LOW);
                     break;
+            }
+            if (this.canFinish) {
+                placeCmd = placeCmd.canFinish();
             }
             placeCmd.initialize();
         }
@@ -100,7 +104,7 @@ public class SuperstructureCommands {
         }
 
         public TransitionToPlace canFinish() {
-            placeCmd = placeCmd.canFinish();
+            this.canFinish = true;
             return this;
         }
     }

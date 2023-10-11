@@ -127,7 +127,7 @@ public final class Constants {
              * The ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_HOME = 40.0;
+            public static final double CURRENT_PEAK_FOR_HOME = 35.0;
 
             public static final double TOLERANCE = 0.5;
 

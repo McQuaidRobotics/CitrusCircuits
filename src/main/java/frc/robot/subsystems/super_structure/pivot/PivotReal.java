@@ -138,14 +138,18 @@ public class PivotReal implements Pivot {
     @Override
     public Boolean homeMechanism() {
         if (isStowed) {
+            this.stopMechanism();
             return true;
         }
 
         var reached = this.setPivotDegrees(kPivot.HOME_DEGREES);
         if (reached) {
+            this.stopMechanism();
             seedPivot();
             isStowed = true;
-        } else if (motorAmps.getValue() > kPivot.CURRENT_PEAK_FOR_HOME) {
+            return isStowed;
+        }
+        if (motorAmps.getValue() > kPivot.CURRENT_PEAK_FOR_HOME) {
             this.stopMechanism();
             seedPivot();
             isStowed = true;

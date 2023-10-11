@@ -162,16 +162,15 @@ public class WristReal implements Wrist {
             return true;
         }
 
-        if (getWristDegrees() > kWrist.HOME_DEGREES - 10.0) {
-            // run using fast closed loop control if far away from home
+        if (getWristDegrees() < kWrist.HOME_DEGREES - 10.0) {
             setWristDegrees(kWrist.HOME_DEGREES);
         } else {
             manualDriveWrist(0.2);
-            if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
-                this.stopMechanism();
-                this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES + kWrist.HARD_OFFSET));
-                isStowed = true;
-            }
+        }
+        if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
+            this.stopMechanism();
+            this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES + kWrist.HARD_OFFSET));
+            isStowed = true;
         }
 
         return isStowed;

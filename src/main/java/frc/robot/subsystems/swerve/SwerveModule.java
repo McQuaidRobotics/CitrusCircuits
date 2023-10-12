@@ -1,24 +1,22 @@
 package frc.robot.subsystems.swerve;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.kSwerve;
-import frc.robot.Robot;
 import frc.robot.util.SwerveModuleConstants;
 
 public class SwerveModule {
@@ -53,34 +51,45 @@ public class SwerveModule {
     }
 
     public void configureDriveMotor() {
-        driveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
-        var mDriveConfig = new MotorOutputConfigs();
-        mDriveConfig.Inverted = kSwerve.DRIVE_MOTOR_INVERT;
-        mDriveConfig.NeutralMode = kSwerve.DRIVE_NEUTRAL_MODE;
-        driveMotor.getConfigurator().apply(mDriveConfig);
+        var driveConfig = new TalonFXConfiguration();
+        driveConfig.CurrentLimits.StatorCurrentLimitEnable = kSwerve.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveConfig.CurrentLimits.SupplyCurrentLimit = kSwerve.DRIVE_CONTINUOUS_CURRENT_LIMIT;
+        driveConfig.CurrentLimits.SupplyCurrentThreshold = kSwerve.DRIVE_PEAK_CURRENT_LIMIT;
+        driveConfig.CurrentLimits.SupplyTimeThreshold = kSwerve.DRIVE_PEAK_CURRENT_DURATION;
+        driveConfig.MotorOutput.Inverted = kSwerve.DRIVE_MOTOR_INVERT;
+        driveConfig.MotorOutput.NeutralMode = kSwerve.DRIVE_NEUTRAL_MODE;
+        driveConfig.Slot0.kP = kSwerve.DRIVE_KP;
+        driveConfig.Slot0.kI = kSwerve.DRIVE_KI;
+        driveConfig.Slot0.kD = kSwerve.DRIVE_KD;
+        driveConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = kSwerve.OPEN_LOOP_RAMP;
+        driveConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = kSwerve.CLOSED_LOOP_RAMP;
+
+        driveMotor.getConfigurator().apply(driveConfig);
     }
 
     public void configureAngleMotor() {
-        angleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
-        var mAngleConfig = new TalonFXConfiguration();
-        mAngleConfig.MotorOutput.Inverted = kSwerve.ANGLE_MOTOR_INVERT;
-        mAngleConfig.MotorOutput.NeutralMode = kSwerve.ANGLE_NEUTRAL_MODE;
-        mAngleConfig.Slot0.kP = kSwerve.ANGLE_KP;
-        mAngleConfig.Slot0.kI = kSwerve.ANGLE_KI;
-        mAngleConfig.Slot0.kD = kSwerve.ANGLE_KD;
-        mAngleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
-        mAngleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        mAngleConfig.Feedback.RotorToSensorRatio = kSwerve.ANGLE_GEAR_RATIO;
-        mAngleConfig.Feedback.SensorToMechanismRatio = 1.0;
-        mAngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
-        angleMotor.getConfigurator().apply(mAngleConfig);
+        var angleConfig = new TalonFXConfiguration();
+        angleConfig.MotorOutput.Inverted = kSwerve.ANGLE_MOTOR_INVERT;
+        angleConfig.MotorOutput.NeutralMode = kSwerve.ANGLE_NEUTRAL_MODE;
+        angleConfig.Slot0.kP = kSwerve.ANGLE_KP;
+        angleConfig.Slot0.kI = kSwerve.ANGLE_KI;
+        angleConfig.Slot0.kD = kSwerve.ANGLE_KD;
+        angleConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
+        angleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        angleConfig.Feedback.RotorToSensorRatio = kSwerve.ANGLE_GEAR_RATIO;
+        angleConfig.Feedback.SensorToMechanismRatio = 1.0;
+        angleConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
+        angleMotor.getConfigurator().apply(angleConfig);
     }
 
     public void configureCANcoder() {
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
-        var CANCoderConfig = new CANcoderConfiguration();
-        CANCoderConfig.MagnetSensor.MagnetOffset = -rotationOffset.getRotations();
-        angleEncoder.getConfigurator().apply(CANCoderConfig);
+        var canCoderConfig = new CANcoderConfiguration();
+        canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        canCoderConfig.MagnetSensor.SensorDirection = kSwerve.CANCODER_INVERT;
+        canCoderConfig.MagnetSensor.MagnetOffset = -rotationOffset.getRotations();
+
+        angleEncoder.getConfigurator().apply(canCoderConfig);
     }
 
     public Rotation2d getCanCoder() {
@@ -95,7 +104,6 @@ public class SwerveModule {
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = optimize(desiredState, getAngle());
-        SmartDashboard.putNumber("Mod " + this.moduleNumber + " Desired State", desiredState.angle.getDegrees());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -115,16 +123,16 @@ public class SwerveModule {
     }
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
-        var controlRequest = new DutyCycleOut(percentOutput);
-        if (!isOpenLoop) {
-            var slot0Config = new Slot0Configs();
-            slot0Config.kP = kSwerve.DRIVE_KP;
-            slot0Config.kI = kSwerve.DRIVE_KI;
-            slot0Config.kD = kSwerve.DRIVE_KD;
-            driveMotor.getConfigurator().apply(slot0Config);
+        if (isOpenLoop) {
+            double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
+            var controlRequest = new DutyCycleOut(percentOutput);
+            driveMotor.setControl(controlRequest);
+        } else {
+            double rps = Math.min(desiredState.speedMetersPerSecond, kSwerve.MAX_SPEED)
+                / (kSwerve.WHEEL_CIRCUMFERENCE / kSwerve.DRIVE_GEAR_RATIO);
+            var veloRequest = new VelocityTorqueCurrentFOC(rps);
+            driveMotor.setControl(veloRequest);
         }
-        driveMotor.setControl(controlRequest);
     }
 
     private double driveRotationsToMeters(double rotations) {

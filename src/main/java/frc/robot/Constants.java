@@ -5,16 +5,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
-import frc.robot.util.NTpreferences.Module;
+import frc.robot.util.SwerveModuleConstants.ModuleId;
 
 public final class Constants {
     public static final double dPlaceholder = 0.0;
@@ -215,13 +213,12 @@ public final class Constants {
         public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
-        /*
-         * Swerve Kinematics
-         * No need to ever change this unless you are not doing a traditional
-         * rectangular/square 4 module swerve
-         */
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
-                Mod0.CHASSIS_OFFSET, Mod1.CHASSIS_OFFSET, Mod2.CHASSIS_OFFSET, Mod3.CHASSIS_OFFSET);
+            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0), //idk why this is needed?
+            Mod1.CHASSIS_OFFSET,
+            Mod2.CHASSIS_OFFSET,
+            Mod3.CHASSIS_OFFSET
+        );
 
         /* Module Gear Ratios */
         public static final double DRIVE_GEAR_RATIO = (6.75 / 1.0);
@@ -274,43 +271,43 @@ public final class Constants {
         public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
 
         public static final class Mod0 {
+            public static final ModuleId MODULE = ModuleId.m0;
             public static final int DRIVE_MOTOR_ID = 1;
             public static final int ANGLE_MOTOR_ID = 2;
             public static final int CANCODER_ID = 21;
-            public static final Rotation2d ROTATION_OFFSET = NTpreferences.getRotationOffset(Module.u0);
             public static final Translation2d CHASSIS_OFFSET = new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
-            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_MOTOR_ID,
-                    ANGLE_MOTOR_ID, CANCODER_ID, ROTATION_OFFSET, CHASSIS_OFFSET);
+            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE,DRIVE_MOTOR_ID,
+                    ANGLE_MOTOR_ID, CANCODER_ID, CHASSIS_OFFSET);
         }
 
         public static final class Mod1 {
+            public static final ModuleId MODULE = ModuleId.m1;
             public static final int DRIVE_MOTOR_ID = 3;
             public static final int ANLGE_MOTOR_ID = 4;
             public static final int CANCODER_ID = 22;
-            public static final Rotation2d ROTATION_OFFSET = NTpreferences.getRotationOffset(Module.u1);
             public static final Translation2d CHASSIS_OFFSET = new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
-            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_MOTOR_ID,
-                    ANLGE_MOTOR_ID, CANCODER_ID, ROTATION_OFFSET, CHASSIS_OFFSET);
+            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE, DRIVE_MOTOR_ID,
+                    ANLGE_MOTOR_ID, CANCODER_ID, CHASSIS_OFFSET);
         }
 
         public static final class Mod2 {
+            public static final ModuleId MODULE = ModuleId.m2;
             public static final int DRIVE_MOTOR_ID = 5;
             public static final int ANGLE_MOTOR_ID = 6;
             public static final int CANCODER_ID = 23;
-            public static final Rotation2d ROTATION_OFFSET = NTpreferences.getRotationOffset(Module.u2);
             public static final Translation2d CHASSIS_OFFSET = new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
-            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_MOTOR_ID,
-                    ANGLE_MOTOR_ID, CANCODER_ID, ROTATION_OFFSET, CHASSIS_OFFSET);
+            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE, DRIVE_MOTOR_ID,
+                    ANGLE_MOTOR_ID, CANCODER_ID, CHASSIS_OFFSET);
         }
 
         public static final class Mod3 {
+            public static final ModuleId MODULE = ModuleId.m3;
             public static final int DRIVE_MOTOR_ID = 7;
             public static final int ANGLE_MOTOR_ID = 8;
             public static final int CANCODER_ID = 24;
-            public static final Rotation2d ROTATION_OFFSET = NTpreferences.getRotationOffset(Module.u3);
             public static final Translation2d CHASSIS_OFFSET = new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
-            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_MOTOR_ID,
-                    ANGLE_MOTOR_ID, CANCODER_ID, ROTATION_OFFSET, CHASSIS_OFFSET);
+            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE, DRIVE_MOTOR_ID,
+                    ANGLE_MOTOR_ID, CANCODER_ID, CHASSIS_OFFSET);
         }
     }
 }

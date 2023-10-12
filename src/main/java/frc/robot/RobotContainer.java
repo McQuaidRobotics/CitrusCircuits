@@ -5,8 +5,6 @@ import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.swerve.TeleopSwerve;
-import frc.robot.commands.auto.Autos;
-import frc.robot.commands.auto.Autos.AutoRoutines;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -19,30 +17,26 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-    private final CommandXboxController driveController = new CommandXboxController(0);
-    private final CommandXboxController operatorController = new CommandXboxController(1);
+    private static final CommandXboxController driveController = new CommandXboxController(0);
+    private static final CommandXboxController operatorController = new CommandXboxController(1);
 
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private static final int translationAxis = XboxController.Axis.kLeftY.value;
+    private static final int strafeAxis = XboxController.Axis.kLeftX.value;
+    private static final int rotationAxis = XboxController.Axis.kRightX.value;
 
     public static final Swerve swerve = new Swerve();
     public static final SuperStructure superStructure = new SuperStructure();
 
-    public final ShuffleboardTab driverTab;
-
-    public RobotContainer() {
+    public static void RobotContainerInit() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         configureDriverBindings();
         configureOperatorBindings();
 
-        driverTab = Shuffleboard.getTab("Driver");
         configureDriverTabShuffleboard();
 
         swerve.setDefaultCommand(
@@ -70,7 +64,7 @@ public class RobotContainer {
     // RightTrigger: set desired gamepiece to cone
     // LeftTrigger: set desired gamepiece to cube
 
-    private void configureDriverBindings() {
+    private static void configureDriverBindings() {
         // Bumpers/Triggers
         driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
         driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
@@ -97,7 +91,7 @@ public class RobotContainer {
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
     }
 
-    private void configureOperatorBindings() {
+    private static void configureOperatorBindings() {
         // Face buttons
         operatorController.y().onTrue(new InstantCommand(
                 () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))
@@ -136,7 +130,8 @@ public class RobotContainer {
         // .ignoringDisable(true));
     }
 
-    private void configureDriverTabShuffleboard() {
+    private static void configureDriverTabShuffleboard() {
+        ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
         driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
                 .withSize(2, 1)
                 .withPosition(6, 0)
@@ -170,9 +165,5 @@ public class RobotContainer {
                 .withPosition(3, 3)
                 .withSize(2, 1)
                 .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
-    }
-
-    public Command getAutonomousCommand(AutoRoutines autoPath) {
-        return Autos.getAutoRoutineCommand(autoPath, swerve, superStructure);
     }
 }

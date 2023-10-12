@@ -17,30 +17,33 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.kSwerve;
+import frc.robot.util.NTpreferences;
 
 public class Swerve extends SubsystemBase {
-    private SwerveDriveOdometry swerveOdometry;
-    private SwerveModule[] mSwerveMods;
-    private Pigeon2 gyro;
+    private final SwerveDriveOdometry swerveOdometry;
+    private final SwerveModule[] swerveMods;
+    private final Pigeon2 gyro;
 
     public Swerve() {
+        NTpreferences.loadPreferences();
+
         this.gyro = new Pigeon2(Constants.kSwerve.PIGEON_ID, Constants.kSwerve.CANBUS);
         var gyroEmptyConfig = new Pigeon2Configuration();
         gyro.getConfigurator().apply(gyroEmptyConfig);
         zeroGyro();
 
-        mSwerveMods = new SwerveModule[] {
-                new SwerveModule(Constants.kSwerve.Mod0.CONSTANTS, 0),
-                new SwerveModule(Constants.kSwerve.Mod1.CONSTANTS, 1),
-                new SwerveModule(Constants.kSwerve.Mod2.CONSTANTS, 2),
-                new SwerveModule(Constants.kSwerve.Mod3.CONSTANTS, 3)
+        swerveMods = new SwerveModule[] {
+                new SwerveModule(Constants.kSwerve.Mod0.CONSTANTS),
+                new SwerveModule(Constants.kSwerve.Mod1.CONSTANTS),
+                new SwerveModule(Constants.kSwerve.Mod2.CONSTANTS),
+                new SwerveModule(Constants.kSwerve.Mod3.CONSTANTS)
         };
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.kSwerve.SWERVE_KINEMATICS, getYaw(), getModulePositions());
+        swerveOdometry = new SwerveDriveOdometry(kSwerve.SWERVE_KINEMATICS, getYaw(), getModulePositions());
     }
 
     public void Drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] mSwerveModuleStates = Constants.kSwerve.SWERVE_KINEMATICS.toSwerveModuleStates(fieldRelative
+        SwerveModuleState[] mSwerveModuleStates = kSwerve.SWERVE_KINEMATICS.toSwerveModuleStates(fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(),
                         translation.getY(),
@@ -53,7 +56,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(mSwerveModuleStates, Constants.kSwerve.MAX_SPEED);
 
-        for (SwerveModule module : mSwerveMods) {
+        for (SwerveModule module : swerveMods) {
             module.setDesiredState(mSwerveModuleStates[module.moduleNumber], isOpenLoop);
         }
     }
@@ -68,7 +71,7 @@ public class Swerve extends SubsystemBase {
                     new SwerveModuleState(0.0, Rotation2d.fromDegrees(0))
             };
 
-            for (SwerveModule module : mSwerveMods) {
+            for (SwerveModule module : swerveMods) {
                 module.setAngle(newModuleStates[module.moduleNumber]);
             }
         }).withName("commandXDrives");
@@ -97,7 +100,7 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-        for (SwerveModule module : mSwerveMods) {
+        for (SwerveModule module : swerveMods) {
             modulePositions[module.moduleNumber] = module.getPosition();
         }
         return modulePositions;
@@ -106,7 +109,7 @@ public class Swerve extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.kSwerve.MAX_SPEED);
 
-        for (SwerveModule module : mSwerveMods) {
+        for (SwerveModule module : swerveMods) {
             module.setDesiredState(desiredStates[module.moduleNumber], true);
         }
     }
@@ -117,7 +120,7 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for (SwerveModule module : mSwerveMods) {
+        for (SwerveModule module : swerveMods) {
             states[module.moduleNumber] = module.getState();
         }
         return states;

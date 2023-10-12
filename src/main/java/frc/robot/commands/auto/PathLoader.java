@@ -16,6 +16,7 @@ public class PathLoader {
         PathPlannerTrajectory autoPath = PathPlanner.loadPath(
             autoPathFile, 
             new PathConstraints(kSwerve.MAX_SPEED, kSwerve.MAX_ANGULAR_VELOCITY));
+        System.out.println("Loaded path: " + autoPathFile);
         return autoPath;
     }
 

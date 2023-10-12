@@ -41,7 +41,7 @@ public final class Constants {
             // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
-            public static final double MAX_VELOCITY = 80;
+            public static final double MAX_VELOCITY = 75;
             public static final double MAX_ACCELERATION = 300;
             public static final double MAX_JERK = 2000;
 
@@ -133,7 +133,7 @@ public final class Constants {
              * The ammount of current the motor needs to pull to
              * be recognized at mechanical limit.
              */
-            public static final double CURRENT_PEAK_FOR_HOME = 40.0;
+            public static final double CURRENT_PEAK_FOR_HOME = 35.0;
 
             public static final double TOLERANCE = 0.5;
 

@@ -82,9 +82,6 @@ public class ElevatorReal implements Elevator {
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        motorCfg.MotorOutput.PeakForwardDutyCycle *= 0.4;
-        motorCfg.MotorOutput.PeakReverseDutyCycle *= 0.4;
-
         motorCfg.MotorOutput.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 

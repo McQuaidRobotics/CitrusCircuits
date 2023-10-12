@@ -6,21 +6,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.auto.Autos;
 import frc.robot.commands.auto.Autos.AutoRoutines;
-import frc.robot.util.CTREConfigs;
 import frc.robot.util.NTpreferences;
 
 public class Robot extends TimedRobot {
-  public static CTREConfigs ctreConfigs;
 
   private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
   private final SendableChooser<Autos.AutoRoutines> autoRoutineChooser = new SendableChooser<>();
+  private RobotContainer robotContainer;
 
   @Override
   public void robotInit() {
     NTpreferences.loadPreferences();
-    ctreConfigs = new CTREConfigs();
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
 
     Autos.AutoRoutines[] autoRoutines = Autos.AutoRoutines.values();
     for (Autos.AutoRoutines autoRoutine : autoRoutines) {
@@ -30,7 +27,7 @@ public class Robot extends TimedRobot {
       }
       autoRoutineChooser.addOption(autoRoutine.name(), autoRoutine);
     }
-    m_robotContainer.driverTab.add("Autonomous Routine", autoRoutineChooser)
+    robotContainer.driverTab.add("Autonomous Routine", autoRoutineChooser)
       .withSize(2, 1)
       .withPosition(0, 0);
   }

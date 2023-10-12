@@ -56,6 +56,7 @@ public class commandDriveTimedDirection extends CommandBase{
         swerve.Drive(
             new Translation2d(direction.x * speedPercent, direction.y * speedPercent).times(Constants.kSwerve.MAX_SPEED),
             0.0,
+            true,
             true);
     }
 

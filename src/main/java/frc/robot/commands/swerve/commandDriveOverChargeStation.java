@@ -72,6 +72,7 @@ public class commandDriveOverChargeStation extends CommandBase {
             swerve.Drive(
                     new Translation2d(driveStrengthPercent, 0.0).times(Constants.kSwerve.MAX_SPEED),
                     0.0,
+                    true,
                     true);
 
             SmartDashboard.putBoolean("returnedToGroundDebouncer | OverChargeStation",
@@ -82,6 +83,7 @@ public class commandDriveOverChargeStation extends CommandBase {
             swerve.Drive(
                     new Translation2d(-driveStrengthPercent, 0.0).times(Constants.kSwerve.MAX_SPEED),
                     0.0,
+                    true,
                     true);
 
             SmartDashboard.putBoolean("returnedToGroundDebouncer | OverChargeStation",

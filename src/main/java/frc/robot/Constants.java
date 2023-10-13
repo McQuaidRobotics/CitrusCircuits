@@ -198,8 +198,8 @@ public final class Constants {
     }
 
     public static class kAuto {
-        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(1.0, 0.0, 0.0);
-        public static final PIDController AUTO_ANGULAR_PID = new PIDController(1.0, 0.0, 0.0);
+        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDController AUTO_ANGULAR_PID = new PIDController(0.0, 0.0, 0.0);
     }
 
     public static class kSwerve {
@@ -256,13 +256,13 @@ public final class Constants {
         public static final double ANGLE_KD = 0.0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.05;
+        public static final double DRIVE_KP = 3.0;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double MAX_SPEED = 2.0;
+        public static final double MAX_SPEED = 4.5;
         /** Radians per Second */
         public static final double MAX_ANGULAR_VELOCITY = 10.0;
 

@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.kAuto;
 import frc.robot.Constants.kSwerve;
@@ -16,7 +17,6 @@ public class PathLoader {
         PathPlannerTrajectory autoPath = PathPlanner.loadPath(
             autoPathFile, 
             new PathConstraints(kSwerve.MAX_SPEED, kSwerve.MAX_ANGULAR_VELOCITY));
-        System.out.println("Loaded path: " + autoPathFile);
         return autoPath;
     }
 
@@ -24,6 +24,7 @@ public class PathLoader {
         return new SwerveAutoBuilder(
             RobotContainer.swerve::getPose, 
             RobotContainer.swerve::resetOdometry, 
+            Constants.kSwerve.SWERVE_KINEMATICS,
             new PIDConstants(
                 kAuto.AUTO_TRANSLATION_PID.getP(), 
                 kAuto.AUTO_TRANSLATION_PID.getI(), 

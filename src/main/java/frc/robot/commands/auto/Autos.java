@@ -24,6 +24,7 @@ public class Autos {
     // }
 
     public static final Block[] THREE_GAME_PIECE = Blocks.groupBlocks(
+        Cmds.OVERRIDE_HOLD_CONE,
         Cmds.PLACE_HIGH,
         Paths.PLACE9_FLAT.merge(Cmds.HOME, Cmds.DESIRE_CUBE),
         Paths.FLAT_SWOOP4
@@ -31,12 +32,15 @@ public class Autos {
             .merge(0.65, Cmds.STOW),
         Paths.FLAT_PLACE8.merge(0.2, Cmds.PLACE_STANDBY),
         Cmds.PLACE_HIGH,
-        Paths.FLAT_PICKUP3.merge(0.8, Cmds.PICKUP_GROUND),
+        Paths.FLAT_PICKUP3
+            .merge(Cmds.STOW)
+            .merge(0.8, Cmds.PICKUP_GROUND),
         Paths.PICKUP3_FLAT.merge(Cmds.STOW),
         Paths.FLAT_PLACE8.merge(0.2, Cmds.PLACE_STANDBY),
         Cmds.PLACE_LOW,
         Paths.PLACE8_FLAT.merge(Cmds.STOW)
     );
 
-    public static final Command TEST_PATH = Paths.ONE_METER.getCommand(PathLoader.getPPAutoBuilder());
+    public static final Command TEST_PATH = Blocks.buildBlocks(THREE_GAME_PIECE);
+    // public static final Command TEST_PATH = Paths.ONE_METER.getCommand(PathLoader.getPPAutoBuilder());
 }

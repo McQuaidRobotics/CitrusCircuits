@@ -52,13 +52,15 @@ public class RobotContainer {
     // LeftBumper: pickup position
     // RightTrigger: placing standby
     // LeftTrigger: stow
+    // D-pad UP: home/stow
     // Start: zero gyro
 
     // [operator]
     // Y: set desired score level to high
     // B: set desired score level to mid
-    // A: set desired score level to low
-    // X: home/stow
+    // A: set desired score level to low front
+    // X: set desired score level to low back
+    // D-pad UP: home/stow
     // RightBumper: set desired pickup method to ground
     // LeftBumper: set desired pickup method to shelf
     // RightTrigger: set desired gamepiece to cone
@@ -66,29 +68,16 @@ public class RobotContainer {
 
     private static void configureDriverBindings() {
         // Bumpers/Triggers
-        driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
-        driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
+        driveController.rightBumper().onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
+        driveController.leftBumper().onTrueForce(new SuperstructureCommands.TransitionToPickup(superStructure));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
-        // used for testing
-        // driveController.pov(0).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(12.0, false), superStructure));
-        // driveController.pov(180).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(-12.0, false), superStructure));
-        // driveController.pov(90).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(0.0, false), superStructure));
-        // driveController.x().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.STOW));
-        // driveController.a().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
-        // driveController.b().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
-        // driveController.y().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
-
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+
+        // POV buttons
+        driveController.pov(0).onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
     private static void configureOperatorBindings() {
@@ -100,9 +89,11 @@ public class RobotContainer {
                 () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))
                 .ignoringDisable(true));
         operatorController.a().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW))
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT))
                 .ignoringDisable(true));
-        operatorController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+        operatorController.x().onTrue(new InstantCommand(
+            () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_BACK))
+            .ignoringDisable(true));
 
         // Bumpers/Triggers
         operatorController.rightBumper().onTrue(new InstantCommand(
@@ -118,16 +109,9 @@ public class RobotContainer {
                 () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))
                 .ignoringDisable(true));
 
-        // used for testing
-        // operatorController.pov(0).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))
-        // .ignoringDisable(true));
-        // operatorController.pov(180).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))
-        // .ignoringDisable(true));
-        // operatorController.pov(270).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(null))
-        // .ignoringDisable(true));
+        // POV buttons
+        operatorController.pov(0).onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+
     }
 
     private static void configureDriverTabShuffleboard() {
@@ -140,9 +124,13 @@ public class RobotContainer {
                 .withSize(2, 1)
                 .withPosition(6, 1)
                 .withProperties(Map.of("colorWhenTrue", "Magenta", "colorWhenFalse", "Black"));
-        driverTab.addBoolean("Low", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW)
+        driverTab.addBoolean("Low Front", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW_FRONT)
                 .withSize(2, 1)
                 .withPosition(6, 2)
+                .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
+        driverTab.addBoolean("Low Back", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW_BACK)
+                .withSize(2, 1)
+                .withPosition(6, 3)
                 .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
         var pickup = driverTab.getLayout("Pickup Mode", BuiltInLayouts.kList)

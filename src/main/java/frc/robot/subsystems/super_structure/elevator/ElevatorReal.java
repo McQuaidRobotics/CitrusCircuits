@@ -77,8 +77,8 @@ public class ElevatorReal implements Elevator {
         motorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
         motorCfg.HardwareLimitSwitch.ReverseLimitEnable = true;
-        motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
-        motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0.0;
+        // motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+        // motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0.0;
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -138,6 +138,7 @@ public class ElevatorReal implements Elevator {
         this.manualDriveWrist(-0.2);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
+            this.leaderMotor.setRotorPosition(0.0);
             this.isStowed = true;
         }
         return this.isLimitSwitchHit();

@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +24,7 @@ public class Swerve extends SubsystemBase {
     private final SwerveDriveOdometry swerveOdometry;
     private final SwerveModule[] swerveMods;
     private final Pigeon2 gyro;
+    private final Field2d field = new Field2d();
 
     public Swerve() {
         NTpreferences.loadPreferences();
@@ -53,6 +55,38 @@ public class Swerve extends SubsystemBase {
                         translation.getX(),
                         translation.getY(),
                         rotation));
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(mSwerveModuleStates, Constants.kSwerve.MAX_SPEED);
+
+        for (SwerveModule module : swerveMods) {
+            module.setDesiredState(mSwerveModuleStates[module.moduleNumber], isOpenLoop);
+        }
+    }
+
+    public void Drive(Translation2d translation, Translation2d absRotation, boolean isOpenLoop) {
+        //the angle of the translation vector
+        Double wantedAngle = Math.atan2(absRotation.getY(), absRotation.getX());
+        //a 0-1 value representing the magnitude of the translation vector
+        Double magnitude = absRotation.getNorm();
+        //the current angle reading of the gyro
+        Double currentAngle = getYaw().getRadians();
+        //the angle of the translation vector relative to the gyro
+        Double relativeAngle = wantedAngle - currentAngle;
+
+        Double rotVelo;
+        if (relativeAngle < kSwerve.MAX_ANGULAR_VELOCITY * 0.02) {
+            rotVelo = relativeAngle * 50;
+        } else {
+            rotVelo = Math.signum(relativeAngle) * kSwerve.MAX_ANGULAR_VELOCITY * magnitude;
+        }
+
+        SwerveModuleState[] mSwerveModuleStates = kSwerve.SWERVE_KINEMATICS.toSwerveModuleStates(
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                translation.getX() * kSwerve.MAX_SPEED,
+                translation.getY() * kSwerve.MAX_SPEED,
+                rotVelo,
+                getYaw()
+            ));
 
         SwerveDriveKinematics.desaturateWheelSpeeds(mSwerveModuleStates, Constants.kSwerve.MAX_SPEED);
 
@@ -110,7 +144,7 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.kSwerve.MAX_SPEED);
 
         for (SwerveModule module : swerveMods) {
-            module.setDesiredState(desiredStates[module.moduleNumber], true);
+            module.setDesiredState(desiredStates[module.moduleNumber], false);
         }
     }
 
@@ -138,5 +172,7 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         var currCmd = this.getCurrentCommand();
         SmartDashboard.putString("swerve cmd", currCmd == null ? "None" : currCmd.getName());
+        swerveOdometry.update(getYaw(), getModulePositions());
+        field.getRobotObject().setPose(swerveOdometry.getPoseMeters());
     }
 }

@@ -12,6 +12,8 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.GamepieceMode;
@@ -28,6 +30,7 @@ public class Blocks {
 
     public interface Block {
         public Command getCommand(SwerveAutoBuilder builder);
+
         public String getCommandName();
     }
 
@@ -45,22 +48,25 @@ public class Blocks {
         HOME(new CmdTransitionState(RobotContainer.superStructure, States.HOME)),
         STOW(new CmdTransitionState(RobotContainer.superStructure, States.STOW)),
 
-        PLACE(new TransitionToPlace(RobotContainer.superStructure).canFinish()/*.andThen(STOW.command)*/),
+        PLACE(new TransitionToPlace(RobotContainer.superStructure).canFinish()),
         PLACE_STANDBY(new CmdTransitionState(RobotContainer.superStructure, States.STANDBY).canFinish()),
-        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()/*.andThen(STOW.command)*/),
-        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()/*.andThen(STOW.command)*/),
-        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW).canFinish()/*.andThen(STOW.command)*/),
+        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()),
+        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()),
+        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT).canFinish()),
 
         WANT_HIGH(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))),
         WANT_MID(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))),
-        WANT_LOW(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW))),
+        WANT_LOW(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT))),
 
         PICKUP_GROUND(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_GROUND).withTimeout(1.0)),
         PICKUP_STATION(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_STATION).withTimeout(1.0)),
 
         DESIRE_CUBE(new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))),
         DESIRE_CONE(new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))),
-        
+
+        OVERRIDE_HOLD_CUBE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))),
+        OVERRIDE_HOLD_CONE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))),
+
         DISPELL_GAMEPIECE(StateManager.dispellGamepiece(RobotContainer.superStructure));
 
         public final Command command;
@@ -170,7 +176,8 @@ public class Blocks {
         }
     }
 
-    private static CustomPath merge(PathPlannerTrajectory traj, Double percentThrough, Boolean eraseOld, Cmds block, Cmds... blocks) {
+    private static CustomPath merge(PathPlannerTrajectory traj, Double percentThrough, Boolean eraseOld, Cmds block,
+            Cmds... blocks) {
         List<String> names = new ArrayList<>();
         names.add(ScreamingSnakeToCamal(block.name()));
         for (Cmds blk : blocks) {
@@ -181,20 +188,19 @@ public class Blocks {
             newMarkers.addAll(traj.getMarkers());
         }
         newMarkers.add(
-            EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough)
-        );
+                EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough));
         var newTraj = new PathPlannerTrajectory(
-            traj.getStates(),
-            newMarkers,
-            new StopEvent(),
-            new StopEvent(),
-            false
-        );
+                traj.getStates(),
+                newMarkers,
+                new StopEvent(),
+                new StopEvent(),
+                false);
         return new CustomPath(newTraj);
     }
 
     /**
      * Merges command blocks into a path to be run at start
+     * 
      * @param blocks The blocks to run at the end of the path
      * @return The merged block
      */
@@ -223,13 +229,22 @@ public class Blocks {
     public static Command buildBlocks(Block... blocks) {
         var builder = PathLoader.getPPAutoBuilder();
         List<Command> commands = new ArrayList<>();
+        var scheduler = CommandScheduler.getInstance();
 
+        Integer count = 0;
         for (Block block : blocks) {
-            commands.add(block.getCommand(builder));
+            var cmd = block.getCommand(builder);
+            scheduler.removeComposedCommand(cmd);
+            var namedCmd = cmd.withName("Block: " + count);
+            commands.add(namedCmd);
+            scheduler.removeComposedCommand(namedCmd);
+            count++;
         }
 
-        commands.add(RobotContainer.swerve.commandStopDrives());
+        // commands.add(RobotContainer.swerve.commandStopDrives().withName("Stop
+        // Swerve"));
 
-        return new SequentialCommandGroup(commands.toArray(CommandBase[]::new));
+        Commands.sequence(commands.toArray(CommandBase[]::new));
+        return new InstantCommand();
     }
 }

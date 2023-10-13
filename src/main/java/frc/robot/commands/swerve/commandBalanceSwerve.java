@@ -38,21 +38,21 @@ public class commandBalanceSwerve extends CommandBase {
 
     @Override
     public void execute() {
-        if (swerve.getPitch() > 0) {
-            new TeleopSwerve(
-                    swerve,
-                    () -> -1.0 * backwardDriveStrengthPercent,
-                    () -> 0.0,
-                    () -> 0.0,
-                    false);
-        } else {
-            new TeleopSwerve(
-                    swerve,
-                    () -> 1.0 * forwardDriveStrengthPercent,
-                    () -> 0.0,
-                    () -> 0.0,
-                    false);
-        }
+        // if (swerve.getPitch() > 0) {
+        //     new TeleopSwerve(
+        //             swerve,
+        //             () -> -1.0 * backwardDriveStrengthPercent,
+        //             () -> 0.0,
+        //             () -> 0.0,
+        //             false);
+        // } else {
+        //     new TeleopSwerve(
+        //             swerve,
+        //             () -> 1.0 * forwardDriveStrengthPercent,
+        //             () -> 0.0,
+        //             () -> 0.0,
+        //             false);
+        // }
 
         /*
          * TODO {Maddox} May want some kind of system in place which will decrease

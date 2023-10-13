@@ -37,7 +37,8 @@ public class SuperstructureCommands {
      * Acts as a pseudo-proxy command for
      * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_HIGH}),
      * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_MID}), or
-     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_LOW})
+     * new {@link StateManager.CmdTransitionState}(ss,
+     * {@link States#PLACE_LOW_FRONT})
      * that will dynamically determine which to use based on
      * {@link OperatorPrefs.ScoreLevel#getCurrentLevel()}.
      * The decided proxy command can only be changed by calling
@@ -66,10 +67,15 @@ public class SuperstructureCommands {
                             superStructure,
                             States.PLACE_MID);
                     break;
-                case LOW:
+                case LOW_FRONT:
                     placeCmd = new StateManager.CmdTransitionState(
                             superStructure,
-                            States.PLACE_LOW);
+                            States.PLACE_LOW_FRONT);
+                    break;
+                case LOW_BACK:
+                    placeCmd = new StateManager.CmdTransitionState(
+                            superStructure,
+                            States.PLACE_LOW_BACK);
                     break;
             }
             if (this.canFinish) {

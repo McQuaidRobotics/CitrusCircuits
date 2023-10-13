@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.kSwerve;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
@@ -53,10 +54,6 @@ public class SwerveModule {
 
     public void configureDriveMotor() {
         var driveConfig = new TalonFXConfiguration();
-        driveConfig.CurrentLimits.StatorCurrentLimitEnable = kSwerve.DRIVE_ENABLE_CURRENT_LIMIT;
-        driveConfig.CurrentLimits.SupplyCurrentLimit = kSwerve.DRIVE_CONTINUOUS_CURRENT_LIMIT;
-        driveConfig.CurrentLimits.SupplyCurrentThreshold = kSwerve.DRIVE_PEAK_CURRENT_LIMIT;
-        driveConfig.CurrentLimits.SupplyTimeThreshold = kSwerve.DRIVE_PEAK_CURRENT_DURATION;
         driveConfig.MotorOutput.Inverted = kSwerve.DRIVE_MOTOR_INVERT;
         driveConfig.MotorOutput.NeutralMode = kSwerve.DRIVE_NEUTRAL_MODE;
         driveConfig.Slot0.kP = kSwerve.DRIVE_KP;
@@ -124,6 +121,7 @@ public class SwerveModule {
     }
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+        SmartDashboard.putNumber("Module: " + moduleNumber + " velo", desiredState.speedMetersPerSecond);
         if (isOpenLoop) {
             double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
             var controlRequest = new DutyCycleOut(percentOutput);

@@ -9,6 +9,7 @@ import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.util.ForcibleTrigger;
 
 import java.util.Map;
 
@@ -72,8 +73,8 @@ public class RobotContainer {
 
     private static void configureDriverBindings() {
         // Bumpers/Triggers
-        driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
-        driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
+        ForcibleTrigger.from(driveController.rightBumper()).onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
+        ForcibleTrigger.from(driveController.leftBumper()).onTrueForce(new SuperstructureCommands.TransitionToPickup(superStructure));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
@@ -81,7 +82,7 @@ public class RobotContainer {
         driveController.start().onTrue(new InstantCommand(() -> swerve.setYaw(0.0)));
 
         // POV buttons
-        driveController.pov(0).onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+        ForcibleTrigger.from(driveController.pov(0)).onTrueForce(new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
     private static void configureOperatorBindings() {
@@ -114,7 +115,7 @@ public class RobotContainer {
         ).ignoringDisable(true));
 
         // POV buttons
-        operatorController.pov(0).onTrue(
+        ForcibleTrigger.from(operatorController.pov(0)).onTrueForce(
             new StateManager.CmdTransitionState(superStructure, States.HOME)
         );
     }

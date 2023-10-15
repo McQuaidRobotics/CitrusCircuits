@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.auto.Blocks.Block;
@@ -31,7 +32,7 @@ public class Autos {
             default:
                 break;
         };
-        return autoCommand;
+        return autoCommand.withName(autoRoutine + "(" + DriverStation.getAlliance() + ") Auto");
     }
 
     public static final Block[] THREE_GAME_PIECE_FLAT = Blocks.groupBlocks(

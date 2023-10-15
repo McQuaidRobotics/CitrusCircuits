@@ -5,13 +5,14 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.auto.Autos;
 
 public class Robot extends TimedRobot {
 
-    private Command autonomousCommand;
+    private Command autoCmd;
     private Autos.AutoRoutines autoRoutine;
     private Alliance alliance = Alliance.Invalid;
     private final SendableChooser<Autos.AutoRoutines> autoRoutineChooser = new SendableChooser<>();
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         CommandScheduler.getInstance().run();
     }
 
@@ -49,14 +51,14 @@ public class Robot extends TimedRobot {
         if (selectedRoutine != autoRoutine || alliance != currAlliance) {
             autoRoutine = selectedRoutine;
             alliance = currAlliance;
-            autonomousCommand = Autos.getAutoRoutineCommand(autoRoutine);
+            autoCmd = Autos.getAutoRoutineCommand(autoRoutine);
         }
     }
 
     @Override
     public void autonomousInit() {
-        if (autonomousCommand != null) {
-            autonomousCommand.schedule();
+        if (autoCmd != null) {
+            autoCmd.schedule();
         }
     }
 

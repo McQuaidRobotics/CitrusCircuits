@@ -5,6 +5,7 @@ import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.TeleopSwerve2;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -31,6 +32,8 @@ public class RobotContainer {
     public static final Swerve swerve = new Swerve();
     public static final SuperStructure superStructure = new SuperStructure();
 
+    private static final boolean TRADITIONAL_TELEOP_CONTROLS = true;
+
     public static void RobotContainerInit() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -39,13 +42,24 @@ public class RobotContainer {
 
         configureDriverTabShuffleboard();
 
-        swerve.setDefaultCommand(
-            new TeleopSwerve(
-                swerve,
-                () -> driveController.getLeftY(),
-                () -> driveController.getLeftX(),
-                () -> -driveController.getRightX()
+        if (TRADITIONAL_TELEOP_CONTROLS) {
+            swerve.setDefaultCommand(
+                new TeleopSwerve(
+                    swerve,
+                    () -> driveController.getLeftY(),
+                    () -> driveController.getLeftX(),
+                    () -> -driveController.getRightX()
             ));
+        } else {
+            swerve.setDefaultCommand(
+                new TeleopSwerve2(
+                    swerve,
+                    () -> driveController.getLeftY(),
+                    () -> driveController.getLeftX(),
+                    () -> driveController.getRightX(),
+                    () -> driveController.getRightY()
+            ));
+        }
 
         var brakeTrig = new Trigger(() -> brakeSwitch.get()).or(DriverStation::isEnabled);
         brakeTrig.onTrue(new InstantCommand(superStructure::brake));

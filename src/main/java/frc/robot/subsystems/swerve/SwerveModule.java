@@ -109,6 +109,7 @@ public class SwerveModule {
         angleConfig.Feedback.RotorToSensorRatio = 1.0 / kSwerve.ANGLE_MECHANISM_RATIO;
         angleConfig.Feedback.SensorToMechanismRatio = 1.0;
         angleConfig.ClosedLoopGeneral.ContinuousWrap = true;
+        angleConfig.MotorOutput.DutyCycleNeutralDeadband = 0.05;
 
         angleMotor.getConfigurator().apply(angleConfig);
     }

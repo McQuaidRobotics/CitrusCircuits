@@ -219,7 +219,7 @@ public final class Constants {
         public static final SensorDirectionValue CANCODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;
 
         /* Angle Motor PID Values */
-        public static final double ANGLE_KP = 3.0;
+        public static final double ANGLE_KP = 1.0;
         public static final double ANGLE_KI = 0.0;
         public static final double ANGLE_KD = 0.0;
 

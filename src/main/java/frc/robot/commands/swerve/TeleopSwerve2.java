@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ControllerConsts;
 import frc.robot.commands.Helpers;
 
 /** An example command that uses an example subsystem. */
@@ -27,10 +28,10 @@ public class TeleopSwerve2 extends CommandBase {
         this.swerve = swerve;
         addRequirements(swerve);
 
-        this.translationXSup = Helpers.deadbandSupplier(translationX, 0.1);
-        this.translationYSup = Helpers.deadbandSupplier(translationY, 0.1);
-        this.rotationXSup = Helpers.deadbandSupplier(rotationX, 0.075);
-        this.rotationYSup = Helpers.deadbandSupplier(rotationY, 0.075);
+        this.translationXSup = Helpers.deadbandSupplier(translationX, ControllerConsts.LEFT_DEADBAND);
+        this.translationYSup = Helpers.deadbandSupplier(translationY, ControllerConsts.LEFT_DEADBAND);
+        this.rotationXSup = Helpers.deadbandSupplier(rotationX, ControllerConsts.RIGHT_DEADBAND);
+        this.rotationYSup = Helpers.deadbandSupplier(rotationY, ControllerConsts.RIGHT_DEADBAND);
     }
 
     @Override

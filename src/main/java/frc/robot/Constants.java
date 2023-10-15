@@ -14,26 +14,20 @@ import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SwerveModuleConstants.ModuleId;
 
 public final class Constants {
-    public static final double dPlaceholder = 0.0;
-    public static final int iPlaceholder = 0;
-    public static final boolean bPlaceholder = false;
 
     public static class ControllerConsts {
         public static final double LEFT_DEADBAND = 0.1;
-        public static final double RIGHT_DEADBAND = 0.2;
+        public static final double RIGHT_DEADBAND = 0.1;
     }
 
     public static class kSuperStructure {
-        public static final int BRAKE_SWITCH_PIN = 0;
+        public static final int BRAKE_SWITCH_PIN = 16;
 
         public static final class kWrist {
             public static final int MOTOR_ID = 12;
             public static final double MOTOR_kP = 1.0;
             public static final double MOTOR_kI = 0.0;
             public static final double MOTOR_kD = 0.0;
-
-            public static final double MOTOR_kS = dPlaceholder;
-            public static final double MOTOR_kV = dPlaceholder;
 
             /** For every {@value} rotations of the motor the mechanism moves 1 rotation */
             // motor -> (10t -> 72t) -> (20t -> 72t) -> (24t -> 48t)
@@ -134,7 +128,6 @@ public final class Constants {
             public static final double CURRENT_PEAK_FOR_HOME = 35.0;
 
             public static final double TOLERANCE = 0.5;
-
         }
 
         public static final class kElevator {
@@ -144,8 +137,6 @@ public final class Constants {
             public static final double MOTOR_kP = 0.5;
             public static final double MOTOR_kD = 0.0;
             public static final double MOTOR_kI = 0.0;
-            public static final double MOTOR_kS = dPlaceholder;
-            public static final double MOTOR_kV = dPlaceholder;
 
             public static final boolean ENABLE_SOFTLIMITS = false;
 
@@ -154,9 +145,6 @@ public final class Constants {
             public static final double MAX_VELOCITY = 45;
             public static final double MAX_ACCELERATION = 200;
             public static final double MAX_JERK = 500;
-            // public static final double MAX_VELOCITY = 100;
-            // public static final double MAX_ACCELERATION = 750;
-            // public static final double MAX_JERK = 5000;
 
             public static final double MOTOR_TO_MECHANISM_RATIO = 1.0 / 3.0;
             public static final double MECHANISM_DIAMETER_METERS = 0.0425; // approximate

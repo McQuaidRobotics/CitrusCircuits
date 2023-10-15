@@ -2,7 +2,6 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -33,17 +32,11 @@ public class SwerveModule {
     private final TalonFXSimState driveSimState;
     private final StatusSignal<Double> drivePositionSignal;
     private final StatusSignal<Double> driveVelocitySignal;
-    // private final StatusSignal<Double> driveCurrentSignal;
-    // private final StatusSignal<Double> driveVoltageSignal;
-    // private final StatusSignal<Double> driveTempSignal;
 
     private final TalonFX angleMotor;
     private final TalonFXSimState angleSimState;
     private final StatusSignal<Double> anglePositionSignal;
     private final StatusSignal<Double> angleVelocitySignal;
-    // private final StatusSignal<Double> angleCurrentSignal;
-    // private final StatusSignal<Double> angleVoltageSignal;
-    // private final StatusSignal<Double> angleTempSignal;
 
     private final CANcoder angleEncoder;
     private final CANcoderSimState angleEncoderSimState;
@@ -78,15 +71,9 @@ public class SwerveModule {
 
         drivePositionSignal = driveMotor.getPosition();
         driveVelocitySignal = driveMotor.getVelocity();
-        // driveCurrentSignal = driveMotor.getSupplyCurrent();
-        // driveVoltageSignal = driveMotor.getSupplyVoltage();
-        // driveTempSignal = driveMotor.getDeviceTemp();
 
         anglePositionSignal = angleMotor.getPosition();
         angleVelocitySignal = angleMotor.getVelocity();
-        // angleCurrentSignal = angleMotor.getSupplyCurrent();
-        // angleVoltageSignal = angleMotor.getSupplyVoltage();
-        // angleTempSignal = angleMotor.getDeviceTemp();
 
         angleAbsoluteSignal = angleEncoder.getAbsolutePosition();
         angleAbsoluteVeloSignal = angleEncoder.getVelocity();
@@ -147,7 +134,6 @@ public class SwerveModule {
     }
 
     public Rotation2d getAngle() {
-        // return Rotation2d.fromRotations(0);
         return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
     }
 
@@ -155,17 +141,7 @@ public class SwerveModule {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (kSwerve.MAX_SPEED * 0.01)) ? lastAngle
                 : desiredState.angle;
 
-        // double deltaRot = angle.getDegrees() - angleAbsoluteSignal.getValue() * 360;
-        // if (deltaRot > 180) {
-        //     deltaRot -= 360;
-        // } else if (deltaRot < -180) {
-        //     deltaRot += 360;
-        // }
-        // double targetAngle = (angleAbsoluteSignal.getValue() * 360) + deltaRot;
-
-        // SmartDashboard.putNumber("Module: " + moduleNumber + " targetangle", targetAngle);
         SmartDashboard.putNumber("Module: " + moduleNumber + " angle", angle.getRotations());
-
 
         var controlRequest = new PositionDutyCycle(angle.getRotations());
         // var controlRequest = new PositionVoltage(angle.getRotations());
@@ -199,24 +175,10 @@ public class SwerveModule {
                 getAngle());
     }
 
-    // public Double[] getTemps() {
-    //     return new Double[] {
-    //             driveTempSignal.getValue(),
-    //             angleTempSignal.getValue()
-    //     };
-    // }
-
     public void periodic() {
         drivePositionSignal.refresh();
         driveVelocitySignal.refresh();
-        // driveCurrentSignal.refresh();
-        // driveVoltageSignal.refresh();
-        // driveTempSignal.refresh();
         anglePositionSignal.refresh();
-        // angleVelocitySignal.refresh();
-        // angleCurrentSignal.refresh();
-        // angleVoltageSignal.refresh();
-        // angleTempSignal.refresh();
         angleAbsoluteSignal.refresh();
         angleAbsoluteVeloSignal.refresh();
     }

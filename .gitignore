@@ -170,3 +170,7 @@ out/
 
 # Simulation GUI and other tools window save file
 *-window.json
+
+#the rest of sim stuff
+simgui.json
+simgui-ds.json

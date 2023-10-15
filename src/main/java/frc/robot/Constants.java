@@ -210,7 +210,11 @@ public final class Constants {
          * rectangular/square 4 module swerve
          */
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
-                Mod0.CHASSIS_OFFSET, Mod1.CHASSIS_OFFSET, Mod2.CHASSIS_OFFSET, Mod3.CHASSIS_OFFSET);
+            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
+            Mod1.CHASSIS_OFFSET,
+            Mod2.CHASSIS_OFFSET,
+            Mod3.CHASSIS_OFFSET
+        );
 
         /* Module Gear Ratios */
         public static final double DRIVE_GEAR_RATIO = (6.75 / 1.0);

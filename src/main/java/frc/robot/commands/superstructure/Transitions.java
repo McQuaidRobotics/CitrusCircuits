@@ -3,6 +3,7 @@ package frc.robot.commands.superstructure;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -33,9 +34,13 @@ public class Transitions {
     }
 
     public static Command homeTransition(TransitionData data) {
-        return data.superStructure.runEnd(
-            () -> data.superStructure.home(),
-            () -> OperatorPrefs.NEED_HOME = false
+        return new FunctionalCommand(
+            //do a force home on start incase its rescheduled it will try homing again
+            () -> data.superStructure.home(true),
+            () -> data.superStructure.home(false),
+            (bool) -> OperatorPrefs.NEED_HOME = false,
+            () -> false,
+            data.superStructure
         );
     }
 

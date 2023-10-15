@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 // import com.ctre.phoenix.sensors.PigeonIMU;
 // import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -15,7 +16,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-import frc.robot.Constants.kSuperStructure.*;
+import frc.robot.Constants.kSuperStructure.kPivot;
 import frc.robot.subsystems.super_structure.Errors.*;
 
 public class PivotReal implements Pivot {
@@ -75,7 +76,6 @@ public class PivotReal implements Pivot {
         motorCfg.MotionMagic.MotionMagicJerk = kPivot.MAX_JERK;
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
         motorCfg.MotorOutput.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
@@ -136,7 +136,10 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
+        if (force) {
+            isStowed = false;
+        }
         if (isStowed) {
             this.stopMechanism();
             return true;
@@ -161,6 +164,15 @@ public class PivotReal implements Pivot {
     @Override
     public Double getRecentCurrent() {
         return ampWindowVal;
+    }
+
+    @Override
+    public void brake(Boolean toggle) {
+        var motorOutputCfg = new MotorOutputConfigs();
+        motorOutputCfg.NeutralMode = toggle ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
+        leaderMotor.getConfigurator().apply(motorOutputCfg);
     }
 
     @Override

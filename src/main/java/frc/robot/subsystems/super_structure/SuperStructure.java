@@ -79,13 +79,13 @@ public class SuperStructure extends SubsystemBase {
         return false;
     }
 
-    public Boolean home() {
+    public Boolean home(boolean force) {
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot
-        return this.wrist.homeMechanism()
-                && this.elevator.homeMechanism()
-                && this.pivot.homeMechanism();
+        return this.wrist.homeMechanism(force)
+                && this.elevator.homeMechanism(force)
+                && this.pivot.homeMechanism(force);
     }
 
     public void runEndEffector(Double volts, Double currentLimit) {
@@ -140,6 +140,18 @@ public class SuperStructure extends SubsystemBase {
                 this.pivot.getRecentCurrent(),
                 this.elevator.getRecentCurrent()
         };
+    }
+
+    public void brake() {
+        this.wrist.brake(true);
+        this.pivot.brake(true);
+        this.elevator.brake(true);
+    }
+
+    public void coast() {
+        this.wrist.brake(false);
+        this.pivot.brake(false);
+        this.elevator.brake(false);
     }
 
     /** once moved over to TEMPLATE this can be removed */

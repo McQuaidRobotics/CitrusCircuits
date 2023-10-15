@@ -615,8 +615,8 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
      *                                  composed.
      */
     public void registerComposedCommands(Command... commands) {
-        var commandSet = Set.of(commands);
-        requireNotComposed(commandSet);
+        // var commandSet = Set.of(commands);
+        // requireNotComposed(commandSet);
         // m_composedCommands.addAll(commandSet);
     }
 

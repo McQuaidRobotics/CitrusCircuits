@@ -40,7 +40,7 @@ public class ElevatorSim implements Elevator {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
         elevatorMeters.setTargetPosition(kElevator.HOME_METERS);
         return isLimitSwitchHit();
     }

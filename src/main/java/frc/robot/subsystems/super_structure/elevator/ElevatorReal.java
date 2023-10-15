@@ -2,6 +2,7 @@ package frc.robot.subsystems.super_structure.elevator;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -14,7 +15,8 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-import frc.robot.Constants.kSuperStructure.*;
+import frc.robot.Constants.kSuperStructure.Specs;
+import frc.robot.Constants.kSuperStructure.kElevator;
 import frc.robot.subsystems.super_structure.Errors.*;
 
 public class ElevatorReal implements Elevator {
@@ -131,7 +133,10 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
+        if (force) {
+            isStowed = false;
+        }
         if (this.isStowed) {
             return true;
         }
@@ -147,6 +152,15 @@ public class ElevatorReal implements Elevator {
     @Override
     public Double getRecentCurrent() {
         return ampWindowVal;
+    }
+
+    @Override
+    public void brake(Boolean toggle) {
+        var motorOutputCfg = new MotorOutputConfigs();
+        motorOutputCfg.NeutralMode = toggle ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
+        leaderMotor.getConfigurator().apply(motorOutputCfg);
     }
 
     @Override

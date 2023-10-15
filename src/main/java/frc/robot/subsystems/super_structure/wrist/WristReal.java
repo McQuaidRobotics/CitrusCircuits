@@ -3,6 +3,7 @@ package frc.robot.subsystems.super_structure.wrist;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
@@ -12,7 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-import frc.robot.Constants.kSuperStructure.*;
+import frc.robot.Constants.kSuperStructure.kWrist;
+import frc.robot.Constants.kSuperStructure.kIntake;
 import frc.robot.subsystems.super_structure.Errors.*;
 
 public class WristReal implements Wrist {
@@ -74,10 +76,10 @@ public class WristReal implements Wrist {
         wristMotorCfg.MotionMagic.MotionMagicJerk = kWrist.MAX_JERK;
 
         wristMotorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        wristMotorCfg.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.2;
-
         wristMotorCfg.MotorOutput.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
+
+        wristMotorCfg.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.2;
 
 
         return wristMotorCfg;
@@ -157,7 +159,10 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
+        if (force) {
+            isStowed = false;
+        }
         if (isStowed) {
             return true;
         }
@@ -179,6 +184,15 @@ public class WristReal implements Wrist {
     @Override
     public Double getRecentCurrent() {
         return ampWindowVal;
+    }
+
+    @Override
+    public void brake(Boolean toggle) {
+        var motorOutputCfg = new MotorOutputConfigs();
+        motorOutputCfg.NeutralMode = toggle ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
+        wristMotor.getConfigurator().apply(motorOutputCfg);
     }
 
     @Override

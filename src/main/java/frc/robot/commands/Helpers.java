@@ -22,4 +22,5 @@ public class Helpers {
         else if (value > max) return max;
         return value;
     }
+
 }

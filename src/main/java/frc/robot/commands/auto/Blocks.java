@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
@@ -15,13 +17,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.GamepieceMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.superstructure.StateManager;
-import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.superstructure.StateManager.CmdTransitionState;
-import frc.robot.commands.superstructure.SuperstructureCommands.TransitionToPlace;
+import frc.robot.commands.swerve.SwerveCommands;
 import frc.robot.subsystems.super_structure.States;
 
 public class Blocks {
@@ -46,20 +46,19 @@ public class Blocks {
 
     public static enum Cmds implements Block {
         HOME(new CmdTransitionState(RobotContainer.superStructure, States.HOME)),
+        HOME_TIMEOUT(new CmdTransitionState(RobotContainer.superStructure, States.HOME).withTimeout(0.5)),
         STOW(new CmdTransitionState(RobotContainer.superStructure, States.STOW)),
 
-        PLACE(new TransitionToPlace(RobotContainer.superStructure).canFinish()),
         PLACE_STANDBY(new CmdTransitionState(RobotContainer.superStructure, States.STANDBY).canFinish()),
-        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()),
-        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()),
-        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT).canFinish()),
+        PLACE_HIGH(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()
+                .andThen(StateManager.dispellGamepiece(RobotContainer.superStructure))),
+        PLACE_MID(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()
+                .andThen(StateManager.dispellGamepiece(RobotContainer.superStructure))),
+        PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT).canFinish()
+                .andThen(StateManager.dispellGamepiece(RobotContainer.superStructure))),
 
-        WANT_HIGH(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))),
-        WANT_MID(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))),
-        WANT_LOW(new InstantCommand(() -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT))),
-
-        PICKUP_GROUND(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_GROUND).withTimeout(1.0)),
-        PICKUP_STATION(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_STATION).withTimeout(1.0)),
+        PICKUP_GROUND(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_GROUND)),
+        PICKUP_STATION(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_STATION)),
 
         DESIRE_CUBE(new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))),
         DESIRE_CONE(new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))),
@@ -67,7 +66,10 @@ public class Blocks {
         OVERRIDE_HOLD_CUBE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))),
         OVERRIDE_HOLD_CONE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))),
 
-        DISPELL_GAMEPIECE(StateManager.dispellGamepiece(RobotContainer.superStructure));
+        GYRO_0(new InstantCommand()),
+        GYRO_90(new InstantCommand()),
+        GYRO_180(new InstantCommand()),
+        GYRO_270(new InstantCommand());
 
         public final Command command;
 
@@ -94,46 +96,46 @@ public class Blocks {
         }
     }
 
-    public static enum Paths implements Block {
-        ONE_METER(PathLoader.openFilePath("1M")),
-        FLAT_BALANCE_SETUP(PathLoader.openFilePath("FLAT_BALANCE_SETUP")),
-        FLAT_PICKUP3(PathLoader.openFilePath("FLAT_PICKUP3")),
-        FLAT_PICKUP4(PathLoader.openFilePath("FLAT_PICKUP4")),
-        FLAT_PLACE7(PathLoader.openFilePath("FLAT_PLACE7")),
-        FLAT_PLACE8(PathLoader.openFilePath("FLAT_PLACE8")),
-        FLAT_PLACE9(PathLoader.openFilePath("FLAT_PLACE9")),
-        FLAT_SWOOP4(PathLoader.openFilePath("FLAT_SWOOP4")),
-        PICKUP1_WIRE(PathLoader.openFilePath("PICKUP1_WIRE")),
-        PICKUP2_WIRE(PathLoader.openFilePath("PICKUP2_WIRE")),
-        PICKUP3_FLAT(PathLoader.openFilePath("PICKUP3_FLAT")),
-        PICKUP4_FLAT(PathLoader.openFilePath("PICKUP4_FLAT")),
-        PLACE1_WIRE(PathLoader.openFilePath("PLACE1_WIRE")),
-        PLACE2_WIRE(PathLoader.openFilePath("PLACE2_WIRE")),
-        PLACE7_FLAT(PathLoader.openFilePath("PLACE7_FLAT")),
-        PLACE8_FLAT(PathLoader.openFilePath("PLACE8_FLAT")),
-        PLACE9_FLAT(PathLoader.openFilePath("PLACE9_FLAT")),
-        WIRE_BALANCE_SETUP(PathLoader.openFilePath("WIRE_BALANCE_SETUP")),
-        WIRE_OVER_IN(PathLoader.openFilePath("WIRE_OVER_IN")),
-        WIRE_OVER_OUT(PathLoader.openFilePath("WIRE_OVER_OUT")),
-        WIRE_PICKUP1(PathLoader.openFilePath("WIRE_PICKUP1")),
-        WIRE_PICKUP2(PathLoader.openFilePath("WIRE_PICKUP2")),
-        WIRE_PLACE1(PathLoader.openFilePath("WIRE_PLACE1")),
-        WIRE_PLACE2(PathLoader.openFilePath("WIRE_PLACE2")),
-        WIRE_PLACE3(PathLoader.openFilePath("WIRE_PLACE3"));
+    public static enum PPPaths implements Block {
+        ONE_METER("1M_BI"),
+        FLAT_BALANCE_SETUP("FLAT_BALANCE_SETUP"),
+        FLAT_PICKUP3("FLAT_PICKUP3"),
+        FLAT_PICKUP4("FLAT_PICKUP4"),
+        FLAT_PLACE7("FLAT_PLACE7"),
+        FLAT_PLACE8("FLAT_PLACE8"),
+        FLAT_PLACE9("FLAT_PLACE9"),
+        FLAT_SWOOP4("FLAT_SWOOP4"),
+        PICKUP1_WIRE("PICKUP1_WIRE"),
+        PICKUP2_WIRE("PICKUP2_WIRE"),
+        PICKUP3_FLAT("PICKUP3_FLAT"),
+        PICKUP4_FLAT("PICKUP4_FLAT"),
+        PLACE1_WIRE("PLACE1_WIRE"),
+        PLACE2_WIRE("PLACE2_WIRE"),
+        PLACE7_FLAT("PLACE7_FLAT"),
+        PLACE8_FLAT("PLACE8_FLAT"),
+        PLACE9_FLAT("PLACE9_FLAT"),
+        WIRE_BALANCE_SETUP("WIRE_BALANCE_SETUP"),
+        WIRE_OVER_IN("WIRE_OVER_IN"),
+        WIRE_OVER_OUT("WIRE_OVER_OUT"),
+        WIRE_PICKUP1("WIRE_PICKUP1"),
+        WIRE_PICKUP2("WIRE_PICKUP2"),
+        WIRE_PLACE1("WIRE_PLACE1"),
+        WIRE_PLACE2("WIRE_PLACE2"),
+        WIRE_PLACE3("WIRE_PLACE3");
 
-        public final PathPlannerTrajectory traj;
+        public final String trajName;
 
-        Paths(PathPlannerTrajectory traj) {
-            this.traj = traj;
+        PPPaths(String trajName) {
+            this.trajName = trajName;
         }
 
         public PathPlannerTrajectory getTraj() {
-            return traj;
+            return PathLoader.openFilePath(trajName);
         }
 
         @Override
         public Command getCommand(SwerveAutoBuilder builder) {
-            return builder.followPath(traj);
+            return builder.followPath(getTraj());
         }
 
         @Override
@@ -141,25 +143,82 @@ public class Blocks {
             return "Path: " + ScreamingSnakeToCamal(this.name());
         }
 
+        public CustomPath resetPose() {
+            return new CustomPath(this::getTraj, true);
+        }
+
         public CustomPath merge(Double percentThrough, Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, percentThrough, true, block, blocks);
+            return new CustomPath(this::getTraj, false, percentThrough, block, blocks);
         }
 
         public CustomPath merge(Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, 0.0, true, block, blocks);
+            return new CustomPath(this::getTraj, false, 0.0, block, blocks);
         }
     }
 
     public static class CustomPath implements Block {
-        private final PathPlannerTrajectory traj;
+        private final Supplier<PathPlannerTrajectory> trajSupplier;
+        private final Map<Double, List<Cmds>> cmdMap = new HashMap<>();
+        private Boolean resetPose = false;
 
-        public CustomPath(PathPlannerTrajectory traj) {
-            this.traj = traj;
+        public CustomPath(Supplier<PathPlannerTrajectory> trajSupplier) {
+            this.trajSupplier = trajSupplier;
+        }
+
+        public CustomPath(Supplier<PathPlannerTrajectory> trajSupplier, boolean resetPose) {
+            this.trajSupplier = trajSupplier;
+            this.resetPose = resetPose;
+        }
+
+        public CustomPath(
+            Supplier<PathPlannerTrajectory> trajSupplier,
+            Boolean resetPose,
+            Double percentThrough,
+            Cmds block,
+            Cmds... blocks
+        ) {
+            this.trajSupplier = trajSupplier;
+            this.resetPose = resetPose;
+            var list = new ArrayList<Cmds>();
+            list.add(block);
+            list.addAll(Arrays.asList(blocks));
+            cmdMap.put(percentThrough, list);
+        }
+
+        public CustomPath resetPose() {
+            this.resetPose = true;
+            return this;
         }
 
         @Override
         public Command getCommand(SwerveAutoBuilder builder) {
-            return builder.followPathWithEvents(traj);
+
+            var traj = trajSupplier.get();
+
+            var markers = new ArrayList<EventMarker>();
+            for (var cmdEntry : cmdMap.entrySet()) {
+                var percentThrough = cmdEntry.getKey();
+                var cmds = cmdEntry.getValue();
+                var names = new ArrayList<String>();
+                for (var cmd : cmds) {
+                    names.add(ScreamingSnakeToCamal(cmd.name()));
+                }
+                markers.add(
+                        EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough));
+            }
+            traj = new PathPlannerTrajectory(
+                        traj.getStates(),
+                        markers,
+                        new StopEvent(),
+                        new StopEvent(),
+                        false);
+
+            if (resetPose) {
+                return builder.resetPose(traj)
+                        .andThen(builder.followPathWithEvents(traj));
+            } else {
+                return builder.followPathWithEvents(traj);
+            }
         }
 
         @Override
@@ -168,58 +227,49 @@ public class Blocks {
         }
 
         public CustomPath merge(Double percentThrough, Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, percentThrough, false, block, blocks);
+            if (cmdMap.containsKey(percentThrough)) {
+                cmdMap.get(percentThrough).add(block);
+                cmdMap.get(percentThrough).addAll(Arrays.asList(blocks));
+            } else {
+                var list = new ArrayList<Cmds>();
+                list.add(block);
+                list.addAll(Arrays.asList(blocks));
+                cmdMap.put(percentThrough, list);
+            }
+            return this;
         }
 
         public CustomPath merge(Cmds block, Cmds... blocks) {
-            return Blocks.merge(this.traj, 0.0, false, block, blocks);
+            return this.merge(0.0, block, blocks);
         }
     }
 
-    private static CustomPath merge(PathPlannerTrajectory traj, Double percentThrough, Boolean eraseOld, Cmds block,
-            Cmds... blocks) {
-        List<String> names = new ArrayList<>();
-        names.add(ScreamingSnakeToCamal(block.name()));
-        for (Cmds blk : blocks) {
-            names.add(ScreamingSnakeToCamal(blk.name()));
-        }
-        List<EventMarker> newMarkers = new ArrayList<>();
-        if (!eraseOld) {
-            newMarkers.addAll(traj.getMarkers());
-        }
-        newMarkers.add(
-                EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough));
-        var newTraj = new PathPlannerTrajectory(
-                traj.getStates(),
-                newMarkers,
-                new StopEvent(),
-                new StopEvent(),
-                false);
-        return new CustomPath(newTraj);
-    }
+    public static enum DynPaths implements Block {
+        BALANCE_FORWARD(new InstantCommand()),
+        BALANCE_RIGHTWARD(new InstantCommand()),
+        BALANCE_LEFTWARD(new InstantCommand()),
+        BALANCE_BACKWARD(new InstantCommand()),
 
-    /**
-     * Merges command blocks into a path to be run at start
-     * 
-     * @param blocks The blocks to run at the end of the path
-     * @return The merged block
-     */
-    public static Block sequential(Block... blocks) {
-        return new Block() {
-            @Override
-            public Command getCommand(SwerveAutoBuilder builder) {
-                List<Command> commands = new ArrayList<>();
-                for (Block block : blocks) {
-                    commands.add(block.getCommand(builder));
-                }
-                return new SequentialCommandGroup(commands.toArray(CommandBase[]::new));
-            }
+        TAXI_OVER_BALANCE_FORWARD(new InstantCommand()),
+        TAXI_OVER_BALANCE_RIGHTWARD(new InstantCommand()),
+        TAXI_OVER_BALANCE_LEFTWARD(new InstantCommand()),
+        TAXI_OVER_BALANCE_BACKWARD(new InstantCommand());
 
-            @Override
-            public String getCommandName() {
-                return "Sequential: " + Arrays.toString(blocks);
-            }
-        };
+        public final Command command;
+
+        DynPaths(Command command) {
+            this.command = command;
+        }
+
+        @Override
+        public Command getCommand(SwerveAutoBuilder builder) {
+            return command;
+        }
+
+        @Override
+        public String getCommandName() {
+            return "DynPath: " + ScreamingSnakeToCamal(this.name());
+        }
     }
 
     public static Block[] groupBlocks(Block... blocks) {
@@ -229,6 +279,7 @@ public class Blocks {
     public static Command buildBlocks(Block... blocks) {
         var builder = PathLoader.getPPAutoBuilder();
         List<Command> commands = new ArrayList<>();
+
         var scheduler = CommandScheduler.getInstance();
 
         Integer count = 0;
@@ -241,10 +292,8 @@ public class Blocks {
             count++;
         }
 
-        // commands.add(RobotContainer.swerve.commandStopDrives().withName("Stop
-        // Swerve"));
+        commands.add(SwerveCommands.commandStopDrives(RobotContainer.swerve).withName("Stop Swerve"));
 
-        Commands.sequence(commands.toArray(CommandBase[]::new));
-        return new InstantCommand();
+        return Commands.sequence(commands.toArray(CommandBase[]::new));
     }
 }

@@ -43,7 +43,7 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
         return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }

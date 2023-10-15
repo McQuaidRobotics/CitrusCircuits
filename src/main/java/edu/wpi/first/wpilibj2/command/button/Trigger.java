@@ -95,7 +95,7 @@ public class Trigger implements BooleanSupplier {
      * @param command the command to start
      * @return this trigger, so calls can be chained
      */
-    public Trigger onTrueForce(Command command) {
+    public Trigger onTrue(Command command, boolean force) {
         requireNonNullParam(command, "command", "onRising");
         m_loop.bind(
                 new Runnable() {
@@ -106,7 +106,9 @@ public class Trigger implements BooleanSupplier {
                         boolean pressed = m_condition.getAsBoolean();
 
                         if (!m_pressedLast && pressed) {
-                            command.cancel();
+                            if (force) {
+                                command.cancel();
+                            }
                             command.schedule();
                         }
 

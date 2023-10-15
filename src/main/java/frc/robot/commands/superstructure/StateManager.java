@@ -4,14 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.superstructure.Transitions.TransitionData;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
-// import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 import frc.robot.subsystems.super_structure.States.IntakeRequest;
 
@@ -76,7 +74,7 @@ public class StateManager {
     static {
         // without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
-        // fromAllStates(States.STOW, Transitions::stowTransition);
+        fromAllStates(States.STOW, Transitions::stowTransition);
     }
 
     /**
@@ -220,7 +218,7 @@ public class StateManager {
         @Override
         public boolean isFinished() {
             if (canFinish) {
-                return superStructure.reachedSetpoint(1.0);
+                return reachedSetpoint;
             }
             return false;
         }
@@ -242,11 +240,11 @@ public class StateManager {
 
     public static Command dispellGamepiece(SuperStructure superStructure) {
         return superStructure.startEnd(
-            () -> superStructure.runEndEffector(intakeVoltage(lastState), lastState.intakeRequest.maxCurrent),
-            () -> {
-                superStructure.runEndEffector(0.0, 0.0);
-                lastState = States.HOME; //idk
-            }
-        ).withTimeout(0.4);
+                () -> superStructure.runEndEffector(intakeVoltage(lastState), lastState.intakeRequest.maxCurrent),
+                () -> {
+                    superStructure.runEndEffector(0.0, 0.0);
+                    lastState = States.STANDBY; //idk
+                }
+            ).withTimeout(0.4);
     }
 }

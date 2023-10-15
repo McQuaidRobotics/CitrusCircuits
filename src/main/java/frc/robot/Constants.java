@@ -3,14 +3,13 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.auto.PIDConstants;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.util.Units;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SwerveModuleConstants.ModuleId;
 
@@ -25,6 +24,7 @@ public final class Constants {
     }
 
     public static class kSuperStructure {
+        public static final int BRAKE_SWITCH_PIN = 0;
 
         public static final class kWrist {
             public static final int MOTOR_ID = 12;
@@ -198,8 +198,8 @@ public final class Constants {
     }
 
     public static class kAuto {
-        public static final PIDController AUTO_TRANSLATION_PID = new PIDController(0.0, 0.0, 0.0);
-        public static final PIDController AUTO_ANGULAR_PID = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDConstants AUTO_TRANSLATION_PID = new PIDConstants(2.0, 0.0, 0.0);
+        public static final PIDConstants AUTO_ANGULAR_PID = new PIDConstants(0.75, 0.0, 0.0);
     }
 
     public static class kSwerve {
@@ -208,55 +208,35 @@ public final class Constants {
         public static final String CANBUS = "McQDriveBus";
 
         /* Drivetrain Constants */
-        public static final double TRACK_WIDTH = Units.inchesToMeters(21.73);
-        public static final double WHEEL_BASE = Units.inchesToMeters(21.73);
-        public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
+        public static final double TRACK_WIDTH = 0.551942;
+        public static final double WHEEL_BASE = 0.551942;
+        public static final double WHEEL_DIAMETER = 0.1016;
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
+        /** For every {@value} rotations of the motor the wheel rolls one rotation */
+        public static final double DRIVE_MECHANISM_RATIO = 1.0 / 6.75;
+        /** For every {@value} rotations of the motor the wheel spins one rotation */
+        public static final double ANGLE_MECHANISM_RATIO = 7.0 / 150.0;
+        public static final double METERS_PER_DRIVE_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE * DRIVE_MECHANISM_RATIO;
+
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
-            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0), //idk why this is needed?
-            Mod1.CHASSIS_OFFSET,
-            Mod2.CHASSIS_OFFSET,
-            Mod3.CHASSIS_OFFSET
-        );
+                new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0), // idk why this is needed?
+                Mod1.CHASSIS_OFFSET,
+                Mod2.CHASSIS_OFFSET,
+                Mod3.CHASSIS_OFFSET);
 
-        /* Module Gear Ratios */
-        public static final double DRIVE_GEAR_RATIO = (6.75 / 1.0);
-        public static final double ANGLE_GEAR_RATIO = ((150.0 / 7.0) / 1.0);
-
-        /* Motor Inverts */
+        /* Inverts */
         public static final InvertedValue ANGLE_MOTOR_INVERT = InvertedValue.Clockwise_Positive;
         public static final InvertedValue DRIVE_MOTOR_INVERT = InvertedValue.CounterClockwise_Positive;
-
-        /* Angle Encoder Invert */
         public static final SensorDirectionValue CANCODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;
 
-        /* Swerve Current Limiting */
-        public static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
-        public static final int ANGLE_PEAK_CURRENT_LIMIT = 40;
-        public static final double ANGLE_PEAK_CURRENT_DURATION = 0.1;
-        public static final boolean ANGLE_ENABLE_CURRENT_LIMIT = true;
-
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 35;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
-        public static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
-        public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
-
-        /*
-         * These values are used by the drive falcon to ramp in open loop and closed
-         * loop driving.
-         * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc
-         */
-        public static final double OPEN_LOOP_RAMP = 0.25;
-        public static final double CLOSED_LOOP_RAMP = 0.0;
-
         /* Angle Motor PID Values */
-        public static final double ANGLE_KP = 2;
+        public static final double ANGLE_KP = 3.0;
         public static final double ANGLE_KI = 0.0;
         public static final double ANGLE_KD = 0.0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 3.0;
+        public static final double DRIVE_KP = 0.5;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
 
@@ -270,13 +250,25 @@ public final class Constants {
         public static final NeutralModeValue ANGLE_NEUTRAL_MODE = NeutralModeValue.Coast;
         public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
 
+        public static final class Sim {
+            // Volts to meters/sec
+            public static final double DRIVE_KV = 3.42;
+            // Volts to meters/sec^2
+            public static final double DRIVE_KA = 0.265;
+
+            // Volts to deg/sec
+            public static final double ROTATION_KV = 12.0 / 2.5;
+            // Volts to deg/sec^2
+            public static final double ROTATION_KA = 0.00004;
+        }
+
         public static final class Mod0 {
             public static final ModuleId MODULE = ModuleId.m0;
             public static final int DRIVE_MOTOR_ID = 1;
             public static final int ANGLE_MOTOR_ID = 2;
             public static final int CANCODER_ID = 21;
             public static final Translation2d CHASSIS_OFFSET = new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
-            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE,DRIVE_MOTOR_ID,
+            public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(MODULE, DRIVE_MOTOR_ID,
                     ANGLE_MOTOR_ID, CANCODER_ID, CHASSIS_OFFSET);
         }
 

@@ -19,12 +19,11 @@ public class TeleopSwerve2 extends CommandBase {
     private final DoubleSupplier rotationYSup;
 
     public TeleopSwerve2(
-        Swerve swerve,
-        DoubleSupplier translationX,
-        DoubleSupplier translationY,
-        DoubleSupplier rotationX,
-        DoubleSupplier rotationY
-    ) {
+            Swerve swerve,
+            DoubleSupplier translationX,
+            DoubleSupplier translationY,
+            DoubleSupplier rotationX,
+            DoubleSupplier rotationY) {
         this.swerve = swerve;
         addRequirements(swerve);
 
@@ -36,13 +35,11 @@ public class TeleopSwerve2 extends CommandBase {
 
     @Override
     public void execute() {
-        swerve.Drive(
+        swerve.drive(
                 new Translation2d(
-                    translationXSup.getAsDouble(), translationYSup.getAsDouble()
-                ),
+                        translationXSup.getAsDouble(), translationYSup.getAsDouble()),
                 new Translation2d(
-                    rotationXSup.getAsDouble(), rotationYSup.getAsDouble()
-                ),
+                        rotationXSup.getAsDouble(), rotationYSup.getAsDouble()),
                 true);
     }
 }

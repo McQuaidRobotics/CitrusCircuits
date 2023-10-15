@@ -4,38 +4,38 @@ package frc.robot.commands.auto;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.kAuto;
-import frc.robot.Constants.kSwerve;
 
 public class PathLoader {
+
+    public static final PathConstraints constraints = new PathConstraints(4.0, 3.0);
+
     public static PathPlannerTrajectory openFilePath(String autoPathFile) {
+        //if filename ends with _BI do nothing
+        if(!autoPathFile.endsWith("_BI") && DriverStation.getAlliance() == Alliance.Red) {
+            autoPathFile += "_R";
+        }
         PathPlannerTrajectory autoPath = PathPlanner.loadPath(
             autoPathFile, 
-            new PathConstraints(kSwerve.MAX_SPEED, kSwerve.MAX_ANGULAR_VELOCITY));
+            constraints
+        );
         return autoPath;
     }
 
     public static SwerveAutoBuilder getPPAutoBuilder() {
         return new SwerveAutoBuilder(
             RobotContainer.swerve::getPose, 
-            RobotContainer.swerve::resetOdometry, 
-            Constants.kSwerve.SWERVE_KINEMATICS,
-            new PIDConstants(
-                kAuto.AUTO_TRANSLATION_PID.getP(), 
-                kAuto.AUTO_TRANSLATION_PID.getI(), 
-                kAuto.AUTO_TRANSLATION_PID.getD()), 
-            new PIDConstants(
-                kAuto.AUTO_ANGULAR_PID.getP(), 
-                kAuto.AUTO_ANGULAR_PID.getI(), 
-                kAuto.AUTO_ANGULAR_PID.getD()), 
-            RobotContainer.swerve::setModuleStates, 
+            RobotContainer.swerve::resetOdometry,
+            kAuto.AUTO_TRANSLATION_PID,
+            kAuto.AUTO_ANGULAR_PID,
+            RobotContainer.swerve::driveRobotRelative,
             Blocks.EVENT_MAP,
-            true,
+            false,
             RobotContainer.swerve);
     }
 }

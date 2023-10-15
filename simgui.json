@@ -3,10 +3,16 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Driver/Autonomous Routine": "String Chooser",
-      "/Shuffleboard/SuperStructure/Superstructure Visualizer": "Mechanism2d"
+      "/Shuffleboard/SuperStructure/Superstructure Visualizer": "Mechanism2d",
+      "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/SuperStructure/Superstructure Visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
         "window": {
           "visible": true
         }
@@ -37,6 +43,14 @@
             },
             "open": true
           },
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
+        "PPSwerveControllerCommand": {
           "open": true
         },
         "open": true

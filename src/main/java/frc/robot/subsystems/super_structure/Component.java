@@ -42,8 +42,12 @@ public interface Component {
      * 
      * @return true if the mcahnism has reached home
      */
-    public Boolean homeMechanism();
+    public Boolean homeMechanism(boolean force);
 
     /** Returns the average current over the past .5 seconds */
     public Double getRecentCurrent();
+
+    public default void brake(Boolean toggle) {
+
+    }
 }

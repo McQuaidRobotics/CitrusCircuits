@@ -93,8 +93,9 @@ public class SuperstructureCommands {
         public void end(boolean interrupted) {
             placeCmd.end(interrupted);
             Commands.sequence(
-                    Commands.waitSeconds(0.5),
-                    Commands.runOnce(() -> GamepieceMode.setHeldPiece(null))).schedule();
+                Commands.waitSeconds(0.5),
+                Commands.runOnce(() -> GamepieceMode.setHeldPiece(null))
+            ).schedule();
         }
 
         @Override

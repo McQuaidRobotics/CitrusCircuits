@@ -8,6 +8,16 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+task redPathMaker {
+    doFirst {
+        exec {
+            commandLine 'python', 'RedPathMaker.py'
+        }
+    }
+}
+tasks.getByName('compileJava').dependsOn redPathMaker
+
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -92,6 +102,7 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
 
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {

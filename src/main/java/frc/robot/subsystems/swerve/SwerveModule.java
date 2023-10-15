@@ -85,7 +85,7 @@ public class SwerveModule {
                 LinearSystemId.identifyPositionSystem(kSwerve.Sim.ROTATION_KV, kSwerve.Sim.ROTATION_KA));
     }
 
-    public void configureDriveMotor() {
+    private void configureDriveMotor() {
         var driveConfig = new TalonFXConfiguration();
         driveConfig.MotorOutput.Inverted = kSwerve.DRIVE_MOTOR_INVERT;
         driveConfig.MotorOutput.NeutralMode = kSwerve.DRIVE_NEUTRAL_MODE;
@@ -97,7 +97,7 @@ public class SwerveModule {
         driveMotor.getConfigurator().apply(driveConfig);
     }
 
-    public void configureAngleMotor() {
+    private void configureAngleMotor() {
         var angleConfig = new TalonFXConfiguration();
         angleConfig.MotorOutput.Inverted = kSwerve.ANGLE_MOTOR_INVERT;
         angleConfig.MotorOutput.NeutralMode = kSwerve.ANGLE_NEUTRAL_MODE;
@@ -113,7 +113,7 @@ public class SwerveModule {
         angleMotor.getConfigurator().apply(angleConfig);
     }
 
-    public void configureCANcoder() {
+    private void configureCANcoder() {
         var canCoderConfig = new CANcoderConfiguration();
         canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         canCoderConfig.MagnetSensor.SensorDirection = kSwerve.CANCODER_INVERT;
@@ -124,7 +124,7 @@ public class SwerveModule {
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-                driveRotationsToMeters(driveVelocitySignal.getValue()),
+                driveRotationsToMeters(drivePositionSignal.getValue()),
                 getAngle());
     }
 
@@ -137,7 +137,11 @@ public class SwerveModule {
     }
 
     public Rotation2d getAngle() {
-        return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
+        if (Robot.isSimulation()) {
+            return lastAngle;
+        } else {
+            return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
+        }
     }
 
     public void setAngle(SwerveModuleState desiredState) {

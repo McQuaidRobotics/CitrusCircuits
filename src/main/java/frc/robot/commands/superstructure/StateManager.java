@@ -245,6 +245,6 @@ public class StateManager {
                     superStructure.runEndEffector(0.0, 0.0);
                     lastState = States.STANDBY; //idk
                 }
-            ).withTimeout(0.4);
+            ).withTimeout(0.3);
     }
 }

@@ -42,13 +42,13 @@ public class Autos {
             PPPaths.FLAT_SWOOP4
                     .merge(0.1, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE)
                     .merge(0.9, Cmds.STOW),
-            PPPaths.FLAT_PLACE8.merge(0.2, Cmds.PLACE_STANDBY),
+            PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY),
             Cmds.PLACE_HIGH,
             PPPaths.PLACE8_FLAT.merge(Cmds.STOW, Cmds.DESIRE_CONE),
             PPPaths.FLAT_PICKUP3.merge(
-                    0.1, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CONE),
+                    0.2, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CONE),
             PPPaths.PICKUP3_FLAT.merge(Cmds.STOW),
-            PPPaths.FLAT_PLACE8.merge(0.2, Cmds.PLACE_STANDBY));
+            PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY));
 
     public static final Block[] TWO_GAME_PIECE_WIRE = Blocks.groupBlocks(
             Cmds.OVERRIDE_HOLD_CONE,

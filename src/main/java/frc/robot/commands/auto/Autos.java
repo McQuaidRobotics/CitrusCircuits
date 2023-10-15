@@ -13,7 +13,7 @@ public class Autos {
     public enum AutoRoutines {
         NOTHING,
         THREE_GAME_PIECE,
-        TWO_GAME_PIECE_WIRE,
+        TWO_HALF_GAME_PIECE_WIRE,
         ONE_GAME_PIECE_TAXI
     }
 
@@ -23,8 +23,8 @@ public class Autos {
             case THREE_GAME_PIECE:
                 autoCommand = Blocks.buildBlocks(THREE_GAME_PIECE_FLAT);
                 break;
-            case TWO_GAME_PIECE_WIRE:
-                autoCommand = Blocks.buildBlocks(TWO_GAME_PIECE_WIRE);
+            case TWO_HALF_GAME_PIECE_WIRE:
+                autoCommand = Blocks.buildBlocks(TWO_HALF_GAME_PIECE_WIRE);
                 break;
             case ONE_GAME_PIECE_TAXI:
                 autoCommand = Blocks.buildBlocks(ONE_GAME_PIECE_TAXI);
@@ -50,7 +50,7 @@ public class Autos {
             PPPaths.PICKUP3_FLAT.merge(Cmds.STOW),
             PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY));
 
-    public static final Block[] TWO_GAME_PIECE_WIRE = Blocks.groupBlocks(
+    public static final Block[] TWO_HALF_GAME_PIECE_WIRE = Blocks.groupBlocks(
             Cmds.OVERRIDE_HOLD_CONE,
             Cmds.PLACE_HIGH,
             PPPaths.PLACE1_WIRE.resetPose().merge(Cmds.STOW, Cmds.DESIRE_CUBE),
@@ -61,7 +61,9 @@ public class Autos {
             PPPaths.WIRE_PLACE2.merge(0.2, Cmds.PLACE_STANDBY),
             Cmds.PLACE_HIGH,
             PPPaths.PLACE2_WIRE.merge(Cmds.STOW),
-            PPPaths.WIRE_OVER_OUT);
+            PPPaths.WIRE_OVER_OUT,
+            PPPaths.WIRE_PICKUP2.merge(0.2, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE),
+            Cmds.STOW);
 
     public static final Block[] ONE_GAME_PIECE_TAXI = Blocks.groupBlocks(
             Cmds.OVERRIDE_HOLD_CONE,

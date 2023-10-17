@@ -48,7 +48,7 @@ public class RobotContainer {
                     swerve,
                     () -> driveController.getLeftY(),
                     () -> driveController.getLeftX(),
-                    () -> -driveController.getRightX()
+                    () -> driveController.getRightX()
             ));
         } else {
             swerve.setDefaultCommand(

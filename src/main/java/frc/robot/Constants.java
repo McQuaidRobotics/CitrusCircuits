@@ -105,7 +105,7 @@ public final class Constants {
             public static final double HOME_DEGREES = Specs.PIVOT_MIN_ANGLE + 2.0;
             public static final double PIGEON_OFFSET = 1.85;
 
-            public final static double SCORE_DEGREES = 45.0;
+            public final static double SCORE_DEGREES = 41.0;
 
             public static final boolean ENABLE_SOFTLIMITS = false;
 

@@ -23,7 +23,7 @@ public class SuperStructure extends SubsystemBase {
 
     private final Visualizer visualizer = new Visualizer();
 
-    private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.STOW);
+    private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.HOME);
 
     public SuperStructure() {
         if (Robot.isReal()) {

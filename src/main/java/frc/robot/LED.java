@@ -23,11 +23,8 @@ public class LED {
         TEST(3),
         CONE(4),
         CUBE(5),
-        PLACING(6),
-        ERROR(7),
-        RAINBOW(8),
-        LOCK_FLASH(9),
-        _30S_LEFT(10),
+        _30S_LEFT(6),
+        PLACING(7),
         BOOTING(31);
 
         private final int value;
@@ -41,11 +38,10 @@ public class LED {
         }
     }
 
-    private final DigitalOutput bitOne = new DigitalOutput(10);
-    private final DigitalOutput bitTwo = new DigitalOutput(11);
-    private final DigitalOutput bitThree = new DigitalOutput(12);
-    private final DigitalOutput bitFour = new DigitalOutput(13);
-    private final DigitalOutput bitFive = new DigitalOutput(14);
+    private final DigitalOutput bitOne = new DigitalOutput(10+10);
+    private final DigitalOutput bitTwo = new DigitalOutput(8+10);
+    private final DigitalOutput bitThree = new DigitalOutput(7+10);
+    private final DigitalOutput bitFour = new DigitalOutput(9+10);
 
     private Timer timer;
     private Double duration;
@@ -71,7 +67,6 @@ public class LED {
         bitTwo.set((num & 0b0010) == 0b0010);
         bitThree.set((num & 0b0100) == 0b0100);
         bitFour.set((num & 0b1000) == 0b1000);
-        bitFive.set((num & 0b10000) == 0b10000);
     }
 
     public void setLed(LedPatterns pattern, double seconds) {

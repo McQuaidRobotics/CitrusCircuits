@@ -34,7 +34,7 @@ public final class Constants {
             public static final double MOTOR_TO_MECHANISM_RATIO = (10.0 / 72.0) * (20.0 / 72.0) * (24.0 / 48.0);
 
             public static final double MAX_VELOCITY = 75;
-            public static final double MAX_ACCELERATION = 300;
+            public static final double MAX_ACCELERATION = 333;
             public static final double MAX_JERK = 2000;
 
             public static final boolean INVERTED = false;
@@ -142,9 +142,9 @@ public final class Constants {
 
             public static final boolean INVERTED = false;
 
-            public static final double MAX_VELOCITY = 45;
-            public static final double MAX_ACCELERATION = 200;
-            public static final double MAX_JERK = 500;
+            public static final double MAX_VELOCITY = 50;
+            public static final double MAX_ACCELERATION = 250;
+            public static final double MAX_JERK = 625;
 
             public static final double MOTOR_TO_MECHANISM_RATIO = 1.0 / 3.0;
             public static final double MECHANISM_DIAMETER_METERS = 0.0425; // approximate

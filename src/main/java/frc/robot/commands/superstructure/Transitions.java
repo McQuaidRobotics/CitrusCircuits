@@ -74,4 +74,39 @@ public class Transitions {
             }
         };
     }
+
+    public static Command placeHighTransition(TransitionData data) {
+        return data.superStructure.run(() -> {
+            SuperStructurePosition toPose;
+            if (data.superStructure.getPose().elevatorMeters < States.PLACE_MID.elevatorMeters) {
+                var wristOffset = (States.STOW.wristDegrees - States.PLACE_HIGH.wristDegrees)/2.0;
+                toPose = new SuperStructurePosition(
+                    data.to.wristDegrees + wristOffset,
+                    data.to.pivotDegrees,
+                    data.to.elevatorMeters,
+                    0.0
+                );
+            } else {
+                toPose = SuperStructurePosition.fromState(data.to);
+            }
+            data.superStructure.setSetpoint(toPose);
+        });
+    }
+
+    public static Command placeLowAntiChopTransition(TransitionData data) {
+        return data.superStructure.run(() -> {
+            SuperStructurePosition toPose;
+            if (data.superStructure.getPose().pivotDegrees < States.PLACE_LOW_FRONT.pivotDegrees * 0.95) {
+                toPose = new SuperStructurePosition(
+                    data.to.wristDegrees + 20.0,
+                    data.to.pivotDegrees,
+                    data.to.elevatorMeters,
+                    0.0
+                );
+            } else {
+                toPose = SuperStructurePosition.fromState(data.to);
+            }
+            data.superStructure.setSetpoint(toPose);
+        });
+    }
 }

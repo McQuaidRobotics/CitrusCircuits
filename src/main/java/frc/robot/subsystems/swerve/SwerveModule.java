@@ -130,9 +130,7 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        if (Robot.isReal()) {
-            desiredState = SwerveModuleState.optimize(desiredState, getAngle());
-        }
+        desiredState = SwerveModuleState.optimize(desiredState, getAngle());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }

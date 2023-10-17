@@ -46,22 +46,22 @@ public class RobotContainer {
             swerve.setDefaultCommand(
                 new TeleopSwerve(
                     swerve,
-                    () -> driveController.getLeftY(),
-                    () -> driveController.getLeftX(),
-                    () -> -driveController.getRightX()
+                    driveController::getLeftY,
+                    driveController::getLeftX,
+                    driveController::getRightX
             ));
         } else {
             swerve.setDefaultCommand(
                 new TeleopSwerve2(
                     swerve,
-                    () -> driveController.getLeftY(),
-                    () -> driveController.getLeftX(),
-                    () -> driveController.getRightX(),
-                    () -> driveController.getRightY()
+                    driveController::getLeftY,
+                    driveController::getLeftX,
+                    driveController::getRightX,
+                    driveController::getRightY
             ));
         }
 
-        var brakeTrig = new Trigger(() -> brakeSwitch.get()).or(DriverStation::isEnabled);
+        var brakeTrig = new Trigger(brakeSwitch::get).or(DriverStation::isEnabled);
         brakeTrig.onTrue(new InstantCommand(superStructure::brake));
         brakeTrig.onFalse(new InstantCommand(superStructure::coast));
     }

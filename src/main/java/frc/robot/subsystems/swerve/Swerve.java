@@ -111,7 +111,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
-        if (Robot.isReal()) speeds.omegaRadiansPerSecond *= -1;
+        // if (Robot.isReal()) speeds.omegaRadiansPerSecond *= -1;
         SwerveModuleState[] targetStates = kSwerve.SWERVE_KINEMATICS.toSwerveModuleStates(speeds);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, kSwerve.MAX_SPEED);
@@ -128,7 +128,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d getYawRot() {
-        return Rotation2d.fromDegrees(gyro.getYaw().getValue());
+        return Rotation2d.fromDegrees(gyro.getYaw().getValue() % 360);
     }
 
     public Double getYaw() {

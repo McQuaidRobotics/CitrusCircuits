@@ -16,8 +16,8 @@ import frc.robot.util.SwerveModuleConstants.ModuleId;
 public final class Constants {
 
     public static class ControllerConsts {
-        public static final double LEFT_DEADBAND = 0.1;
-        public static final double RIGHT_DEADBAND = 0.1;
+        public static final double LEFT_DEADBAND = 0.15;
+        public static final double RIGHT_DEADBAND = 0.15;
     }
 
     public static class kSuperStructure {
@@ -219,12 +219,12 @@ public final class Constants {
         public static final SensorDirectionValue CANCODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;
 
         /* Angle Motor PID Values */
-        public static final double ANGLE_KP = 1.0;
+        public static final double ANGLE_KP = 2.0;
         public static final double ANGLE_KI = 0.0;
         public static final double ANGLE_KD = 0.0;
 
         /* Drive Motor PID Values */
-        public static final double DRIVE_KP = 0.5;
+        public static final double DRIVE_KP = 0.25;
         public static final double DRIVE_KI = 0.0;
         public static final double DRIVE_KD = 0.0;
 

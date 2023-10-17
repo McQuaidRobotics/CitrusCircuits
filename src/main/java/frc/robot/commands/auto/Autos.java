@@ -14,7 +14,8 @@ public class Autos {
         NOTHING,
         THREE_GAME_PIECE,
         TWO_HALF_GAME_PIECE_WIRE,
-        ONE_GAME_PIECE_TAXI
+        ONE_GAME_PIECE_TAXI,
+        STRAIGHT_LINE
     }
 
     public static Command getAutoRoutineCommand(AutoRoutines autoRoutine) {
@@ -29,6 +30,8 @@ public class Autos {
             case ONE_GAME_PIECE_TAXI:
                 autoCommand = Blocks.buildBlocks(ONE_GAME_PIECE_TAXI);
                 break;
+            case STRAIGHT_LINE:
+                autoCommand = Blocks.buildBlocks(PPPaths.ONE_METER.resetPose());
             default:
                 break;
         };

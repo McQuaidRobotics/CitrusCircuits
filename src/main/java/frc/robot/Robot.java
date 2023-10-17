@@ -29,6 +29,8 @@ public class Robot extends TimedRobot {
             }
             autoRoutineChooser.addOption(autoRoutine.name(), autoRoutine);
         }
+
+        SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         Shuffleboard.getTab("Autos").add("Autonomous Routine", autoRoutineChooser)
             .withSize(2, 1)
             .withPosition(0, 0);
@@ -36,8 +38,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         CommandScheduler.getInstance().run();
+        LED.getInstance().run();
     }
 
     @Override
@@ -52,6 +54,7 @@ public class Robot extends TimedRobot {
             autoRoutine = selectedRoutine;
             alliance = currAlliance;
             autoCmd = Autos.getAutoRoutineCommand(autoRoutine);
+            SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         }
     }
 

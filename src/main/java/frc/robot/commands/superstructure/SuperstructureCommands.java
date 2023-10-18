@@ -4,7 +4,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.Helpers;
 import frc.robot.commands.superstructure.StateManager.CmdTransitionState;
@@ -92,10 +91,6 @@ public class SuperstructureCommands {
         @Override
         public void end(boolean interrupted) {
             placeCmd.end(interrupted);
-            Commands.sequence(
-                Commands.waitSeconds(0.5),
-                Commands.runOnce(() -> GamepieceMode.setHeldPiece(null))
-            ).schedule();
         }
 
         @Override

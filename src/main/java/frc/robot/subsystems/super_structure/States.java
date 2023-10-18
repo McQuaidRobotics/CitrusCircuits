@@ -50,19 +50,21 @@ public enum States {
     }
 
     public enum IntakeRequest {
-        IDLE(0.0, 0.0, 0.0),
-        INTAKING(12.0, -12.0, 120.0),
-        OUTTAKING(-12.0, 12.0, 120.0),
-        SPIT(-8.0, 8.0, 40.0),
-        HOLD_TIGHT(2.5, -2.5, 15.0),
-        HOLD(1.2, -1.2, 7.5);
+        IDLE(0.0, 0.0, 0.0, false),
+        INTAKING(12.0, -12.0, 120.0, false),
+        OUTTAKING(-12.0, 12.0, 120.0, true),
+        SPIT(-8.0, 8.0, 40.0, true),
+        HOLD_TIGHT(2.5, -2.5, 15.0, false),
+        HOLD(1.2, -1.2, 7.5, false);
 
         public final double voltageCone, voltageCube, maxCurrent;
+        public final boolean expelling;
 
-        IntakeRequest(double voltageCone, double voltageCube, double maxCurrent) {
+        IntakeRequest(double voltageCone, double voltageCube, double maxCurrent, boolean expelling) {
             this.voltageCone = voltageCone;
             this.voltageCube = voltageCube;
             this.maxCurrent = maxCurrent;
+            this.expelling = expelling;
         }
 
         public double getVoltage(GamepieceMode mode) {

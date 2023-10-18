@@ -186,7 +186,10 @@ public class StateManager {
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION
                     && to.intakeBehavior != IntakeBehavior.RUN_ON_TRANSITION) {
                 superStructure.runEndEffector(intakeVoltage(from), from.intakeRequest.getCurrentLimit());
-                this.deadCycles = 20;
+                if (from.intakeRequest.expelling) {
+                    GamepieceMode.setHeldPiece(null);
+                }
+                this.deadCycles = 15;
             }
         }
 
@@ -288,6 +291,7 @@ public class StateManager {
                 },
                 () -> {
                     superStructure.runEndEffector(0.0, 0.0);
+                    GamepieceMode.setHeldPiece(null);
                     lastState = null;
                 }
             ).withTimeout(0.3);

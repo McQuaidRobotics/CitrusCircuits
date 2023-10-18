@@ -48,21 +48,20 @@ public class RobotContainer {
                     swerve,
                     driveController::getLeftY,
                     driveController::getLeftX,
-                    driveController::getRightX
-            ));
+                    driveController::getRightX));
         } else {
             swerve.setDefaultCommand(
-                    new TeleopSwerve2(
-                            swerve,
-                            driveController::getLeftY,
-                            driveController::getLeftX,
-                            driveController::getRightX,
-                            driveController::getRightY));
+                new TeleopSwerve2(
+                    swerve,
+                    driveController::getLeftY,
+                    driveController::getLeftX,
+                    driveController::getRightX,
+                    driveController::getRightY));
         }
 
         var brakeTrig = new Trigger(brakeSwitch::get).or(DriverStation::isEnabled);
-        brakeTrig.onTrue(new InstantCommand(superStructure::brake));
-        brakeTrig.onFalse(new InstantCommand(superStructure::coast));
+        brakeTrig.onTrue(new InstantCommand(superStructure::brake).ignoringDisable(true));
+        brakeTrig.onFalse(new InstantCommand(superStructure::coast).ignoringDisable(true));
     }
 
     // [driver]

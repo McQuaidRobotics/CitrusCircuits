@@ -5,8 +5,10 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -187,12 +189,17 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void brake(Boolean toggle) {
+    public void brake(Boolean toBrake) {
         var motorOutputCfg = new MotorOutputConfigs();
-        motorOutputCfg.NeutralMode = toggle ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.NeutralMode = toBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         motorOutputCfg.Inverted = kWrist.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
         wristMotor.getConfigurator().apply(motorOutputCfg);
+        if (toBrake) {
+            wristMotor.setControl(new StaticBrake());
+        } else {
+            wristMotor.setControl(new CoastOut());
+        }
     }
 
     @Override

@@ -93,12 +93,12 @@ public class LED {
     }
 
     public void run() {
+        if (timer.hasElapsed(duration)) {
+            setDefault();
+        }
         if (pattern != lastPattern || duration == 0) {
             sendPattern(pattern);
             lastPattern = pattern;
-        }
-        if (timer.hasElapsed(duration)) {
-            setDefault();
         }
     }
 }

@@ -4,9 +4,11 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -155,12 +157,17 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public void brake(Boolean toggle) {
+    public void brake(Boolean toBrake) {
         var motorOutputCfg = new MotorOutputConfigs();
-        motorOutputCfg.NeutralMode = toggle ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.NeutralMode = toBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         motorOutputCfg.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
         leaderMotor.getConfigurator().apply(motorOutputCfg);
+        if (toBrake) {
+            leaderMotor.setControl(new StaticBrake());
+        } else {
+            leaderMotor.setControl(new CoastOut());
+        }
     }
 
     @Override

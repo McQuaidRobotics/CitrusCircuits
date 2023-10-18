@@ -47,7 +47,6 @@ public interface Component {
     /** Returns the average current over the past .5 seconds */
     public Double getRecentCurrent();
 
-    public default void brake(Boolean toggle) {
-
+    public default void brake(Boolean toBrake) {
     }
 }

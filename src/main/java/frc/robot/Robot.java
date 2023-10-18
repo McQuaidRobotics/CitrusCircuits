@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         if (selectedRoutine != autoRoutine || alliance != currAlliance) {
             autoRoutine = selectedRoutine;
             alliance = currAlliance;
-            autoCmd = Autos.getAutoRoutineCommand(autoRoutine);
+            autoCmd = autoRoutine.getCommand();
             SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         }
     }

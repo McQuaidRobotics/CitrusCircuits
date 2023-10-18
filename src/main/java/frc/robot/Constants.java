@@ -186,8 +186,8 @@ public final class Constants {
     }
 
     public static class kAuto {
-        public static final PIDConstants AUTO_TRANSLATION_PID = new PIDConstants(2.0, 0.0, 0.0);
-        public static final PIDConstants AUTO_ANGULAR_PID = new PIDConstants(0.75, 0.0, 0.0);
+        public static final PIDConstants AUTO_TRANSLATION_PID = new PIDConstants(3.5, 0.0, 0.0);
+        public static final PIDConstants AUTO_ANGULAR_PID = new PIDConstants(3.0, 0.0, 0.0);
     }
 
     public static class kSwerve {
@@ -219,7 +219,7 @@ public final class Constants {
         public static final SensorDirectionValue CANCODER_INVERT = SensorDirectionValue.CounterClockwise_Positive;
 
         /* Angle Motor PID Values */
-        public static final double ANGLE_KP = 2.0;
+        public static final double ANGLE_KP = 4.0;
         public static final double ANGLE_KI = 0.0;
         public static final double ANGLE_KD = 0.0;
 

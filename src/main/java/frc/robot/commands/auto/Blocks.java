@@ -2,6 +2,7 @@ package frc.robot.commands.auto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
 import com.pathplanner.lib.PathPlannerTrajectory.StopEvent;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -105,6 +108,8 @@ public class Blocks {
         FLAT_PLACE8("FLAT_PLACE8"),
         FLAT_PLACE9("FLAT_PLACE9"),
         FLAT_SWOOP4("FLAT_SWOOP4"),
+        FLAT_SWOOP4B_RED("FLAT_SWOOP4B_B_BI"),
+        FLAT_SWOOP4B_BLUE("FLAT_SWOOP4B_R_BI"),
         PICKUP1_WIRE("PICKUP1_WIRE"),
         PICKUP2_WIRE("PICKUP2_WIRE"),
         PICKUP3_FLAT("PICKUP3_FLAT"),
@@ -154,6 +159,10 @@ public class Blocks {
         public CustomPath merge(Cmds block, Cmds... blocks) {
             return new CustomPath(this::getTraj, false, 0.0, block, blocks);
         }
+
+        public CustomPath asCustom() {
+            return new CustomPath(this::getTraj);
+        }
     }
 
     public static class CustomPath implements Block {
@@ -171,12 +180,11 @@ public class Blocks {
         }
 
         public CustomPath(
-            Supplier<PathPlannerTrajectory> trajSupplier,
-            Boolean resetPose,
-            Double percentThrough,
-            Cmds block,
-            Cmds... blocks
-        ) {
+                Supplier<PathPlannerTrajectory> trajSupplier,
+                Boolean resetPose,
+                Double percentThrough,
+                Cmds block,
+                Cmds... blocks) {
             this.trajSupplier = trajSupplier;
             this.resetPose = resetPose;
             var list = new ArrayList<Cmds>();
@@ -197,21 +205,24 @@ public class Blocks {
 
             var markers = new ArrayList<EventMarker>();
             for (var cmdEntry : cmdMap.entrySet()) {
-                var percentThrough = cmdEntry.getKey();
+                var percThrough = cmdEntry.getKey();
                 var cmds = cmdEntry.getValue();
                 var names = new ArrayList<String>();
                 for (var cmd : cmds) {
                     names.add(ScreamingSnakeToCamal(cmd.name()));
                 }
-                markers.add(
-                        EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percentThrough));
+                System.out.println(percThrough + ": " + names);
+                markers.add(EventMarker.fromTime(names, traj.getTotalTimeSeconds() * percThrough));
             }
+
+            markers.sort(Comparator.comparingDouble(i -> i.timeSeconds));
+
             traj = new PathPlannerTrajectory(
-                        traj.getStates(),
-                        markers,
-                        new StopEvent(),
-                        new StopEvent(),
-                        false);
+                    traj.getStates(),
+                    markers,
+                    new StopEvent(),
+                    new StopEvent(),
+                    false);
 
             if (resetPose) {
                 return builder.resetPose(traj)
@@ -241,6 +252,57 @@ public class Blocks {
 
         public CustomPath merge(Cmds block, Cmds... blocks) {
             return this.merge(0.0, block, blocks);
+        }
+    }
+
+    public static class AlliancePath implements Block {
+        private final CustomPath trajSupplierRed, trajSupplierBlue;
+
+        public AlliancePath(CustomPath blue, CustomPath red) {
+            this.trajSupplierBlue = blue;
+            this.trajSupplierRed = red;
+        }
+
+        public AlliancePath(CustomPath blue, PPPaths red) {
+            this(blue, red.asCustom());
+        }
+
+        public AlliancePath(PPPaths blue, CustomPath red) {
+            this(blue.asCustom(), red);
+        }
+
+        public AlliancePath(PPPaths blue, PPPaths red) {
+            this(blue.asCustom(), red.asCustom());
+        }
+
+        public AlliancePath merge(Double percentThrough, Cmds block, Cmds... blocks) {
+            trajSupplierBlue.merge(percentThrough, block, blocks);
+            trajSupplierRed.merge(percentThrough, block, blocks);
+            return this;
+        }
+
+        public AlliancePath merge(Cmds block, Cmds... blocks) {
+            return this.merge(0.0, block, blocks);
+        }
+
+        public AlliancePath resetPose() {
+            trajSupplierBlue.resetPose();
+            trajSupplierRed.resetPose();
+            return this;
+        }
+
+        @Override
+        public Command getCommand(SwerveAutoBuilder builder) {
+            if (DriverStation.getAlliance() == Alliance.Blue) {
+                return trajSupplierBlue.getCommand(builder);
+            } else {
+                return trajSupplierRed.getCommand(builder);
+            }
+        }
+
+        @Override
+        public String getCommandName() {
+            return "Alliance Path";
         }
     }
 
@@ -280,8 +342,9 @@ public class Blocks {
         var builder = PathLoader.getPPAutoBuilder();
         List<Command> commands = new ArrayList<>();
 
-        var scheduler = CommandScheduler.getInstance();
+        commands.add(RobotContainer.swerve.runOnce(() -> RobotContainer.swerve.setYaw(0.0)).withName("Reset Yaw"));
 
+        var scheduler = CommandScheduler.getInstance();
         Integer count = 0;
         for (Block block : blocks) {
             var cmd = block.getCommand(builder);

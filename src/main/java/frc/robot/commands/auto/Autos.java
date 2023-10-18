@@ -2,49 +2,37 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.auto.Blocks.Block;
 import static frc.robot.commands.auto.Blocks.Cmds;
-
-import frc.robot.commands.auto.Blocks.PPPaths;
+import static frc.robot.commands.auto.Blocks.PPPaths;
+import static frc.robot.commands.auto.Blocks.AlliancePath;;
 
 public class Autos {
 
-    public enum AutoRoutines {
-        NOTHING,
-        THREE_GAME_PIECE,
-        TWO_HALF_GAME_PIECE_WIRE,
-        ONE_GAME_PIECE_TAXI,
-        STRAIGHT_LINE
-    }
-
-    public static Command getAutoRoutineCommand(AutoRoutines autoRoutine) {
-        Command autoCommand = new InstantCommand();
-        switch (autoRoutine) {
-            case THREE_GAME_PIECE:
-                autoCommand = Blocks.buildBlocks(THREE_GAME_PIECE_FLAT);
-                break;
-            case TWO_HALF_GAME_PIECE_WIRE:
-                autoCommand = Blocks.buildBlocks(TWO_HALF_GAME_PIECE_WIRE);
-                break;
-            case ONE_GAME_PIECE_TAXI:
-                autoCommand = Blocks.buildBlocks(ONE_GAME_PIECE_TAXI);
-                break;
-            case STRAIGHT_LINE:
-                autoCommand = Blocks.buildBlocks(PPPaths.ONE_METER.resetPose());
-            default:
-                break;
-        };
-        return autoCommand.withName(autoRoutine + "(" + DriverStation.getAlliance() + ") Auto");
-    }
-
     public static final Block[] THREE_GAME_PIECE_FLAT = Blocks.groupBlocks(
+        Cmds.OVERRIDE_HOLD_CONE,
+        Cmds.PLACE_STANDBY,
+        Cmds.PLACE_HIGH,
+        PPPaths.PLACE9_FLAT.resetPose().merge(Cmds.STOW, Cmds.DESIRE_CUBE),
+        PPPaths.FLAT_SWOOP4
+                .merge(0.1, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE)
+                .merge(0.8, Cmds.STOW),
+        PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY),
+        Cmds.PLACE_HIGH,
+        PPPaths.PLACE8_FLAT.merge(Cmds.STOW, Cmds.DESIRE_CONE),
+        PPPaths.FLAT_PICKUP3.merge(
+                0.2, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CONE),
+        PPPaths.PICKUP3_FLAT.merge(Cmds.STOW),
+        PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY));
+
+    public static final Block[] THREE_GAME_PIECE_FLAT_ALT = Blocks.groupBlocks(
             Cmds.OVERRIDE_HOLD_CONE,
+            Cmds.PLACE_STANDBY,
             Cmds.PLACE_HIGH,
             PPPaths.PLACE9_FLAT.resetPose().merge(Cmds.STOW, Cmds.DESIRE_CUBE),
-            PPPaths.FLAT_SWOOP4
+            new AlliancePath(PPPaths.FLAT_SWOOP4B_BLUE, PPPaths.FLAT_SWOOP4B_RED)
                     .merge(0.1, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE)
-                    .merge(0.9, Cmds.STOW),
+                    .merge(0.8, Cmds.STOW),
             PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY),
             Cmds.PLACE_HIGH,
             PPPaths.PLACE8_FLAT.merge(Cmds.STOW, Cmds.DESIRE_CONE),
@@ -72,4 +60,23 @@ public class Autos {
             Cmds.OVERRIDE_HOLD_CONE,
             Cmds.PLACE_HIGH,
             PPPaths.PLACE9_FLAT.resetPose().merge(Cmds.HOME));
+
+    public enum AutoRoutines {
+        NOTHING(new Block[] {}),
+        THREE_GAME_PIECE(Autos.THREE_GAME_PIECE_FLAT),
+        THREE_GAME_PIECE_ALT(Autos.THREE_GAME_PIECE_FLAT_ALT),
+        TWO_HALF_GAME_PIECE_WIRE(Autos.TWO_HALF_GAME_PIECE_WIRE),
+        ONE_GAME_PIECE_TAXI(Autos.ONE_GAME_PIECE_TAXI),
+        STRAIGHT_LINE(PPPaths.ONE_METER.resetPose());
+
+        private final Block[] blocks;
+
+        private AutoRoutines(Block... blocks) {
+            this.blocks = blocks;
+        }
+
+        public Command getCommand() {
+            return Blocks.buildBlocks(blocks).withName(this + "(" + DriverStation.getAlliance() + ") Auto");
+        }
+    }
 }

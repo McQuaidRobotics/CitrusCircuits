@@ -27,7 +27,7 @@ class Rotation:
     deg: float
 
     def translate_across_field(self) -> "Rotation":
-        return Rotation(self.deg + 180)
+        return Rotation(180 - self.deg)
 
     @staticmethod
     def from_json(json: Optional[float]) -> Optional["Rotation"]:

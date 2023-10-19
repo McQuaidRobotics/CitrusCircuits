@@ -1,12 +1,12 @@
 package frc.robot.subsystems.super_structure;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
 import frc.robot.subsystems.super_structure.States.SuperStructurePosition;
+import frc.robot.util.ShuffleboardApi.ShuffleTable;
 
 public class Visualizer {
 
@@ -71,8 +71,8 @@ public class Visualizer {
         wristUpperSetpoint.setLineWeight(3.0);
     }
 
-    public void setShuffleboardTab(ShuffleboardTab tab) {
-        tab.add("Superstructure Visualizer", mechanism);
+    public void setShuffleboardTab(ShuffleTable tab) {
+        tab.addSendable("Superstructure Visualizer", mechanism);
     }
 
     public void updateCurrent(SuperStructurePosition currentForm) {

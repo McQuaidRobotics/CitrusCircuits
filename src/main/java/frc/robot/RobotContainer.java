@@ -11,14 +11,13 @@ import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.util.ForcibleTrigger;
+import frc.robot.util.ShuffleboardApi;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -86,9 +85,9 @@ public class RobotContainer {
     private static void configureDriverBindings() {
         // Bumpers/Triggers
         ForcibleTrigger.from(driveController.rightBumper())
-                .onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
+            .onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
         ForcibleTrigger.from(driveController.leftBumper())
-                .onTrueForce(new SuperstructureCommands.TransitionToPickup(superStructure));
+            .onTrueForce(new SuperstructureCommands.TransitionToPickup(superStructure));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
@@ -97,37 +96,38 @@ public class RobotContainer {
 
         // POV buttons
         ForcibleTrigger.from(driveController.pov(0))
-                .onTrueForce(new StateManager.CmdTransitionState(superStructure, States.HOME));
+            .onTrueForce(new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
     private static void configureOperatorBindings() {
         // Face buttons
         operatorController.y().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)).ignoringDisable(true));
+            () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)).ignoringDisable(true));
         operatorController.b().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID)).ignoringDisable(true));
+            () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID)).ignoringDisable(true));
         operatorController.a().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT)).ignoringDisable(true));
+            () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT)).ignoringDisable(true));
         operatorController.x().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_BACK)).ignoringDisable(true));
+            () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_BACK)).ignoringDisable(true));
 
         // Bumpers/Triggers
         operatorController.rightBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.GROUND)).ignoringDisable(true));
+            () -> PickupMode.setCurrentMode(PickupMode.GROUND)).ignoringDisable(true));
         operatorController.leftBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.STATION)).ignoringDisable(true));
+            () -> PickupMode.setCurrentMode(PickupMode.STATION)).ignoringDisable(true));
         operatorController.leftTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE)).ignoringDisable(true));
+            () -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE)).ignoringDisable(true));
         operatorController.rightTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)).ignoringDisable(true));
+            () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)).ignoringDisable(true));
 
         // POV buttons
         ForcibleTrigger.from(operatorController.pov(0)).onTrueForce(
-                new StateManager.CmdTransitionState(superStructure, States.HOME));
+            new StateManager.CmdTransitionState(superStructure, States.HOME)
+        );
     }
 
     private static void configureDriverTabShuffleboard() {
-        ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
+        var driverTab = ShuffleboardApi.getTab("Driver");
         driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
                 .withSize(2, 1)
                 .withPosition(6, 0)
@@ -145,16 +145,16 @@ public class RobotContainer {
                 .withPosition(6, 3)
                 .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
-        var pickup = driverTab.getLayout("Pickup Mode", BuiltInLayouts.kList)
-                .withSize(2, 2)
-                .withPosition(3, 0);
+        ShuffleLayout pickup = driverTab.getLayout("Pickup Mode");
+                // .withSize(2, 2)
+                // .withPosition(3, 0);
         pickup.addBoolean("GROUND", () -> PickupMode.getCurrentMode() == PickupMode.GROUND);
         pickup.addBoolean("STATION", () -> PickupMode.getCurrentMode() == PickupMode.STATION);
 
         driverTab.addBoolean("Desired Gamepiece", () -> GamepieceMode.getDesiredPiece() == GamepieceMode.CUBE)
-                .withSize(2, 2)
-                .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
-                .withPosition(8, 0);
+            .withSize(2, 2)
+            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
+            .withPosition(8, 0);
 
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();
@@ -162,8 +162,8 @@ public class RobotContainer {
         });
 
         driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
-                .withPosition(3, 3)
-                .withSize(2, 1)
-                .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
+            .withPosition(3, 3)
+            .withSize(2, 1)
+            .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
     }
 }

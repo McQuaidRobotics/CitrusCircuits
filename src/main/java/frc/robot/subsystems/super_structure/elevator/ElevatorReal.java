@@ -16,10 +16,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.Specs;
 import frc.robot.Constants.kSuperStructure.kElevator;
 import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class ElevatorReal implements Elevator {
     /** Right */
@@ -171,11 +171,11 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleboardContainer tab) {
-        tab.addNumber("Elevator Motor Rots", () -> motorRots.refresh().getValue());
-        tab.addNumber("Elevator Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addNumber("Elevator Motor Amps", () -> motorAmps.refresh().getValue());
-        tab.addNumber("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
+    public void setupShuffleboard(ShuffleLayout tab) {
+        tab.addDouble("Elevator Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addDouble("Elevator Motor Velo", () -> motorVelo.refresh().getValue());
+        tab.addDouble("Elevator Motor Amps", () -> motorAmps.refresh().getValue());
+        tab.addDouble("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
         tab.addBoolean("Elevator LimitSwitch", this::isLimitSwitchHit);
     }
 

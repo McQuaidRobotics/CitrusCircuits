@@ -14,10 +14,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.kWrist;
 import frc.robot.Constants.kSuperStructure.kIntake;
 import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class WristReal implements Wrist {
 
@@ -203,7 +203,7 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleboardContainer tab) {
+    public void setupShuffleboard(ShuffleLayout tab) {
         tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue());// refreshed in periodic
         tab.addDouble("Wrist Volts", () -> wristMotorVolts.refresh().getValue());
         tab.addDouble("Wrist Rots", () -> wristMotorRots.refresh().getValue());

@@ -17,9 +17,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import frc.robot.Constants.kSuperStructure.kPivot;
 import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class PivotReal implements Pivot {
 
@@ -183,15 +183,15 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleboardContainer tab) {
-        tab.addNumber("Pivot Motor Rots", () -> motorRots.refresh().getValue());
-        tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addNumber("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
-        tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
+    public void setupShuffleboard(ShuffleLayout tab) {
+        tab.addDouble("Pivot Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addDouble("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
+        tab.addDouble("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
+        tab.addDouble("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
         // tab.addNumber("Pivot Gyro Yaw", () -> gyro.getYaw().getValue());
         // tab.addNumber("Pivot Gyro Roll", () -> gyro.getRoll().getValue());
         // tab.addNumber("Pivot Gyro Pitch", () -> gyro.getPitch().getValue());
-        tab.addNumber("Pivot Degrees Gyro", this::getPivotDegreesPigeon);
+        tab.addDouble("Pivot Degrees Gyro", this::getPivotDegreesPigeon);
         tab.addBoolean("Pivot Homed", () -> isStowed);
     }
 

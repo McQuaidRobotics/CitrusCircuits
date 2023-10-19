@@ -3,8 +3,6 @@ package frc.robot.subsystems.super_structure;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.super_structure.elevator.Elevator;
@@ -12,6 +10,7 @@ import frc.robot.subsystems.super_structure.elevator.ElevatorReal;
 import frc.robot.subsystems.super_structure.elevator.ElevatorSim;
 import frc.robot.subsystems.super_structure.wrist.Wrist;
 import frc.robot.subsystems.super_structure.wrist.WristReal;
+import frc.robot.util.ShuffleboardApi;
 import frc.robot.subsystems.super_structure.States.SuperStructurePosition;
 import frc.robot.subsystems.super_structure.pivot.*;
 import frc.robot.subsystems.super_structure.wrist.*;
@@ -156,7 +155,7 @@ public class SuperStructure extends SubsystemBase {
 
     /** once moved over to TEMPLATE this can be removed */
     private void setupShuffleboard() {
-        var tab = Shuffleboard.getTab("SuperStructure");
+        var tab = ShuffleboardApi.getTab("SuperStructure");
         tab.addDouble("Wrist Setpoint Degrees", () -> this.setpoint.wristDegrees)
                 .withSize(2, 1);
         tab.addDouble("Pivot Setpoint Degrees", () -> this.setpoint.pivotDegrees)
@@ -174,9 +173,9 @@ public class SuperStructure extends SubsystemBase {
         tab.addString("Current Command", () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "None")
                 .withSize(2, 1);
 
-        wrist.setupShuffleboard(tab.getLayout("Wrist", BuiltInLayouts.kList));
-        pivot.setupShuffleboard(tab.getLayout("Pivot", BuiltInLayouts.kList));
-        elevator.setupShuffleboard(tab.getLayout("Elevator", BuiltInLayouts.kList));
+        wrist.setupShuffleboard(tab.getLayout("Wrist"));
+        pivot.setupShuffleboard(tab.getLayout("Pivot"));
+        elevator.setupShuffleboard(tab.getLayout("Elevator"));
 
         visualizer.setShuffleboardTab(tab);
     }

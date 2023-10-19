@@ -3,14 +3,14 @@ package frc.robot.subsystems.super_structure;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public interface Component {
 
     default public void periodic() {
     };
 
-    default public void setupShuffleboard(ShuffleboardContainer tab) {
+    default public void setupShuffleboard(ShuffleLayout tab) {
     };
 
     default void massSoftLimits(Boolean toggle, TalonFX... motors) {

@@ -13,16 +13,14 @@ import frc.robot.Constants.kAuto;
 
 public class PathLoader {
 
-    public static final PathConstraints constraints = new PathConstraints(4.0, 3.0);
-
-    public static PathPlannerTrajectory openFilePath(String autoPathFile) {
+    public static PathPlannerTrajectory openFilePath(String autoPathFile, Double maxSpeed) {
         //if filename ends with _BI do nothing
         if(!autoPathFile.endsWith("_BI") && DriverStation.getAlliance() == Alliance.Red) {
             autoPathFile += "_R";
         }
         PathPlannerTrajectory autoPath = PathPlanner.loadPath(
             autoPathFile, 
-            constraints
+            new PathConstraints(maxSpeed, 3.0)
         );
         return autoPath;
     }

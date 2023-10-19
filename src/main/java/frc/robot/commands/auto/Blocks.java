@@ -60,6 +60,10 @@ public class Blocks {
         PLACE_LOW(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT).canFinish()
                 .andThen(StateManager.dispellGamepiece(RobotContainer.superStructure))),
 
+        PLACE_HIGH_NO_DROP(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_HIGH).canFinish()),
+        PLACE_MID_NO_DROP(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID).canFinish()),
+        PLACE_LOW_NO_DROP(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT).canFinish()),
+
         PICKUP_GROUND(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_GROUND)),
         PICKUP_STATION(new CmdTransitionState(RobotContainer.superStructure, States.PICKUP_STATION)),
 
@@ -68,6 +72,8 @@ public class Blocks {
 
         OVERRIDE_HOLD_CUBE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))),
         OVERRIDE_HOLD_CONE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))),
+
+        SET_LAST_STATE_STARTUP(StateManager.setLastState(States.STANDBY)),
 
         GYRO_0(new InstantCommand()),
         GYRO_90(new InstantCommand()),
@@ -134,7 +140,11 @@ public class Blocks {
         }
 
         public PathPlannerTrajectory getTraj() {
-            return PathLoader.openFilePath(trajName);
+            Double maxSpeed = 4.0;
+            if (trajName.contains("WIRE")) {
+                maxSpeed = 2.6;
+            }
+            return PathLoader.openFilePath(trajName, maxSpeed);
         }
 
         @Override

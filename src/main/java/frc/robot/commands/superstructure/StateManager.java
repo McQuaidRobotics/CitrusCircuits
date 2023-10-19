@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.superstructure.Transitions.TransitionData;
 import frc.robot.subsystems.super_structure.States;
@@ -294,6 +295,11 @@ public class StateManager {
                     GamepieceMode.setHeldPiece(null);
                     lastState = null;
                 }
-            ).withTimeout(0.3);
+            ).withTimeout(0.25);
+    }
+    
+
+    public static Command setLastState(States state) {
+        return Commands.runOnce(() -> lastState = States.STANDBY);
     }
 }

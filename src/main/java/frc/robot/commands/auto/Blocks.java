@@ -142,7 +142,7 @@ public class Blocks {
         public PathPlannerTrajectory getTraj() {
             Double maxSpeed = 4.0;
             if (trajName.contains("WIRE")) {
-                maxSpeed = 2.6;
+                maxSpeed = 2.25;
             }
             return PathLoader.openFilePath(trajName, maxSpeed);
         }

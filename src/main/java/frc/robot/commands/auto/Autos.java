@@ -53,7 +53,7 @@ public class Autos {
         PPPaths.PICKUP1_WIRE.merge(Cmds.STOW),
         PPPaths.WIRE_OVER_IN,
         PPPaths.WIRE_PLACE2.merge(0.2, Cmds.PLACE_STANDBY),
-        Cmds.PLACE_HIGH,
+        Cmds.PLACE_LOW,
         PPPaths.PLACE2_WIRE.merge(Cmds.STOW),
         PPPaths.WIRE_OVER_OUT,
         PPPaths.WIRE_PICKUP2.merge(0.2, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE),
@@ -61,6 +61,8 @@ public class Autos {
     );
 
     public static final Block[] POINT_FIVE_GAME_PIECE_WIRE = Blocks.groupBlocks(
+        Cmds.OVERRIDE_HOLD_CONE,
+        Cmds.PLACE_HIGH,
         PPPaths.PLACE1_WIRE.resetPose(),
         PPPaths.WIRE_OVER_OUT,
         PPPaths.WIRE_PICKUP1

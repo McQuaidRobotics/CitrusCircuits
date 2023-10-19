@@ -128,7 +128,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d getYawRot() {
-        return Rotation2d.fromDegrees(gyro.getYaw().getValue() % 360);
+        return Rotation2d.fromDegrees(scope0To360(this.getYaw()));
     }
 
     public Double getYaw() {
@@ -214,5 +214,14 @@ public class Swerve extends SubsystemBase {
         for (var module : swerveMods) {
             module.simulationPeriodic();
         }
+    }
+
+    public static double scope0To360(double angle) {
+        if (angle < 0) {
+            angle = 360 - (Math.abs(angle) % 360);
+        } else {
+            angle %= 360;
+        }
+        return angle;
     }
 }

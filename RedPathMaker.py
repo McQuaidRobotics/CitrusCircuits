@@ -22,9 +22,12 @@ class Translation:
     def to_json(self) -> dict[str, float]:
         return {"x": self.x, "y": self.y}
 
-@dataclass
+@dataclass(init=False)
 class Rotation:
     deg: float
+
+    def __init__(self, deg: float):
+        self.deg = deg % 360
 
     def translate_across_field(self) -> "Rotation":
         return Rotation(180 - self.deg)
@@ -106,7 +109,7 @@ DIR = "./src/main/deploy/pathplanner"
 if __name__ == "__main__":
     import json, os
 
-    #walk the directory,
+    # walk the directory,
     # delete any file that ends in "_R.path",
     # read all .path files,
     # translate them across the field and write them to a new file with "_R.path" appended

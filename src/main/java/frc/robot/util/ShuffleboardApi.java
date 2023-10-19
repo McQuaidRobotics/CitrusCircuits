@@ -177,6 +177,7 @@ public class ShuffleboardApi {
         private final NetworkTable metaTable;
         private final Map<String, ShuffleEntry> entries = new HashMap<>();
         private final sbPath path;
+        private NetworkTable propertiesTable;
 
         private ShuffleLayout(String _path) {
             path = sbPath.fromPath(_path);
@@ -237,6 +238,47 @@ public class ShuffleboardApi {
 
         public ShuffleEntry addString(String name, Supplier<String> valueSupplier) {
             return this.addEntry(name, valueSupplier);
+        }
+
+        public ShuffleLayout applyMetadata(Map<MetadataFields, Object> metadata) {
+            for (var field : metadata.keySet()) {
+                switch (field) {
+                    case Size:
+                        metaTable.getEntry("Size").setDoubleArray((double[]) metadata.get(field));
+                        break;
+                    case Position:
+                        metaTable.getEntry("Position").setDoubleArray((double[]) metadata.get(field));
+                        break;
+                    case Widget:
+                        metaTable.getEntry("PreferredComponent").setString((String) metadata.get(field));
+                        break;
+                    case Properties:
+                        this.propertiesTable = metaTable.getSubTable("Properties");
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> properties = (Map<String, Object>) metadata.get(field);
+                        properties.forEach((k, v) -> propertiesTable.getEntry(k).setValue(v));
+                        break;
+                }
+            }
+            return this;
+        }
+
+        public ShuffleLayout withSize(Integer width, Integer height) {
+            metaTable.getEntry("Size").setDoubleArray(new double[] {
+                width, height
+            });
+            return this;
+        }
+
+        public ShuffleLayout withPosition(int columnIndex, int rowIndex) {
+            metaTable.getEntry("Position").setDoubleArray(new double[] {
+                columnIndex, rowIndex
+            });
+            return this;
+        }
+
+        public ShuffleLayout withProperties(Map<String, Object> properties) {
+            return this.applyMetadata(Map.of(MetadataFields.Properties, properties));
         }
     }
 

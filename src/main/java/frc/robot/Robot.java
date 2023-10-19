@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        ShuffleboardApi.run();
         CommandScheduler.getInstance().run();
         LED.getInstance().run();
     }

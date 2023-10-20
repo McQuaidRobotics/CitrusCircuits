@@ -73,12 +73,9 @@ public class Blocks {
         OVERRIDE_HOLD_CUBE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))),
         OVERRIDE_HOLD_CONE(new InstantCommand(() -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))),
 
-        SET_LAST_STATE_STARTUP(StateManager.setLastState(States.STANDBY)),
-
-        GYRO_0(new InstantCommand()),
-        GYRO_90(new InstantCommand()),
-        GYRO_180(new InstantCommand()),
-        GYRO_270(new InstantCommand());
+        GYRO_0(new InstantCommand(() -> RobotContainer.swerve.setYaw(0.0))),
+        GYRO_180(new InstantCommand(() -> RobotContainer.swerve.setYaw(180.0))),
+        X_WHEELS(SwerveCommands.commandXDrives(RobotContainer.swerve));
 
         public final Command command;
 
@@ -131,7 +128,8 @@ public class Blocks {
         WIRE_PICKUP2("WIRE_PICKUP2"),
         WIRE_PLACE1("WIRE_PLACE1"),
         WIRE_PLACE2("WIRE_PLACE2"),
-        WIRE_PLACE3("WIRE_PLACE3");
+        WIRE_PLACE3("WIRE_PLACE3"),
+        PLACE_BAL("PLACE_BAL");
 
         public final String trajName;
 
@@ -351,7 +349,10 @@ public class Blocks {
         var builder = PathLoader.getPPAutoBuilder();
         List<Command> commands = new ArrayList<>();
 
-        commands.add(RobotContainer.swerve.runOnce(() -> RobotContainer.swerve.setYaw(0.0)).withName("Reset Yaw"));
+        commands.add(
+            RobotContainer.swerve.runOnce(() -> RobotContainer.swerve.setYaw(0.0)).withName("Reset Yaw")
+            .alongWith(StateManager.setLastState(States.STANDBY))
+        );
 
         var scheduler = CommandScheduler.getInstance();
         Integer count = 0;

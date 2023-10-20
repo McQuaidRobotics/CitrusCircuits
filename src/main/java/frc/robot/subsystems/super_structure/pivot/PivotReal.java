@@ -1,8 +1,6 @@
 package frc.robot.subsystems.super_structure.pivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-// import com.ctre.phoenix.sensors.PigeonIMU;
-// import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

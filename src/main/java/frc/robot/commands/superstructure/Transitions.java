@@ -3,6 +3,7 @@ package frc.robot.commands.superstructure;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -33,9 +34,13 @@ public class Transitions {
     }
 
     public static Command homeTransition(TransitionData data) {
-        return data.superStructure.runEnd(
-            () -> data.superStructure.home(),
-            () -> OperatorPrefs.NEED_HOME = false
+        return new FunctionalCommand(
+            //do a force home on start incase its rescheduled it will try homing again
+            () -> data.superStructure.home(true),
+            () -> data.superStructure.home(false),
+            (bool) -> OperatorPrefs.NEED_HOME = false,
+            () -> false,
+            data.superStructure
         );
     }
 
@@ -68,5 +73,40 @@ public class Transitions {
                 return Set.of(data.superStructure);
             }
         };
+    }
+
+    public static Command placeHighTransition(TransitionData data) {
+        return data.superStructure.run(() -> {
+            SuperStructurePosition toPose;
+            if (data.superStructure.getPose().elevatorMeters < States.PLACE_MID.elevatorMeters) {
+                var wristOffset = (States.STOW.wristDegrees - States.PLACE_HIGH.wristDegrees)/2.0;
+                toPose = new SuperStructurePosition(
+                    data.to.wristDegrees + wristOffset,
+                    data.to.pivotDegrees,
+                    data.to.elevatorMeters,
+                    0.0
+                );
+            } else {
+                toPose = SuperStructurePosition.fromState(data.to);
+            }
+            data.superStructure.setSetpoint(toPose);
+        });
+    }
+
+    public static Command placeLowAntiChopTransition(TransitionData data) {
+        return data.superStructure.run(() -> {
+            SuperStructurePosition toPose;
+            if (data.superStructure.getPose().pivotDegrees < States.PLACE_LOW_FRONT.pivotDegrees * 0.95) {
+                toPose = new SuperStructurePosition(
+                    data.to.wristDegrees + 20.0,
+                    data.to.pivotDegrees,
+                    data.to.elevatorMeters,
+                    0.0
+                );
+            } else {
+                toPose = SuperStructurePosition.fromState(data.to);
+            }
+            data.superStructure.setSetpoint(toPose);
+        });
     }
 }

@@ -4,19 +4,22 @@ import com.ctre.phoenix6.BaseStatusSignal;
 // import com.ctre.phoenix.sensors.PigeonIMU;
 // import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-import frc.robot.Constants.kSuperStructure.*;
+import frc.robot.Constants.kSuperStructure.kPivot;
 import frc.robot.subsystems.super_structure.Errors.*;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class PivotReal implements Pivot {
 
@@ -75,7 +78,6 @@ public class PivotReal implements Pivot {
         motorCfg.MotionMagic.MotionMagicJerk = kPivot.MAX_JERK;
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
         motorCfg.MotorOutput.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
                 : InvertedValue.CounterClockwise_Positive;
 
@@ -136,7 +138,10 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
+        if (force) {
+            isStowed = false;
+        }
         if (isStowed) {
             this.stopMechanism();
             return true;
@@ -164,15 +169,29 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleboardContainer tab) {
-        tab.addNumber("Pivot Motor Rots", () -> motorRots.refresh().getValue());
-        tab.addNumber("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addNumber("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
-        tab.addNumber("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
+    public void brake(Boolean toBrake) {
+        var motorOutputCfg = new MotorOutputConfigs();
+        motorOutputCfg.NeutralMode = toBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        motorOutputCfg.Inverted = kPivot.INVERTED ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
+        leaderMotor.getConfigurator().apply(motorOutputCfg);
+        if (toBrake) {
+            leaderMotor.setControl(new StaticBrake());
+        } else {
+            leaderMotor.setControl(new CoastOut());
+        }
+    }
+
+    @Override
+    public void setupShuffleboard(ShuffleLayout tab) {
+        tab.addDouble("Pivot Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addDouble("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
+        tab.addDouble("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
+        tab.addDouble("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
         // tab.addNumber("Pivot Gyro Yaw", () -> gyro.getYaw().getValue());
         // tab.addNumber("Pivot Gyro Roll", () -> gyro.getRoll().getValue());
         // tab.addNumber("Pivot Gyro Pitch", () -> gyro.getPitch().getValue());
-        tab.addNumber("Pivot Degrees Gyro", this::getPivotDegreesPigeon);
+        tab.addDouble("Pivot Degrees Gyro", this::getPivotDegreesPigeon);
         tab.addBoolean("Pivot Homed", () -> isStowed);
     }
 

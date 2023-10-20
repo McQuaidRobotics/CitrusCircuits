@@ -4,9 +4,9 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.Helpers;
+import frc.robot.commands.superstructure.StateManager.CmdTransitionState;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 
@@ -36,7 +36,8 @@ public class SuperstructureCommands {
      * Acts as a pseudo-proxy command for
      * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_HIGH}),
      * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_MID}), or
-     * new {@link StateManager.CmdTransitionState}(ss, {@link States#PLACE_LOW})
+     * new {@link StateManager.CmdTransitionState}(ss,
+     * {@link States#PLACE_LOW_FRONT})
      * that will dynamically determine which to use based on
      * {@link OperatorPrefs.ScoreLevel#getCurrentLevel()}.
      * The decided proxy command can only be changed by calling
@@ -44,7 +45,8 @@ public class SuperstructureCommands {
      */
     public static class TransitionToPlace extends CommandBase {
         private final SuperStructure superStructure;
-        private Command placeCmd;
+        private CmdTransitionState placeCmd;
+        private Boolean canFinish = false;
 
         public TransitionToPlace(final SuperStructure superStructure) {
             this.superStructure = superStructure;
@@ -64,11 +66,19 @@ public class SuperstructureCommands {
                             superStructure,
                             States.PLACE_MID);
                     break;
-                case LOW:
+                case LOW_FRONT:
                     placeCmd = new StateManager.CmdTransitionState(
                             superStructure,
-                            States.PLACE_LOW);
+                            States.PLACE_LOW_FRONT);
                     break;
+                case LOW_BACK:
+                    placeCmd = new StateManager.CmdTransitionState(
+                            superStructure,
+                            States.PLACE_LOW_BACK);
+                    break;
+            }
+            if (this.canFinish) {
+                placeCmd = placeCmd.canFinish();
             }
             placeCmd.initialize();
         }
@@ -81,9 +91,6 @@ public class SuperstructureCommands {
         @Override
         public void end(boolean interrupted) {
             placeCmd.end(interrupted);
-            Commands.sequence(
-                    Commands.waitSeconds(0.5),
-                    Commands.runOnce(() -> GamepieceMode.setHeldPiece(null))).schedule();
         }
 
         @Override
@@ -96,6 +103,11 @@ public class SuperstructureCommands {
             if (placeCmd == null)
                 return "TransitionToPlace(null)";
             return "TransitionToPlace(" + placeCmd.getName() + ")";
+        }
+
+        public TransitionToPlace canFinish() {
+            this.canFinish = true;
+            return this;
         }
     }
 

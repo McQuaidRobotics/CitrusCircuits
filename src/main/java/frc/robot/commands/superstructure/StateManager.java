@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.GamepieceMode;
 import frc.robot.commands.superstructure.Transitions.TransitionData;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
-// import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 import frc.robot.subsystems.super_structure.States.IntakeBehavior;
 import frc.robot.subsystems.super_structure.States.IntakeRequest;
 
@@ -27,22 +26,34 @@ public class StateManager {
      * Is essential for determining transitions,
      * can only be mutated by {@link CmdTransitionState}
      */
-    private static States lastState = States.STOW;
+    private static States lastState;
 
-    @SuppressWarnings("unused")
     /**
-     * Runs the given command when transitioning to the given state
+     * Runs the given command when transitioning to the given state from the included states
+     * 
+     * @param state The state to transition to
+     * @param cmd   The command to run when transitioning
+     * @param include The states to include in the transition
+     *              WARNING: be careful of the order you call the methods in
+     */
+    private static void toStates(States state, Function<TransitionData, Command> cmd, States... include) {
+        HashMap<States, Function<TransitionData, Command>> map = new HashMap<>();
+        for (var iState : include) {
+            map.put(iState, cmd);
+        }
+        transitions.put(state, map);
+    }
+
+    /**
+     * Runs the given command when transitioning to the given state from any state
      * 
      * @param state The state to transition to
      * @param cmd   The command to run when transitioning
      *              WARNING: be careful of the order you call the methods in
      */
+    @SuppressWarnings("unused")
     private static void toAllStates(States state, Function<TransitionData, Command> cmd) {
-        HashMap<States, Function<TransitionData, Command>> map = new HashMap<>();
-        for (var iState : States.values()) {
-            map.put(iState, cmd);
-        }
-        transitions.put(state, map);
+        toStates(state, cmd, States.values());
     }
 
     /**
@@ -50,10 +61,11 @@ public class StateManager {
      * 
      * @param state The state to transition to
      * @param cmd   The command to run when transitioning
+     * @param include The states to include in the transition
      *              WARNING: be careful of the order you call the methods in
      */
-    private static void fromAllStates(States state, Function<TransitionData, Command> cmd) {
-        for (var iState : States.values()) {
+    private static void fromStates(States state, Function<TransitionData, Command> cmd, States... include) {
+        for (var iState : include) {
             if (iState == state)
                 continue;
             if (transitions.containsKey(iState)) {
@@ -67,6 +79,17 @@ public class StateManager {
     }
 
     /**
+     * Sets the transition from the included states to the given state to the given command
+     * 
+     * @param state The state to transition to
+     * @param cmd   The command to run when transitioning
+     *              WARNING: be careful of the order you call the methods in
+     */
+    private static void fromAllStates(States state, Function<TransitionData, Command> cmd) {
+        fromStates(state, cmd, States.values());
+    }
+
+    /**
      * A map of all possible transitions from one state to another,
      * default is simply setting the motors to the states' setpoints
      * WARNING: be careful of the order you edit the map in
@@ -76,11 +99,13 @@ public class StateManager {
     static {
         // without this the superstructure will never reseed
         fromAllStates(States.HOME, Transitions::homeTransition);
-        // fromAllStates(States.STOW, Transitions::stowTransition);
+        fromAllStates(States.STOW, Transitions::stowTransition);
+        fromAllStates(States.PLACE_HIGH, Transitions::placeHighTransition);
+        fromStates(States.PLACE_LOW_FRONT, Transitions::placeLowAntiChopTransition, States.STOW, States.HOME, States.PICKUP_GROUND);
     }
 
     /**
-     * @param data
+     * @param data The data to use for the transition
      * @return The command to run when transitioning from one state to another
      */
     private static Command getTransitionCmd(TransitionData data) {
@@ -92,6 +117,12 @@ public class StateManager {
         return Transitions.defaultTransition(data);
     }
 
+    /**
+     * A function to solve for the wanted voltage of the intake
+     * @param req The intake request
+     * @param useHeld Whether or not to use the held gamepiece variable or desired gamepiece variable
+     * @return The wanted voltage of the intake
+     */
     private static Double intakeVoltage(IntakeRequest req, Boolean useHeld) {
         if (useHeld) {
             var held = GamepieceMode.getHeldPiece();
@@ -106,15 +137,24 @@ public class StateManager {
         }
     }
 
+    /**
+     * A function to solve for the wanted voltage of the intake
+     * @param to The state to transition to
+     * @return The wanted voltage of the intake
+     */
     private static Double intakeVoltage(States to) {
         return intakeVoltage(to.intakeRequest, to.useHeldGamepiece);
     }
 
+    /**
+     * A Complex Command that handles calling state transitions and handling the intake logic
+     */
     public static class CmdTransitionState extends CommandBase {
         private final SuperStructure superStructure;
         private final States to;
         private States from;
         private Command innerCmd;
+        private Boolean canFinish = false;
 
         /**
          * Can only be set in initialize, will skip x many cycles,
@@ -137,16 +177,20 @@ public class StateManager {
         @Override
         public void initialize() {
             this.from = lastState;
-            StateManager.lastState = to;
+            lastState = to;
             this.innerCmd = getTransitionCmd(new TransitionData(from, to, superStructure));
             this.innerInit = false;
             this.innerFinish = false;
             this.reachedSetpoint = false;
             this.deadCycles = 0;
+            if (from == null) return;
             if (from.intakeBehavior == IntakeBehavior.RUN_ON_TRANSITION
                     && to.intakeBehavior != IntakeBehavior.RUN_ON_TRANSITION) {
                 superStructure.runEndEffector(intakeVoltage(from), from.intakeRequest.getCurrentLimit());
-                this.deadCycles = 20;
+                if (from.intakeRequest.expelling) {
+                    GamepieceMode.setHeldPiece(null);
+                }
+                this.deadCycles = 15;
             }
         }
 
@@ -209,8 +253,19 @@ public class StateManager {
 
         @Override
         public void end(boolean interrupted) {
+            if (!innerFinish) {
+                this.innerCmd.end(interrupted);
+            }
             superStructure.stopAll();
             from = null;
+        }
+
+        @Override
+        public boolean isFinished() {
+            if (canFinish) {
+                return reachedSetpoint;
+            }
+            return false;
         }
 
         @Override
@@ -221,5 +276,30 @@ public class StateManager {
                 return "CmdTransitionState(" + from + " -> " + to + ")";
             }
         }
+
+        public CmdTransitionState canFinish() {
+            this.canFinish = true;
+            return this;
+        }
+    }
+
+    public static Command dispellGamepiece(SuperStructure superStructure) {
+        return superStructure.startEnd(
+                () -> {
+                    if (lastState != null) {
+                        superStructure.runEndEffector(intakeVoltage(lastState), lastState.intakeRequest.maxCurrent);
+                    }
+                },
+                () -> {
+                    superStructure.runEndEffector(0.0, 0.0);
+                    GamepieceMode.setHeldPiece(null);
+                    lastState = null;
+                }
+            ).withTimeout(0.25);
+    }
+    
+
+    public static Command setLastState(States state) {
+        return Commands.runOnce(() -> lastState = States.STANDBY);
     }
 }

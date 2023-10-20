@@ -3,14 +3,14 @@ package frc.robot.subsystems.super_structure;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public interface Component {
 
     default public void periodic() {
     };
 
-    default public void setupShuffleboard(ShuffleboardContainer tab) {
+    default public void setupShuffleboard(ShuffleLayout tab) {
     };
 
     default void massSoftLimits(Boolean toggle, TalonFX... motors) {
@@ -42,8 +42,11 @@ public interface Component {
      * 
      * @return true if the mcahnism has reached home
      */
-    public Boolean homeMechanism();
+    public Boolean homeMechanism(boolean force);
 
     /** Returns the average current over the past .5 seconds */
     public Double getRecentCurrent();
+
+    public default void brake(Boolean toBrake) {
+    }
 }

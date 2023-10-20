@@ -1,48 +1,66 @@
 package frc.robot;
 
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.superstructure.OperatorPrefs;
+import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.TeleopSwerve2;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.util.ForcibleTrigger;
+import frc.robot.util.ShuffleboardApi;
+import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private final CommandXboxController driveController = new CommandXboxController(0);
-    private final CommandXboxController operatorController = new CommandXboxController(1);
+    private static final CommandXboxController driveController = new CommandXboxController(0);
+    private static final CommandXboxController operatorController = new CommandXboxController(1);
 
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private static final DigitalInput brakeSwitch = new DigitalInput(Constants.kSuperStructure.BRAKE_SWITCH_PIN);
 
-    private static final Swerve swerve = new Swerve();
-    private static final SuperStructure superStructure = new SuperStructure();
+    public static final Swerve swerve = new Swerve();
+    public static final SuperStructure superStructure = new SuperStructure();
 
-    public RobotContainer() {
+    private static final boolean TRADITIONAL_TELEOP_CONTROLS = true;
+
+    public static void RobotContainerInit() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         configureDriverBindings();
         configureOperatorBindings();
-        driverShuffleboard();
-        swerve.setDefaultCommand(
-                new TeleopSwerve(
-                        swerve,
-                        () -> driveController.getRawAxis(translationAxis),
-                        () -> driveController.getRawAxis(strafeAxis),
-                        () -> -driveController.getRawAxis(rotationAxis)));
+
+        configureDriverTabShuffleboard();
+
+        if (TRADITIONAL_TELEOP_CONTROLS) {
+            swerve.setDefaultCommand(
+                    new TeleopSwerve(
+                            swerve,
+                            driveController::getLeftY,
+                            driveController::getLeftX,
+                            driveController::getRightX));
+        } else {
+            swerve.setDefaultCommand(
+                    new TeleopSwerve2(
+                            swerve,
+                            driveController::getLeftY,
+                            driveController::getLeftX,
+                            driveController::getRightX,
+                            driveController::getRightY));
+        }
+
+        var brakeTrig = new Trigger(brakeSwitch::get).or(DriverStation::isEnabled);
+        brakeTrig.onTrue(new InstantCommand(superStructure::brake).ignoringDisable(true));
+        brakeTrig.onFalse(new InstantCommand(superStructure::coast).ignoringDisable(true));
     }
 
     // [driver]
@@ -50,123 +68,101 @@ public class RobotContainer {
     // LeftBumper: pickup position
     // RightTrigger: placing standby
     // LeftTrigger: stow
+    // D-pad UP: home/stow
     // Start: zero gyro
 
     // [operator]
     // Y: set desired score level to high
     // B: set desired score level to mid
-    // A: set desired score level to low
-    // X: home/stow
+    // A: set desired score level to low front
+    // X: set desired score level to low back
+    // D-pad UP: home/stow
     // RightBumper: set desired pickup method to ground
     // LeftBumper: set desired pickup method to shelf
     // RightTrigger: set desired gamepiece to cone
     // LeftTrigger: set desired gamepiece to cube
 
-    private void configureDriverBindings() {
+    private static void configureDriverBindings() {
         // Bumpers/Triggers
-        driveController.rightBumper().onTrue(new SuperstructureCommands.TransitionToPlace(superStructure));
-        driveController.leftBumper().onTrue(new SuperstructureCommands.TransitionToPickup(superStructure));
+        ForcibleTrigger.from(driveController.rightBumper())
+                .onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
+        ForcibleTrigger.from(driveController.leftBumper())
+                .onTrueForce(new SuperstructureCommands.TransitionToPickup(superStructure));
         driveController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         driveController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
-        // used for testing
-        // driveController.pov(0).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(12.0, false), superStructure));
-        // driveController.pov(180).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(-12.0, false), superStructure));
-        // driveController.pov(90).onTrue(new InstantCommand(() ->
-        // superStructure.runEndEffector(0.0, false), superStructure));
-        // driveController.x().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.STOW));
-        // driveController.a().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_LOW));
-        // driveController.b().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_MID));
-        // driveController.y().onTrue(new
-        // StateManager.CmdTransitionState(superStructure, States.PLACE_HIGH));
-
         // Center Buttons
-        driveController.start().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+        driveController.start().onTrue(new InstantCommand(() -> swerve.setYaw(0.0)));
+
+        // POV buttons
+        ForcibleTrigger.from(driveController.pov(0))
+                .onTrueForce(new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
-    private void configureOperatorBindings() {
+    private static void configureOperatorBindings() {
         // Face buttons
         operatorController.y().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH))
-                .ignoringDisable(true));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)).ignoringDisable(true));
         operatorController.b().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID))
-                .ignoringDisable(true));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.MID)).ignoringDisable(true));
         operatorController.a().onTrue(new InstantCommand(
-                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW))
-                .ignoringDisable(true));
-        operatorController.x().onTrue(new StateManager.CmdTransitionState(superStructure, States.HOME));
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_FRONT)).ignoringDisable(true));
+        operatorController.x().onTrue(new InstantCommand(
+                () -> ScoreLevel.setCurrentLevel(ScoreLevel.LOW_BACK)).ignoringDisable(true));
 
         // Bumpers/Triggers
         operatorController.rightBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.GROUND))
-                .ignoringDisable(true));
+                () -> PickupMode.setCurrentMode(PickupMode.GROUND)).ignoringDisable(true));
         operatorController.leftBumper().onTrue(new InstantCommand(
-                () -> PickupMode.setCurrentMode(PickupMode.STATION))
-                .ignoringDisable(true));
+                () -> PickupMode.setCurrentMode(PickupMode.STATION)).ignoringDisable(true));
         operatorController.leftTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))
-                .ignoringDisable(true));
+                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE)).ignoringDisable(true));
         operatorController.rightTrigger().onTrue(new InstantCommand(
-                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))
-                .ignoringDisable(true));
+                () -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE)).ignoringDisable(true));
 
-        // used for testing
-        // operatorController.pov(0).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CONE))
-        // .ignoringDisable(true));
-        // operatorController.pov(180).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(GamepieceMode.CUBE))
-        // .ignoringDisable(true));
-        // operatorController.pov(270).onTrue(new InstantCommand(
-        // () -> GamepieceMode.setHeldPiece(null))
-        // .ignoringDisable(true));
+        // POV buttons
+        ForcibleTrigger.from(operatorController.pov(0)).onTrueForce(
+                new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
-    private void driverShuffleboard() {
-        var tab = Shuffleboard.getTab("Driver");
-        tab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
+    private static void configureDriverTabShuffleboard() {
+        var driverTab = ShuffleboardApi.getTab("Driver");
+        driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
                 .withSize(2, 1)
                 .withPosition(6, 0)
                 .withProperties(Map.of("colorWhenTrue", "Blue", "colorWhenFalse", "Black"));
-        tab.addBoolean("Middle", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.MID)
+        driverTab.addBoolean("Middle", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.MID)
                 .withSize(2, 1)
                 .withPosition(6, 1)
                 .withProperties(Map.of("colorWhenTrue", "Magenta", "colorWhenFalse", "Black"));
-        tab.addBoolean("Low", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW)
+        driverTab.addBoolean("Low Front", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW_FRONT)
                 .withSize(2, 1)
                 .withPosition(6, 2)
                 .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
+        driverTab.addBoolean("Low Back", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.LOW_BACK)
+                .withSize(2, 1)
+                .withPosition(6, 3)
+                .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
-        var pickup = tab.getLayout("Pickup Mode", BuiltInLayouts.kList)
-                .withSize(2, 2)
-                .withPosition(3, 0);
+        ShuffleLayout pickup = driverTab.getLayout("Pickup Mode")
+            .withSize(2, 2)
+            .withPosition(3, 0);
         pickup.addBoolean("GROUND", () -> PickupMode.getCurrentMode() == PickupMode.GROUND);
         pickup.addBoolean("STATION", () -> PickupMode.getCurrentMode() == PickupMode.STATION);
 
-        tab.addBoolean("Desired Gamepiece", () -> GamepieceMode.getDesiredPiece() == GamepieceMode.CUBE)
-                .withSize(2, 2)
-                .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"));
+        driverTab.addBoolean("Desired Gamepiece", () -> GamepieceMode.getDesiredPiece() == GamepieceMode.CUBE)
+            .withSize(2, 2)
+            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
+            .withPosition(8, 0);
 
-        tab.addString("Held Gamepiece", () -> {
+        driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
-        })
-                .withPosition(0, 3)
-                .withSize(2, 1);
+        });
 
-        tab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
-                .withPosition(3, 3)
-                .withSize(2, 1)
-                .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
-    }
-
-    public Command getAutonomousCommand() {
-        return new InstantCommand();
+        driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
+            .withPosition(3, 3)
+            .withSize(2, 1)
+            .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
     }
 }

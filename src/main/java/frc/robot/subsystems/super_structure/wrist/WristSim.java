@@ -53,7 +53,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Boolean homeMechanism() {
+    public Boolean homeMechanism(boolean force) {
         wristDegrees.setTargetPosition(kWrist.HOME_DEGREES);
         return Math.abs(wristDegrees.getPose() - kWrist.HOME_DEGREES) < 0.1;
     }

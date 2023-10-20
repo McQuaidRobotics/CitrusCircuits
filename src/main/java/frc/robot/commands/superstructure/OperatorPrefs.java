@@ -18,7 +18,8 @@ public class OperatorPrefs {
     }
 
     public static enum ScoreLevel {
-        LOW,
+        LOW_FRONT,
+        LOW_BACK,
         MID,
         HIGH;
 

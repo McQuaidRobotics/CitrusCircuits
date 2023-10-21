@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.super_structure.elevator.Elevator;
-import frc.robot.subsystems.super_structure.elevator.ElevatorReal;
+import frc.robot.subsystems.super_structure.elevator.ElevatorDisabled;
 import frc.robot.subsystems.super_structure.elevator.ElevatorSim;
 import frc.robot.subsystems.super_structure.wrist.Wrist;
 import frc.robot.subsystems.super_structure.wrist.WristReal;
@@ -28,7 +28,7 @@ public class SuperStructure extends SubsystemBase {
         if (Robot.isReal()) {
             this.wrist = new WristReal(setpoint.wristDegrees);
             this.pivot = new PivotReal(/* uses pigeon */);
-            this.elevator = new ElevatorReal(setpoint.elevatorMeters);
+            this.elevator = new ElevatorDisabled(setpoint.elevatorMeters);
         } else {
             this.wrist = new WristSim(setpoint.wristDegrees);
             this.pivot = new PivotSim(setpoint.pivotDegrees);

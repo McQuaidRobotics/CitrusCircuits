@@ -74,7 +74,7 @@ public class SuperstructureCommands {
                 case LOW_BACK:
                     placeCmd = new StateManager.CmdTransitionState(
                             superStructure,
-                            States.PLACE_LOW_BACK);
+                            States.PLACE_BACK);
                     break;
             }
             if (this.canFinish) {

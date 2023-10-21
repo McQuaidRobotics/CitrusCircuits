@@ -10,8 +10,8 @@ public enum States {
     STANDBY(kPivot.SCORE_DEGREES, kWrist.HOME_DEGREES, kElevator.HOME_METERS, IntakeRequest.HOLD_TIGHT , IntakeBehavior.RUN_WHOLE_TIME, true),
     PLACE_HIGH(kPivot.SCORE_DEGREES, -19.0, kElevator.MAX_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
     PLACE_MID(kPivot.SCORE_DEGREES, -26.0, 1.04, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true),
-    PLACE_LOW_BACK(60.0, kWrist.HOME_DEGREES-7.0, kElevator.HOME_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true, 1.3),
-    PLACE_LOW_FRONT(13.0, 15.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION, true, 1.3),
+    PLACE_BACK(60.0, 90.0, kElevator.HOME_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_TRANSITION, true, 1.3),
+    PLACE_LOW_FRONT(13.0, 25.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION, true, 1.3),
     PICKUP_GROUND(kPivot.HOME_DEGREES, 13.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_WHOLE_TIME, false, 1.3),
     PICKUP_STATION(63.1, -63.0, 1.085, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false),
     PICKUP_CHUTE(48.0, -10.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_WHOLE_TIME, false);

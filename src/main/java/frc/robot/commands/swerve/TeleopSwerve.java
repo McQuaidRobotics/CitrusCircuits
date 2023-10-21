@@ -12,7 +12,11 @@ import frc.robot.Constants.*;
 
 /** An example command that uses an example subsystem. */
 public class TeleopSwerve extends CommandBase {
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+    private static Boolean fieldRelative = true;
+
+    public static void toggleFieldRelative() {
+        fieldRelative = !fieldRelative;
+    }
 
     private final Swerve swerve;
     private final DoubleSupplier translationXSup;
@@ -42,7 +46,7 @@ public class TeleopSwerve extends CommandBase {
                 new Translation2d(translationVal, strafeVal)
                     .times(Constants.kSwerve.MAX_SPEED),
                 rotationVal * Constants.kSwerve.MAX_ANGULAR_VELOCITY * 0.75,
-                true,
+                fieldRelative,
                 true);
     }
 }

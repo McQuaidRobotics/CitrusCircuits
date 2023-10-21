@@ -8,6 +8,25 @@ import static frc.robot.commands.auto.Blocks.PPPaths;
 
 public class Autos {
 
+    public static final Block[] THREE_GAME_PIECE_FLAT_LOW = Blocks.groupBlocks(
+        Cmds.OVERRIDE_HOLD_CONE,
+        Cmds.PLACE_LOW,
+        PPPaths.PLACE9_FLAT.resetPose().merge(Cmds.STOW, Cmds.DESIRE_CUBE),
+        PPPaths.FLAT_SWOOP4B
+            .merge(0.1, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE)
+            .merge(0.65, Cmds.PLACE_STANDBY),
+        PPPaths.FLAT_PLACE8.merge(Cmds.PLACE_STANDBY),
+        Cmds.PLACE_LOW,
+        PPPaths.PLACE8_FLAT.merge(Cmds.STOW, Cmds.DESIRE_CUBE),
+        PPPaths.FLAT_PICKUP3.merge(
+            0.2, Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE),
+        PPPaths.PICKUP3_FLAT.merge(Cmds.STOW).merge(0.7, Cmds.PLACE_STANDBY),
+        PPPaths.FLAT_PLACE7.merge(Cmds.PLACE_HIGH_NO_DROP),
+        Cmds.PLACE_LOW,
+        Cmds.GYRO_180,
+        Cmds.STOW
+    );
+
     public static final Block[] THREE_GAME_PIECE_FLAT_CUBE = Blocks.groupBlocks(
         Cmds.OVERRIDE_HOLD_CONE,
         Cmds.PLACE_MID,
@@ -36,6 +55,19 @@ public class Autos {
         Cmds.STOW
     );
 
+    public static final Block[] TWO_GAME_PIECE_WIRE_LOW = Blocks.groupBlocks(
+        Cmds.OVERRIDE_HOLD_CONE,
+        Cmds.PLACE_LOW,
+        PPPaths.PLACE1_WIRE.resetPose().merge(Cmds.STOW, Cmds.DESIRE_CUBE),
+        PPPaths.WIRE_OVER_OUT,
+        PPPaths.WIRE_PICKUP1.merge(Cmds.PICKUP_GROUND, Cmds.OVERRIDE_HOLD_CUBE),
+        PPPaths.PICKUP1_WIRE.merge(Cmds.STOW),
+        PPPaths.WIRE_OVER_IN,
+        PPPaths.WIRE_PLACE2.merge(Cmds.PLACE_STANDBY),
+        Cmds.PLACE_LOW,
+        Cmds.STOW
+    );
+
     public static final Block[] PLACE_BALANCE = Blocks.groupBlocks(
         Cmds.OVERRIDE_HOLD_CONE,
         Cmds.PLACE_HIGH,
@@ -47,7 +79,9 @@ public class Autos {
         NOTHING(new Block[] {}),
         THREE_GAME_PIECE_FLAT(Autos.THREE_GAME_PIECE_FLAT_CUBE),
         PLACE_TAXI_WIRE(Autos.PLACE_TAXI_WIRE),
-        PLACE_BALANCE(Autos.PLACE_BALANCE);
+        PLACE_BALANCE(Autos.PLACE_BALANCE),
+        THREE_GAME_PIECE_FLAT_LOW(Autos.THREE_GAME_PIECE_FLAT_LOW),
+        TWO_GAME_PIECE_WIRE_LOW(Autos.TWO_GAME_PIECE_WIRE_LOW);
 
         private final Block[] blocks;
 

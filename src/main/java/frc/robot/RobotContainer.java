@@ -92,6 +92,7 @@ public class RobotContainer {
 
         // Center Buttons
         driveController.start().onTrue(new InstantCommand(() -> swerve.setYaw(0.0)));
+        driveController.back().onTrue(new InstantCommand(() -> TeleopSwerve.toggleFieldRelative()));
 
         // POV buttons
         ForcibleTrigger.from(driveController.pov(0))

@@ -27,9 +27,8 @@ public class SwerveCommands {
 
     public static Command commandFlipGyro() {
         return RobotContainer.swerve.runOnce(
-            () -> RobotContainer.swerve.setYaw(
-                RobotContainer.swerve.getYawRot().rotateBy(Rotation2d.fromDegrees(180)).getDegrees()
-            )
-        ).withName("commandFlipGyro");
+                () -> RobotContainer.swerve.setYaw(
+                        RobotContainer.swerve.getYawRotScoped().rotateBy(Rotation2d.fromDegrees(180)).getDegrees()))
+                .withName("commandFlipGyro");
     }
 }

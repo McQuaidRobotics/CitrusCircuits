@@ -3,7 +3,6 @@ package frc.robot.subsystems.super_structure.pivot;
 import frc.robot.util.SimHelper.SimplePoseSim;
 
 import frc.robot.Constants.kSuperStructure.*;
-import frc.robot.subsystems.super_structure.Errors.*;
 
 public class PivotSim implements Pivot {
 
@@ -16,19 +15,12 @@ public class PivotSim implements Pivot {
 
     @Override
     public Boolean setPivotDegrees(Double degrees) {
-        if (degrees > kPivot.MAX_DEGREES) {
-            new SetpointTooHigh(kPivot.MAX_DEGREES, degrees).log();
-            return false;
-        } else if (degrees < kPivot.MIN_DEGREES) {
-            new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
-            return false;
-        }
         pivotDegrees.setTargetPosition(degrees);
         return Math.abs(pivotDegrees.getPose() - degrees) < 0.1;
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         pivotDegrees.setTargetVelocity(percentOut * maxVelo);
     }
 

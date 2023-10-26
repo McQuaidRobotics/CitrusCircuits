@@ -1,6 +1,5 @@
 package frc.robot.subsystems.super_structure.elevator;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -16,9 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import frc.robot.Constants.kSuperStructure.Specs;
 import frc.robot.Constants.kSuperStructure.kElevator;
-import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class ElevatorReal implements Elevator {
@@ -70,8 +67,6 @@ public class ElevatorReal implements Elevator {
         motorCfg.Slot0.kP = kElevator.MOTOR_kP;
         motorCfg.Slot0.kI = kElevator.MOTOR_kI;
         motorCfg.Slot0.kD = kElevator.MOTOR_kD;
-        // motorConfig.Slot0.kS = kElevator.MOTOR_kS;
-        // motorConfig.Slot0.kV = kElevator.MOTOR_kV;
 
         motorCfg.MotionMagic.MotionMagicCruiseVelocity = kElevator.MAX_VELOCITY;
         motorCfg.MotionMagic.MotionMagicAcceleration = kElevator.MAX_ACCELERATION;
@@ -81,8 +76,6 @@ public class ElevatorReal implements Elevator {
         motorCfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
         motorCfg.HardwareLimitSwitch.ReverseLimitEnable = true;
-        // motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
-        // motorCfg.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0.0;
 
         motorCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -94,13 +87,6 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Boolean setElevatorMeters(Double meters) {
-        if (meters < Specs.ELEVATOR_MIN_METERS) {
-            new SetpointTooLow(Specs.ELEVATOR_MIN_METERS, meters).log();
-            return false;
-        } else if (meters > Specs.ELEVATOR_MAX_METERS) {
-            new SetpointTooHigh(Specs.ELEVATOR_MAX_METERS, meters).log();
-            return false;
-        }
         this.isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
@@ -113,7 +99,7 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
         this.isStowed = false;
@@ -142,7 +128,7 @@ public class ElevatorReal implements Elevator {
         if (this.isStowed) {
             return true;
         }
-        this.manualDriveWrist(-0.2);
+        this.manualDriveMechanism(-0.2);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
             this.leaderMotor.setRotorPosition(0.0);
@@ -172,18 +158,17 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public void setupShuffleboard(ShuffleLayout tab) {
-        tab.addDouble("Elevator Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addDouble("Elevator Motor Rots", () -> motorRots.getValue());
         tab.addDouble("Elevator Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addDouble("Elevator Motor Amps", () -> motorAmps.refresh().getValue());
+        tab.addDouble("Elevator Motor Amps", () -> motorAmps.getValue());
         tab.addDouble("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
         tab.addBoolean("Elevator LimitSwitch", this::isLimitSwitchHit);
     }
 
     @Override
     public void periodic() {
-        cachedElevatorMeters = motorRotsToMechMeters(
-                BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
+        cachedElevatorMeters = motorRotsToMechMeters(motorRots.refresh().getValue());
 
-        ampWindowVal = ampWindow.calculate(motorAmps.getValue());
+        ampWindowVal = ampWindow.calculate(motorAmps.refresh().getValue());
     }
 }

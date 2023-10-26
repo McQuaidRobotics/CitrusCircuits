@@ -1,6 +1,5 @@
 package frc.robot.subsystems.super_structure.wrist;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -16,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kWrist;
 import frc.robot.Constants.kSuperStructure.kIntake;
-import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class WristReal implements Wrist {
@@ -83,7 +81,6 @@ public class WristReal implements Wrist {
 
         wristMotorCfg.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.2;
 
-
         return wristMotorCfg;
     }
 
@@ -104,13 +101,6 @@ public class WristReal implements Wrist {
 
     @Override
     public Boolean setWristDegrees(Double degrees) {
-        if (degrees > kWrist.MAX_DEGREES) {
-            new SetpointTooHigh(kWrist.MIN_DEGREES, degrees).log();
-            return false;
-        } else if (degrees < kWrist.MIN_DEGREES) {
-            new SetpointTooLow(kWrist.MIN_DEGREES, degrees).log();
-            return false;
-        }
         isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
@@ -118,7 +108,7 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         isStowed = false;
         var percentControlRequest = new DutyCycleOut(percentOut);
         this.wristMotor.setControl(percentControlRequest);
@@ -172,7 +162,7 @@ public class WristReal implements Wrist {
         if (getWristDegrees() < kWrist.HOME_DEGREES - 10.0) {
             setWristDegrees(kWrist.HOME_DEGREES);
         } else {
-            manualDriveWrist(0.2);
+            manualDriveMechanism(0.2);
         }
         if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
@@ -206,19 +196,18 @@ public class WristReal implements Wrist {
     public void setupShuffleboard(ShuffleLayout tab) {
         tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue());// refreshed in periodic
         tab.addDouble("Wrist Volts", () -> wristMotorVolts.refresh().getValue());
-        tab.addDouble("Wrist Rots", () -> wristMotorRots.refresh().getValue());
+        tab.addDouble("Wrist Rots", () -> wristMotorRots.getValue());
         tab.addDouble("Wrist Velo", () -> wristMotorVelo.refresh().getValue());
         tab.addBoolean("Wrist Homed", () -> isStowed);
 
         tab.addDouble("Intake Amps", () -> intakeMotorAmps.refresh().getValue());
-        tab.addDouble("Intake Volts", () -> intakeMotorVolts.refresh().getValue());
+        tab.addDouble("Intake Volts", () -> intakeMotorVolts.getValue());
 
     }
 
     @Override
     public void periodic() {
-        this.cachedWristDegrees = motorRotsToMechDegrees(
-                BaseStatusSignal.getLatencyCompensatedValue(wristMotorRots.refresh(), wristMotorVelo.refresh()));
+        this.cachedWristDegrees = motorRotsToMechDegrees(wristMotorRots.refresh().getValue());
         this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
 
         ampWindowVal = ampWindow.calculate(wristMotorAmps.refresh().getValue());

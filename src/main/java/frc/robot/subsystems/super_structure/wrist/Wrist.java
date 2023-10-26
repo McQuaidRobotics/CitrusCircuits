@@ -29,7 +29,7 @@ public interface Wrist extends Component {
     public Double getIntakeVoltage();
 
     /**
-     * @param enable true to enable current limits, false to disable
+     * @param amps true to enable current limits, false to disable
      */
-    public void setIntakeCurrentLimits(Double enable);
+    public void setIntakeCurrentLimits(Double amps);
 }

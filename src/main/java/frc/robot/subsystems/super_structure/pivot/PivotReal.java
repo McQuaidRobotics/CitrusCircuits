@@ -1,6 +1,5 @@
 package frc.robot.subsystems.super_structure.pivot;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -16,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kPivot;
-import frc.robot.subsystems.super_structure.Errors.*;
 import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public class PivotReal implements Pivot {
@@ -87,21 +85,6 @@ public class PivotReal implements Pivot {
 
     @Override
     public Boolean setPivotDegrees(Double degrees) {
-        if (degrees > kPivot.MAX_DEGREES) {
-            new SetpointTooHigh(kPivot.MAX_DEGREES, degrees).log();
-            return false;
-        } else if (degrees < kPivot.MIN_DEGREES) {
-            new SetpointTooLow(kPivot.MIN_DEGREES, degrees).log();
-            return false;
-        }
-
-        // if the last state was stow re seed motor by gyro
-        // if (isStowed) {
-        // this.leaderMotor.setRotorPosition(
-        // mechDegreesToMotorRots(gyro.getYaw().refresh().getValue())
-        // );
-        // }
-
         isStowed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
@@ -109,7 +92,7 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         isStowed = false;
         var percentControlRequest = new DutyCycleOut(percentOut);
         this.leaderMotor.setControl(percentControlRequest);
@@ -182,7 +165,7 @@ public class PivotReal implements Pivot {
 
     @Override
     public void setupShuffleboard(ShuffleLayout tab) {
-        tab.addDouble("Pivot Motor Rots", () -> motorRots.refresh().getValue());
+        tab.addDouble("Pivot Motor Rots", () -> motorRots.getValue());
         tab.addDouble("Pivot Motor Velo", () -> motorVelo.refresh().getValue());
         tab.addDouble("Pivot Motor Amps", () -> motorAmps.getValue()); // refreshed in periodic
         tab.addDouble("Pivot Motor Volts", () -> motorVolts.refresh().getValue());
@@ -195,8 +178,7 @@ public class PivotReal implements Pivot {
 
     @Override
     public void periodic() {
-        cachedPivotDegrees = motorRotsToMechDegrees(
-                BaseStatusSignal.getLatencyCompensatedValue(motorRots, motorVelo));
+        cachedPivotDegrees = motorRotsToMechDegrees(motorRots.refresh().getValue());
 
         ampWindowVal = ampWindow.calculate(motorAmps.refresh().getValue());
     }

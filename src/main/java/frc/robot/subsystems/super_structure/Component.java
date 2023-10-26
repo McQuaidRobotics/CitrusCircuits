@@ -1,8 +1,5 @@
 package frc.robot.subsystems.super_structure;
 
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import frc.robot.util.ShuffleboardApi.ShuffleLayout;
 
 public interface Component {
@@ -13,23 +10,13 @@ public interface Component {
     default public void setupShuffleboard(ShuffleLayout tab) {
     };
 
-    default void massSoftLimits(Boolean toggle, TalonFX... motors) {
-        for (var motor : motors) {
-            var cfg = new SoftwareLimitSwitchConfigs();
-            motor.getConfigurator().refresh(cfg);
-            cfg.ReverseSoftLimitEnable = toggle;
-            cfg.ForwardSoftLimitEnable = toggle;
-            motor.getConfigurator().apply(cfg);
-        }
-    }
-
     /**
      * To be used for debugging, not guranteed to have all
      * safety features
      * 
      * @param percentOut of the mechanisms motors
      */
-    public void manualDriveWrist(Double percentOut);
+    public void manualDriveMechanism(Double percentOut);
 
     /**
      * Stops the mechanism

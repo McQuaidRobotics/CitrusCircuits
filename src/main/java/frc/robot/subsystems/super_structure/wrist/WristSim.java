@@ -2,7 +2,6 @@ package frc.robot.subsystems.super_structure.wrist;
 
 import frc.robot.util.SimHelper.SimplePoseSim;
 import frc.robot.Constants.kSuperStructure.*;
-import frc.robot.subsystems.super_structure.Errors.*;
 
 public class WristSim implements Wrist {
 
@@ -16,19 +15,12 @@ public class WristSim implements Wrist {
 
     @Override
     public Boolean setWristDegrees(Double degrees) {
-        if (degrees > kWrist.MAX_DEGREES) {
-            new SetpointTooHigh(kWrist.MAX_DEGREES, degrees).log();
-            return false;
-        } else if (degrees < kWrist.MIN_DEGREES) {
-            new SetpointTooLow(kWrist.MIN_DEGREES, degrees).log();
-            return false;
-        }
         wristDegrees.setTargetPosition(degrees);
         return Math.abs(wristDegrees.getPose() - degrees) < 0.1;
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         wristDegrees.setTargetVelocity(maxVelo * percentOut);
     }
 

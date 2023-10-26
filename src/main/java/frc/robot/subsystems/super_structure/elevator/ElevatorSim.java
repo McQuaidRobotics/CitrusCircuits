@@ -25,7 +25,7 @@ public class ElevatorSim implements Elevator {
     }
 
     @Override
-    public void manualDriveWrist(Double percentOut) {
+    public void manualDriveMechanism(Double percentOut) {
         elevatorMeters.setTargetVelocity(percentOut * maxVelo);
     }
 

@@ -122,9 +122,9 @@ public class SuperStructure extends SubsystemBase {
      * @param elevatorPercent of the elevator mechanisms motors
      */
     public void manualControl(Double wristPercent, Double pivotPercent, Double elevatorPercent, Double intakePercent) {
-        this.wrist.manualDriveWrist(wristPercent);
-        this.pivot.manualDriveWrist(pivotPercent);
-        this.elevator.manualDriveWrist(elevatorPercent);
+        this.wrist.manualDriveMechanism(wristPercent);
+        this.pivot.manualDriveMechanism(pivotPercent);
+        this.elevator.manualDriveMechanism(elevatorPercent);
         this.wrist.runIntake(intakePercent);
     }
 

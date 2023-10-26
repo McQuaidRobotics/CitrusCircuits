@@ -159,7 +159,7 @@ public class RobotContainer {
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
-        }).withSize(2, null);
+        }).withSize(2, 1);
 
         driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
             .withPosition(3, 3)

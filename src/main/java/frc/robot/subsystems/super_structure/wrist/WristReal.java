@@ -15,7 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kWrist;
 import frc.robot.Constants.kSuperStructure.kIntake;
-import frc.robot.util.ShuffleboardApi.ShuffleLayout;
+import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
 public class WristReal implements Wrist {
 
@@ -27,7 +27,7 @@ public class WristReal implements Wrist {
     private final LinearFilter ampWindow = LinearFilter.movingAverage(25);
     private Double ampWindowVal = 0.0;
 
-    private Boolean isStowed = false;
+    private Boolean isHomed = false;
     private Double cachedWristDegrees, cachedIntakeVolts = 0.0, intakeCurrentLimit;
 
     public WristReal(Double startingDegrees) {
@@ -101,7 +101,7 @@ public class WristReal implements Wrist {
 
     @Override
     public Boolean setWristDegrees(Double degrees) {
-        isStowed = false;
+        isHomed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.wristMotor.setControl(posControlRequest);
         return Math.abs(degrees - getWristDegrees()) < kWrist.TOLERANCE;
@@ -109,7 +109,7 @@ public class WristReal implements Wrist {
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
-        isStowed = false;
+        isHomed = false;
         var percentControlRequest = new DutyCycleOut(percentOut);
         this.wristMotor.setControl(percentControlRequest);
     }
@@ -153,9 +153,9 @@ public class WristReal implements Wrist {
     @Override
     public Boolean homeMechanism(boolean force) {
         if (force) {
-            isStowed = false;
+            isHomed = false;
         }
-        if (isStowed) {
+        if (isHomed) {
             return true;
         }
 
@@ -167,10 +167,10 @@ public class WristReal implements Wrist {
         if (wristMotorAmps.getValue() > kWrist.CURRENT_PEAK_FOR_ZERO) {
             this.stopMechanism();
             this.wristMotor.setRotorPosition(mechDegreesToMotorRots(kWrist.HOME_DEGREES + kWrist.HARD_OFFSET));
-            isStowed = true;
+            isHomed = true;
         }
 
-        return isStowed;
+        return isHomed;
     }
 
     @Override
@@ -193,23 +193,26 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleLayout tab) {
-        tab.addDouble("Wrist Amps", () -> wristMotorAmps.getValue());// refreshed in periodic
-        tab.addDouble("Wrist Volts", () -> wristMotorVolts.refresh().getValue());
-        tab.addDouble("Wrist Rots", () -> wristMotorRots.getValue());
-        tab.addDouble("Wrist Velo", () -> wristMotorVelo.refresh().getValue());
-        tab.addBoolean("Wrist Homed", () -> isStowed);
+    public void setupShuffleboard(ShuffleEntryContainer tab) {
+        tab.addDouble("Wrist Amps", wristMotorAmps::getValue);
+        tab.addDouble("Wrist Volts", wristMotorVolts::getValue);
+        tab.addDouble("Wrist Rots", wristMotorRots::getValue);
+        tab.addDouble("Wrist Velo", wristMotorVelo::getValue);
+        tab.addBoolean("Wrist Homed", () -> isHomed);
 
-        tab.addDouble("Intake Amps", () -> intakeMotorAmps.refresh().getValue());
-        tab.addDouble("Intake Volts", () -> intakeMotorVolts.getValue());
+        tab.addDouble("Intake Amps", intakeMotorAmps::getValue);
+        tab.addDouble("Intake Volts", intakeMotorVolts::getValue);
 
     }
 
     @Override
     public void periodic() {
-        this.cachedWristDegrees = motorRotsToMechDegrees(wristMotorRots.refresh().getValue());
-        this.cachedIntakeVolts = intakeMotorVolts.refresh().getValue();
+        wristMotorAmps.refresh(); wristMotorVolts.refresh();
+        wristMotorRots.refresh(); wristMotorVelo.refresh();
+        intakeMotorAmps.refresh(); intakeMotorVolts.refresh();
 
-        ampWindowVal = ampWindow.calculate(wristMotorAmps.refresh().getValue());
+        this.cachedWristDegrees = motorRotsToMechDegrees(wristMotorRots.getValue());
+        this.cachedIntakeVolts = intakeMotorVolts.getValue();
+        ampWindowVal = ampWindow.calculate(wristMotorAmps.getValue());
     }
 }

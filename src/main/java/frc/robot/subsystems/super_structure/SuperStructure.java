@@ -24,6 +24,8 @@ public class SuperStructure extends SubsystemBase {
 
     private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.HOME);
 
+    private Boolean isHomed = false;
+
     public SuperStructure() {
         if (Robot.isReal()) {
             this.wrist = new WristReal(setpoint.wristDegrees);
@@ -39,10 +41,18 @@ public class SuperStructure extends SubsystemBase {
         visualizer.updateCurrent(setpoint);
     }
 
+    public static enum SuperStructureMoveOrder {
+        SELF_RESOLVE,
+        PIVOT_FIRST,
+        PIVOT_LAST,
+        ALL_AT_ONCE
+    }
+
     /** @returns true of the setpoint has been reached */
-    public Boolean setSetpoint(SuperStructurePosition to) {
+    public Boolean setSetpoint(SuperStructurePosition to, SuperStructureMoveOrder order) {
         this.visualizer.updateSetpoint(to);
         this.setpoint = to;
+        this.isHomed = false;
 
         // only pivot or wrist+elevator should run at a time
         BooleanSupplier runWristElevatorParallel = () -> {
@@ -54,37 +64,71 @@ public class SuperStructure extends SubsystemBase {
             return this.pivot.setPivotDegrees(to.pivotDegrees);
         };
 
-        // We need to make sure the pivot and elevator do not move at the same time.
-        // We need to also try and run the pivot when the elevator is in the least
-        // extended between the two states(pose and current).
+        if (order == SuperStructureMoveOrder.SELF_RESOLVE) {
+            // We need to make sure the pivot and elevator do not move at the same time.
+            // We need to also try and run the pivot when the elevator is in the least
+            // extended between the two states(pose and current).
 
-        // i.e. if the elevator is currently not extended but the pose wants it all the
-        // way out,
-        // we will move the pivot first to reduce stress, but if the current elevator
-        // extension
-        // is greater than set pose we move elevator first
+            // i.e. if the elevator is currently not extended but the pose wants it all the
+            // way out,
+            // we will move the pivot first to reduce stress, but if the current elevator
+            // extension
+            // is greater than set pose we move elevator first
 
-        if (this.elevator.getElevatorMeters() > to.elevatorMeters) {
-            // check if wrist and elevator have reached their setpoints
-            // if they have, run pivot
-            if (runWristElevatorParallel.getAsBoolean()) {
-                return runPivot.getAsBoolean();
+            if (this.elevator.getElevatorMeters() > to.elevatorMeters) {
+                // check if wrist and elevator have reached their setpoints
+                // if they have, run pivot
+                if (runWristElevatorParallel.getAsBoolean()) {
+                    return runPivot.getAsBoolean();
+                }
+            } else {
+                if (runPivot.getAsBoolean()) {
+                    return runWristElevatorParallel.getAsBoolean();
+                }
             }
-        } else {
-            if (runPivot.getAsBoolean()) {
-                return runWristElevatorParallel.getAsBoolean();
-            }
+            return false;
+        } else if (order == SuperStructureMoveOrder.PIVOT_FIRST) {
+            return runPivot.getAsBoolean() && runWristElevatorParallel.getAsBoolean();
+        } else if (order == SuperStructureMoveOrder.PIVOT_LAST) {
+            return runWristElevatorParallel.getAsBoolean() && runPivot.getAsBoolean();
+        } else if (order == SuperStructureMoveOrder.ALL_AT_ONCE) {
+            var eagerEvalPivot = runPivot.getAsBoolean();
+            var eagerEvalWristElevator = runWristElevatorParallel.getAsBoolean();
+            return eagerEvalWristElevator && eagerEvalPivot;
         }
         return false;
     }
 
+    /** @returns true of the setpoint has been reached */
+    public Boolean setSetpoint(SuperStructurePosition to) {
+        return setSetpoint(to, SuperStructureMoveOrder.SELF_RESOLVE);
+    }
+
+    /**
+     * Will move the mechanism to the home position,
+     * they will follow the order of wrist -> elevator -> pivot
+     * @param force if true, will ignore if the mechanism is already at the home position
+     * @return true if all mechanisms have reached their home position
+     */
     public Boolean home(boolean force) {
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot
-        return this.wrist.homeMechanism(force)
+        if (this.wrist.homeMechanism(force)
                 && this.elevator.homeMechanism(force)
-                && this.pivot.homeMechanism(force);
+                && this.pivot.homeMechanism(force)) {
+            this.isHomed = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return true if the last {@link SuperStructure#home(boolean)} returned true and
+     * a {@link SuperStructure#setSetpoint} hasn't been called since.
+     */
+    public Boolean isHomed() {
+        return this.isHomed;
     }
 
     public void runEndEffector(Double volts, Double currentLimit) {

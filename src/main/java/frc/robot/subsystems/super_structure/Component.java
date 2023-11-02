@@ -1,13 +1,13 @@
 package frc.robot.subsystems.super_structure;
 
-import frc.robot.util.ShuffleboardApi.ShuffleLayout;
+import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
 public interface Component {
 
     default public void periodic() {
     };
 
-    default public void setupShuffleboard(ShuffleLayout tab) {
+    default public void setupShuffleboard(ShuffleEntryContainer tab) {
     };
 
     /**
@@ -24,10 +24,9 @@ public interface Component {
     public void stopMechanism();
 
     /**
-     * Moves the mechanis towards the stow position,
-     * if {@code toZero} is true the motor encoders will also be reseeded
-     * 
-     * @return true if the mcahnism has reached home
+     * Moves the mechanism towards the home position,
+     * @param force if true, will ignore if the mechanism is already at the home position
+     * @return true if the mechanism has reached home
      */
     public Boolean homeMechanism(boolean force);
 

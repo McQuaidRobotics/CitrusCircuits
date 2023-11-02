@@ -9,14 +9,13 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kElevator;
-import frc.robot.util.ShuffleboardApi.ShuffleLayout;
+import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
 public class ElevatorReal implements Elevator {
     /** Right */
@@ -28,7 +27,7 @@ public class ElevatorReal implements Elevator {
     private final LinearFilter ampWindow = LinearFilter.movingAverage(25);
     private Double ampWindowVal = 0.0;
 
-    private Boolean isStowed = false;
+    private Boolean isHomed = false;
     private Double cachedElevatorMeters;
 
     private Double mechMetersToMotorRots(Double meters) {
@@ -87,7 +86,7 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public Boolean setElevatorMeters(Double meters) {
-        this.isStowed = false;
+        this.isHomed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
         return Math.abs(meters - getElevatorMeters()) < kElevator.TOLERANCE;
@@ -102,37 +101,32 @@ public class ElevatorReal implements Elevator {
     public void manualDriveMechanism(Double percentOut) {
         var percentControlRequest = new DutyCycleOut(percentOut, true, false);
         this.leaderMotor.setControl(percentControlRequest);
-        this.isStowed = false;
+        this.isHomed = false;
     }
 
     @Override
     public void stopMechanism() {
         this.leaderMotor.setVoltage(0.0);
-        ;
     }
 
     @Override
     public Boolean isLimitSwitchHit() {
-        if (leaderMotor.getForwardLimit().getValue() == ForwardLimitValue.ClosedToGround
-                || leaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
-            return true;
-        }
-        return false;
+        return leaderMotor.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
     }
 
     @Override
     public Boolean homeMechanism(boolean force) {
         if (force) {
-            isStowed = false;
+            isHomed = false;
         }
-        if (this.isStowed) {
+        if (this.isHomed) {
             return true;
         }
         this.manualDriveMechanism(-0.2);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
             this.leaderMotor.setRotorPosition(0.0);
-            this.isStowed = true;
+            this.isHomed = true;
         }
         return this.isLimitSwitchHit();
     }
@@ -157,18 +151,20 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public void setupShuffleboard(ShuffleLayout tab) {
-        tab.addDouble("Elevator Motor Rots", () -> motorRots.getValue());
-        tab.addDouble("Elevator Motor Velo", () -> motorVelo.refresh().getValue());
-        tab.addDouble("Elevator Motor Amps", () -> motorAmps.getValue());
-        tab.addDouble("Elevator Motor Volts", () -> motorVolts.refresh().getValue());
+    public void setupShuffleboard(ShuffleEntryContainer tab) {
+        tab.addDouble("Elevator Motor Rots", motorRots::getValue);
+        tab.addDouble("Elevator Motor Velo", motorVelo::getValue);
+        tab.addDouble("Elevator Motor Amps", motorAmps::getValue);
+        tab.addDouble("Elevator Motor Volts", motorVolts::getValue);
         tab.addBoolean("Elevator LimitSwitch", this::isLimitSwitchHit);
     }
 
     @Override
     public void periodic() {
-        cachedElevatorMeters = motorRotsToMechMeters(motorRots.refresh().getValue());
+        motorRots.refresh(); motorVelo.refresh();
+        motorAmps.refresh(); motorVolts.refresh();
 
-        ampWindowVal = ampWindow.calculate(motorAmps.refresh().getValue());
+        cachedElevatorMeters = motorRotsToMechMeters(motorRots.getValue());
+        ampWindowVal = ampWindow.calculate(motorAmps.getValue());
     }
 }

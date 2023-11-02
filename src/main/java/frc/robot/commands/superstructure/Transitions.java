@@ -39,9 +39,10 @@ public class Transitions {
             () -> data.superStructure.home(true),
             () -> data.superStructure.home(false),
             (bool) -> OperatorPrefs.NEED_HOME = false,
-            () -> false,
+            () -> data.superStructure.isHomed(),
             data.superStructure
-        );
+        //then run a normal stow to hold the mechanism in place
+        ).andThen(stowTransition(data));
     }
 
     public static Command stowTransition(TransitionData data) {
@@ -50,13 +51,9 @@ public class Transitions {
 
             @Override
             public void execute() {
-                var b = data.superStructure.setSetpoint(
-                        SuperStructurePosition.fromState(data.to));
-
-                if (b) {
+                if (data.superStructure.setSetpoint(SuperStructurePosition.fromState(data.to))) {
                     cycles++;
                 }
-
                 if (cycles > 50) {
                     var ampInfo = data.superStructure.getComponentAmps();
                     for (var compAmp : ampInfo) {

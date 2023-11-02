@@ -143,18 +143,17 @@ public class RobotContainer {
                 .withPosition(6, 3)
                 .withProperties(Map.of("colorWhenTrue", "Orange", "colorWhenFalse", "Black"));
 
-
         driverTab.addBoolean("GROUND", () -> PickupMode.getCurrentMode() == PickupMode.GROUND)
-            .withSize(2, 1)
-            .withPosition(3, 0);
+                .withSize(2, 1)
+                .withPosition(3, 0);
         driverTab.addBoolean("STATION", () -> PickupMode.getCurrentMode() == PickupMode.STATION)
-            .withSize(2, 1)
-            .withPosition(3, 1);
+                .withSize(2, 1)
+                .withPosition(3, 1);
 
         driverTab.addBoolean("Desired Gamepiece", () -> GamepieceMode.getDesiredPiece() == GamepieceMode.CUBE)
-            .withSize(2, 2)
-            .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
-            .withPosition(8, 0);
+                .withSize(2, 2)
+                .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
+                .withPosition(8, 0);
 
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();
@@ -162,8 +161,8 @@ public class RobotContainer {
         }).withSize(2, 1);
 
         driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
-            .withPosition(3, 3)
-            .withSize(2, 1)
-            .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
+                .withPosition(3, 3)
+                .withSize(2, 1)
+                .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
     }
 }

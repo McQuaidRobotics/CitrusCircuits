@@ -68,7 +68,6 @@ public class ShuffleboardApi {
         }
 
         public static sbPath fromPath(String path) {
-            //remove "/" from begining and end
             while (path.startsWith("/")) path = path.substring(1);
             while (path.endsWith("/")) path = path.substring(0, path.length() - 1);
             if (!path.startsWith("Shuffleboard")) path = "Shuffleboard/" + path;
@@ -84,7 +83,37 @@ public class ShuffleboardApi {
         }
     }
 
-    public static class ShuffleTable {
+    public static interface ShuffleEntryContainer {
+
+        public ShuffleEntry addEntryOnce(String name, Object value);
+        public ShuffleEntry addEntry(String name, Supplier<?> valueSupplier);
+
+        default public ShuffleEntry addBoolean(String name, Supplier<Boolean> valueSupplier) {
+            return this.addEntry(name, valueSupplier);
+        }
+
+        default public ShuffleEntry addDouble(String name, Supplier<Double> valueSupplier) {
+            return this.addEntry(name, valueSupplier);
+        }
+
+        default public ShuffleEntry addString(String name, Supplier<String> valueSupplier) {
+            return this.addEntry(name, valueSupplier);
+        }
+
+        default public ShuffleEntry addBooleanArray(String name, Supplier<Boolean[]> value) {
+            return this.addEntry(name, value);
+        }
+
+        default public ShuffleEntry addDoubleArray(String name, Supplier<Double[]> value) {
+            return this.addEntry(name, value);
+        }
+
+        default public ShuffleEntry addStringArray(String name, Supplier<String[]> value) {
+            return this.addEntry(name, value);
+        }
+    }
+
+    public static class ShuffleTable implements ShuffleEntryContainer {
         private final NetworkTable table;
         private final NetworkTable metaTable;
         private final Map<String, ShuffleEntry> entries = new HashMap<>();
@@ -103,6 +132,10 @@ public class ShuffleboardApi {
             return entries.get(name);
         }
 
+        public String getName() {
+            return path.get(path.len() - 1);
+        }
+
         public ShuffleLayout getLayout(String name) {
             if (layouts.keySet().contains(name)) {
                 return layouts.get(name);
@@ -111,10 +144,6 @@ public class ShuffleboardApi {
                 layouts.put(name, out);
                 return out;
             }
-        }
-
-        public String getName() {
-            return path.get(path.len() - 1);
         }
 
         public void addSendable(String name, Sendable sendable) {
@@ -146,33 +175,29 @@ public class ShuffleboardApi {
             entries.put(name, out);
             return out;
         }
+    }
 
-        public ShuffleEntry addBooleanOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
+    public static interface ShuffleMetadataCarrier {
+        public ShuffleMetadataCarrier applyMetadata(Map<MetadataFields, Object> metadata);
+
+        default public ShuffleMetadataCarrier withProperties(Map<String, Object> properties) {
+            return this.applyMetadata(Map.of(MetadataFields.Properties, properties));
         }
 
-        public ShuffleEntry addBoolean(String name, Supplier<Boolean> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
+        default public ShuffleMetadataCarrier withSize(Integer width, Integer height) {
+            return this.applyMetadata(Map.of(MetadataFields.Size, new double[] {
+                width, height
+            }));
         }
 
-        public ShuffleEntry addDoubleOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
-        }
-
-        public ShuffleEntry addDouble(String name, Supplier<Double> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
-        }
-
-        public ShuffleEntry addStringOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
-        }
-
-        public ShuffleEntry addString(String name, Supplier<String> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
+        default public ShuffleMetadataCarrier withPosition(int columnIndex, int rowIndex) {
+            return this.applyMetadata(Map.of(MetadataFields.Position, new double[] {
+                columnIndex, rowIndex
+            }));
         }
     }
 
-    public static class ShuffleLayout {
+    public static class ShuffleLayout implements ShuffleEntryContainer, ShuffleMetadataCarrier {
         private final NetworkTable table;
         private final NetworkTable metaTable;
         private final Map<String, ShuffleEntry> entries = new HashMap<>();
@@ -216,31 +241,7 @@ public class ShuffleboardApi {
             return out;
         }
 
-        public ShuffleEntry addBooleanOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
-        }
-
-        public ShuffleEntry addBoolean(String name, Supplier<Boolean> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
-        }
-
-        public ShuffleEntry addDoubleOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
-        }
-
-        public ShuffleEntry addDouble(String name, Supplier<Double> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
-        }
-
-        public ShuffleEntry addStringOnce(String name, Boolean value) {
-            return this.addEntryOnce(name, value);
-        }
-
-        public ShuffleEntry addString(String name, Supplier<String> valueSupplier) {
-            return this.addEntry(name, valueSupplier);
-        }
-
-        public ShuffleLayout applyMetadata(Map<MetadataFields, Object> metadata) {
+        public ShuffleMetadataCarrier applyMetadata(Map<MetadataFields, Object> metadata) {
             for (var field : metadata.keySet()) {
                 switch (field) {
                     case Size:
@@ -262,27 +263,9 @@ public class ShuffleboardApi {
             }
             return this;
         }
-
-        public ShuffleLayout withSize(Integer width, Integer height) {
-            metaTable.getEntry("Size").setDoubleArray(new double[] {
-                width, height
-            });
-            return this;
-        }
-
-        public ShuffleLayout withPosition(int columnIndex, int rowIndex) {
-            metaTable.getEntry("Position").setDoubleArray(new double[] {
-                columnIndex, rowIndex
-            });
-            return this;
-        }
-
-        public ShuffleLayout withProperties(Map<String, Object> properties) {
-            return this.applyMetadata(Map.of(MetadataFields.Properties, properties));
-        }
     }
 
-    public static class ShuffleEntry {
+    public static class ShuffleEntry implements ShuffleMetadataCarrier {
         private final NetworkTableEntry entry;
         private final NetworkTable metaTable;
         private final sbPath path;
@@ -303,7 +286,7 @@ public class ShuffleboardApi {
             return entry;
         }
 
-        public ShuffleEntry applyMetadata(Map<MetadataFields, Object> metadata) {
+        public ShuffleMetadataCarrier applyMetadata(Map<MetadataFields, Object> metadata) {
             for (var field : metadata.keySet()) {
                 switch (field) {
                     case Size:
@@ -324,24 +307,6 @@ public class ShuffleboardApi {
                 }
             }
             return this;
-        }
-
-        public ShuffleEntry withSize(Integer width, Integer height) {
-            metaTable.getEntry("Size").setDoubleArray(new double[] {
-                width, height
-            });
-            return this;
-        }
-
-        public ShuffleEntry withPosition(int columnIndex, int rowIndex) {
-            metaTable.getEntry("Position").setDoubleArray(new double[] {
-                columnIndex, rowIndex
-            });
-            return this;
-        }
-
-        public ShuffleEntry withProperties(Map<String, Object> properties) {
-            return this.applyMetadata(Map.of(MetadataFields.Properties, properties));
         }
     }
 

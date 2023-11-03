@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -33,6 +34,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
         ShuffleboardApi.getTab("Autos")
             .addSendable("Autonomous Routine", autoRoutineChooser);
+
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
+        DataLogManager.logNetworkTables(true);
     }
 
     @Override

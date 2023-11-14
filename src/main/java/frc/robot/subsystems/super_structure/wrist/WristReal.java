@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kWrist;
+import frc.robot.Constants.kSuperStructure;
 import frc.robot.Constants.kSuperStructure.kIntake;
 import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
@@ -31,7 +32,7 @@ public class WristReal implements Wrist {
     private Double cachedWristDegrees, cachedIntakeVolts = 0.0, intakeCurrentLimit;
 
     public WristReal(Double startingDegrees) {
-        wristMotor = new TalonFX(kWrist.MOTOR_ID);
+        wristMotor = new TalonFX(kWrist.MOTOR_ID, kSuperStructure.CANBUS);
         wristMotor.getConfigurator().apply(getWristMotorConfig());
 
         wristMotorRots = wristMotor.getRotorPosition();
@@ -42,7 +43,7 @@ public class WristReal implements Wrist {
         wristMotor.setRotorPosition(mechDegreesToMotorRots(startingDegrees));
         cachedWristDegrees = startingDegrees;
 
-        intakeMotor = new TalonFX(kIntake.MOTOR_ID);
+        intakeMotor = new TalonFX(kIntake.MOTOR_ID, kSuperStructure.CANBUS);
         intakeMotor.getConfigurator().apply(getIntakeMotorConfig());
 
         intakeMotorAmps = intakeMotor.getStatorCurrent();

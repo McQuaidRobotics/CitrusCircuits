@@ -14,7 +14,8 @@ public enum States {
     PLACE_LOW_FRONT(13.0, 15.0, kElevator.HOME_METERS, IntakeRequest.SPIT, IntakeBehavior.RUN_ON_TRANSITION, true, 1.3),
     PICKUP_GROUND(kPivot.HOME_DEGREES, 13.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_WHOLE_TIME, false, 1.3),
     PICKUP_STATION(63.1, -63.0, 1.08, IntakeRequest.INTAKING, IntakeBehavior.RUN_ON_REACH, false),
-    PICKUP_CHUTE(48.0, -10.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_WHOLE_TIME, false);
+    PICKUP_CHUTE(48.0, -10.0, kElevator.HOME_METERS, IntakeRequest.INTAKING, IntakeBehavior.RUN_WHOLE_TIME, false),
+    TREBUCHET(85.0, 110.0, kElevator.HOME_METERS, IntakeRequest.OUTTAKING, IntakeBehavior.RUN_ON_REACH, true, 2.0);
 
     public final Double pivotDegrees;
     public final Double wristDegrees;

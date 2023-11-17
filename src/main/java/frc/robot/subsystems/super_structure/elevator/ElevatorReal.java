@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import frc.robot.Constants.kSuperStructure;
 import frc.robot.Constants.kSuperStructure.kElevator;
 import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
@@ -44,11 +45,11 @@ public class ElevatorReal implements Elevator {
 
     public ElevatorReal(Double startingMeters) {
         // Right
-        leaderMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID);
+        leaderMotor = new TalonFX(kElevator.ELEVATOR_RIGHT_MOTOR_ID, kSuperStructure.CANBUS);
         leaderMotor.getConfigurator().apply(getMotorConfiguration());
 
         // Left
-        followerMotor = new TalonFX(kElevator.ELEVATOR_LEFT_MOTOR_ID);
+        followerMotor = new TalonFX(kElevator.ELEVATOR_LEFT_MOTOR_ID, kSuperStructure.CANBUS);
         followerMotor.getConfigurator().apply(getMotorConfiguration());
         followerMotor.setControl(new Follower(kElevator.ELEVATOR_RIGHT_MOTOR_ID, true));
 

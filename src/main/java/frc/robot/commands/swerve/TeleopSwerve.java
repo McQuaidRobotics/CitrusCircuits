@@ -1,6 +1,7 @@
 package frc.robot.commands.swerve;
 
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.swerve.Swerve;
 
 import java.util.function.DoubleSupplier;
@@ -34,9 +35,15 @@ public class TeleopSwerve extends CommandBase {
         double strafeVal;
         double rotationVal;
 
-        translationVal = MathUtil.applyDeadband(-translationXSup.getAsDouble(), ControllerConsts.LEFT_DEADBAND) * kSwerve.SWERVE_NERF_TRANSLATION;
-        strafeVal = MathUtil.applyDeadband(-translationYSup.getAsDouble(), ControllerConsts.LEFT_DEADBAND) * kSwerve.SWERVE_NERF_TRANSLATION;
-        rotationVal = MathUtil.applyDeadband(rotationAxisSup.getAsDouble(), ControllerConsts.RIGHT_DEADBAND) * kSwerve.SWERVE_NERF_ROTATION;
+        translationVal = MathUtil.applyDeadband(
+            -translationXSup.getAsDouble(), 
+            ControllerConsts.LEFT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_TRANSLATION));
+        strafeVal = MathUtil.applyDeadband(
+            -translationYSup.getAsDouble(), 
+            ControllerConsts.LEFT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_TRANSLATION));
+        rotationVal = MathUtil.applyDeadband(
+            rotationAxisSup.getAsDouble(), 
+            ControllerConsts.RIGHT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_ROTATION));
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal)

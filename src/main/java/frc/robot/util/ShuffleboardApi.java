@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /** Lighter weight interface for shuffleboard widgets */
@@ -412,6 +413,14 @@ public class ShuffleboardApi {
             return this.applyMetadata(Map.of(MetadataFields.Position, new double[] {
                     columnIndex, rowIndex
             }));
+        }
+
+        default public ShuffleMetadataCarrier withWidget(String widget) {
+            return this.applyMetadata(Map.of(MetadataFields.Widget, widget));
+        }
+
+        default public ShuffleMetadataCarrier withWidget(WidgetType widget) {
+            return this.applyMetadata(Map.of(MetadataFields.Widget, widget.getWidgetName()));
         }
     }
 

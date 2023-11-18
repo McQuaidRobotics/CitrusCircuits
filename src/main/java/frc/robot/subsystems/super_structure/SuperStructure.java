@@ -2,6 +2,7 @@ package frc.robot.subsystems.super_structure;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -50,6 +51,13 @@ public class SuperStructure extends SubsystemBase {
 
     /** @returns true of the setpoint has been reached */
     public Boolean setSetpoint(SuperStructurePosition to, SuperStructureMoveOrder order) {
+        if (!NetworkTableInstance.getDefault()
+                .getEntry("/Shuffleboard/Driver/Enable Superstructure")
+                .getBoolean(false)
+        ) {
+            return false;
+        }
+
         this.visualizer.updateSetpoint(to);
         this.setpoint = to;
         this.isHomed = false;

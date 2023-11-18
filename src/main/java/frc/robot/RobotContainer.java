@@ -1,12 +1,11 @@
 package frc.robot;
 
-import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.superstructure.StateManager.CmdTransitionState;
+import frc.robot.Constants.kSwerve;
 import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.swerve.TeleopSwerve;
-import frc.robot.commands.swerve.TeleopSwerve2;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -16,7 +15,12 @@ import frc.robot.util.ShuffleboardApi;
 
 import java.util.Map;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -26,11 +30,11 @@ public class RobotContainer {
     public static final Swerve swerve = new Swerve();
     public static final SuperStructure superStructure = new SuperStructure();
 
+    public static NetworkTableEntry swerveTranslationValEntry, swerveRotationValEntry;
+
     public static void RobotContainerInit() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
-        // configureDriverBindings();
-        // configureOperatorBindings();
         configureSoloBindings();
 
         configureDriverTabShuffleboard();
@@ -103,6 +107,25 @@ public class RobotContainer {
                 .withSize(2, 2)
                 .withProperties(Map.of("colorWhenTrue", "Purple", "colorWhenFalse", "Yellow"))
                 .withPosition(8, 0);
+
+        driverTab.addEntryOnce("Enable Superstructure", true)
+                .withWidget(BuiltInWidgets.kToggleSwitch)
+                .withSize(2, 1)
+                .withPosition(0, 1);
+
+        driverTab.addEntryOnce("Swerve Translation Multiplier", kSwerve.SWERVE_DEFAULT_TRANSLATION)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 1))
+                .withSize(2, 1)
+                .withPosition(0, 2);
+        swerveTranslationValEntry = NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Enable Superstructure");
+
+        driverTab.addEntryOnce("Swerve Rotation Multiplier", kSwerve.SWERVE_DEFAULT_ROTATION)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 1))
+                .withSize(2, 1)
+                .withPosition(0, 3);
+        swerveRotationValEntry = NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Swerve Rotation Multiplier");
 
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();

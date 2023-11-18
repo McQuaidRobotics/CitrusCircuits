@@ -49,6 +49,8 @@ public class RobotContainer {
         soloController.b().onTrue(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_MID));
         soloController.a().onTrue(new CmdTransitionState(RobotContainer.superStructure, States.PLACE_LOW_FRONT));
 
+        soloController.start().onTrue(new InstantCommand(() -> swerve.setYaw(0.0)));
+
         soloController.rightTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STANDBY));
         soloController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 

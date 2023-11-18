@@ -192,6 +192,9 @@ public final class Constants {
     }
 
     public static class kSwerve {
+        public static final double SWERVE_NERF_TRANSLATION = 0.70;
+        public static final double SWERVE_NERF_ROTATION = 0.50;
+
         public static final int PIGEON_ID = 33;
         public static final boolean INVERT_GYRO = false;
         public static final String CANBUS = "DriveBus";

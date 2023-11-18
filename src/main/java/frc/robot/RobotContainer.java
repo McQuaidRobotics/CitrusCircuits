@@ -53,11 +53,17 @@ public class RobotContainer {
         soloController.leftTrigger().onTrue(new StateManager.CmdTransitionState(superStructure, States.STOW));
 
         soloController.rightBumper().onTrue(
-            new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CONE))
+            new InstantCommand(() -> {
+                GamepieceMode.setDesiredPiece(GamepieceMode.CONE);
+                GamepieceMode.setHeldPiece(GamepieceMode.CONE);
+            })
                 .andThen(new CmdTransitionState(superStructure, States.PICKUP_GROUND))
         );
         soloController.leftBumper().onTrue(
-            new InstantCommand(() -> GamepieceMode.setDesiredPiece(GamepieceMode.CUBE))
+            new InstantCommand(() -> {
+                GamepieceMode.setDesiredPiece(GamepieceMode.CUBE);
+                GamepieceMode.setHeldPiece(GamepieceMode.CUBE);
+            })
                 .andThen(new CmdTransitionState(superStructure, States.PICKUP_GROUND))
         );
 

@@ -6,8 +6,11 @@ import frc.robot.subsystems.swerve.Swerve;
 
 import java.util.function.DoubleSupplier;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.*;
 
@@ -34,16 +37,22 @@ public class TeleopSwerve extends CommandBase {
         double translationVal;
         double strafeVal;
         double rotationVal;
+        double swerveTranslationMultiplier = 
+            NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Swerve Translation Multiplier")
+            .getDouble(kSwerve.SWERVE_DEFAULT_TRANSLATION);
+        double swerveRotationMultiplier = 
+            NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Swerve Rotation Multiplier")
+            .getDouble(kSwerve.SWERVE_DEFAULT_ROTATION);
 
         translationVal = MathUtil.applyDeadband(
             -translationXSup.getAsDouble(), 
-            ControllerConsts.LEFT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_TRANSLATION));
+            ControllerConsts.LEFT_DEADBAND * swerveTranslationMultiplier);
         strafeVal = MathUtil.applyDeadband(
             -translationYSup.getAsDouble(), 
-            ControllerConsts.LEFT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_TRANSLATION));
+            ControllerConsts.LEFT_DEADBAND * swerveTranslationMultiplier);
         rotationVal = MathUtil.applyDeadband(
             rotationAxisSup.getAsDouble(), 
-            ControllerConsts.RIGHT_DEADBAND * RobotContainer.swerveTranslationValEntry.getDouble(kSwerve.SWERVE_DEFAULT_ROTATION));
+            ControllerConsts.RIGHT_DEADBAND * swerveRotationMultiplier);
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal)

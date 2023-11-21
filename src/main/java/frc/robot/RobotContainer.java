@@ -16,13 +16,12 @@ import frc.robot.util.ShuffleboardApi;
 import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
     private static final CommandXboxController soloController = new CommandXboxController(0);
@@ -46,6 +45,11 @@ public class RobotContainer {
                         soloController::getLeftX,
                         soloController::getRightX));
 
+        new Trigger(() -> superStructure.checkSuperstructureEnabled()).onTrue(
+                new InstantCommand(() -> {}, superStructure)
+        ).or(() -> superStructure.checkSuperstructureEnabled()).onFalse(
+                new InstantCommand(() -> superStructure.stopAll(), superStructure)
+        );
     }
 
     private static void configureSoloBindings() {
@@ -118,14 +122,12 @@ public class RobotContainer {
                 .withProperties(Map.of("min", 0, "max", 1))
                 .withSize(2, 1)
                 .withPosition(0, 2);
-        swerveTranslationValEntry = NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Enable Superstructure");
 
         driverTab.addEntryOnce("Swerve Rotation Multiplier", kSwerve.SWERVE_DEFAULT_ROTATION)
                 .withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", 0, "max", 1))
                 .withSize(2, 1)
                 .withPosition(0, 3);
-        swerveRotationValEntry = NetworkTableInstance.getDefault().getEntry("/Shuffleboard/Driver/Swerve Rotation Multiplier");
 
         driverTab.addString("Held Gamepiece", () -> {
             var held = GamepieceMode.getHeldPiece();

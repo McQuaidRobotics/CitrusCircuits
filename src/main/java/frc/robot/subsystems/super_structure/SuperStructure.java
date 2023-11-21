@@ -51,12 +51,7 @@ public class SuperStructure extends SubsystemBase {
 
     /** @returns true of the setpoint has been reached */
     public Boolean setSetpoint(SuperStructurePosition to, SuperStructureMoveOrder order) {
-        if (!NetworkTableInstance.getDefault()
-                .getEntry("/Shuffleboard/Driver/Enable Superstructure")
-                .getBoolean(false)
-        ) {
-            return false;
-        }
+        if (!checkSuperstructureEnabled()) return false;
 
         this.visualizer.updateSetpoint(to);
         this.setpoint = to;
@@ -119,6 +114,8 @@ public class SuperStructure extends SubsystemBase {
      * @return true if all mechanisms have reached their home position
      */
     public Boolean home(boolean force) {
+        if(!checkSuperstructureEnabled()) return false;
+
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot
@@ -140,10 +137,18 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public void runEndEffector(Double volts, Double currentLimit) {
+        if (!checkSuperstructureEnabled()) return;
+
         // when outtaking this should be false
         this.wrist.setIntakeCurrentLimits(currentLimit);
         // assume max voltage is 12.0
         this.wrist.runIntake(volts / 12.0);
+    }
+
+    public boolean checkSuperstructureEnabled() {
+        return NetworkTableInstance.getDefault()
+        .getEntry("/Shuffleboard/Driver/Enable Superstructure")
+        .getBoolean(false);
     }
 
     public void stopAll() {
@@ -174,6 +179,8 @@ public class SuperStructure extends SubsystemBase {
      * @param elevatorPercent of the elevator mechanisms motors
      */
     public void manualControl(Double wristPercent, Double pivotPercent, Double elevatorPercent, Double intakePercent) {
+        if (!checkSuperstructureEnabled()) return;
+
         this.wrist.manualDriveMechanism(wristPercent);
         this.pivot.manualDriveMechanism(pivotPercent);
         this.elevator.manualDriveMechanism(elevatorPercent);

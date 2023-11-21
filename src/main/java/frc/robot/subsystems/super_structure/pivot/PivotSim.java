@@ -39,9 +39,4 @@ public class PivotSim implements Pivot {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
         return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }
-
-    @Override
-    public Double getRecentCurrent() {
-        return 0.0;
-    }
 }

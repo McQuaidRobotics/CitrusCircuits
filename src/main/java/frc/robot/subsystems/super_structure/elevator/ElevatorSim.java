@@ -44,9 +44,4 @@ public class ElevatorSim implements Elevator {
         elevatorMeters.setTargetPosition(kElevator.HOME_METERS);
         return isLimitSwitchHit();
     }
-
-    @Override
-    public Double getRecentCurrent() {
-        return 0.0;
-    }
 }

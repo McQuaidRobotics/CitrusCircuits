@@ -1,0 +1,10 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Autos/Autonomous Routine": "String Chooser",
+      "/Shuffleboard/SuperStructure/Superstructure Visualizer": "Mechanism2d",
+      "/SmartDashboard/Field": "Field2d"
+    }
+  }
+}

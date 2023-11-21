@@ -1,19 +1,15 @@
 package frc.robot.subsystems.super_structure.elevator;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.math.filter.LinearFilter;
 import frc.robot.Constants.kSuperStructure.kElevator;
 import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
@@ -23,9 +19,6 @@ public class ElevatorReal implements Elevator {
     /** Left */
     private final TalonFX followerMotor;
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts;
-
-    private final LinearFilter ampWindow = LinearFilter.movingAverage(25);
-    private Double ampWindowVal = 0.0;
 
     private Boolean isHomed = false;
     private Double cachedElevatorMeters;
@@ -57,7 +50,7 @@ public class ElevatorReal implements Elevator {
         motorAmps = leaderMotor.getStatorCurrent();
         motorVolts = leaderMotor.getSupplyVoltage();
 
-        leaderMotor.setRotorPosition(mechMetersToMotorRots(startingMeters));
+        leaderMotor.setPosition(mechMetersToMotorRots(startingMeters));
         cachedElevatorMeters = startingMeters;
     }
 
@@ -125,29 +118,10 @@ public class ElevatorReal implements Elevator {
         this.manualDriveMechanism(-0.2);
         if (this.isLimitSwitchHit()) {
             this.stopMechanism();
-            this.leaderMotor.setRotorPosition(0.0);
+            this.leaderMotor.setPosition(0.0);
             this.isHomed = true;
         }
         return this.isLimitSwitchHit();
-    }
-
-    @Override
-    public Double getRecentCurrent() {
-        return ampWindowVal;
-    }
-
-    @Override
-    public void brake(Boolean toBrake) {
-        var motorOutputCfg = new MotorOutputConfigs();
-        motorOutputCfg.NeutralMode = toBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        motorOutputCfg.Inverted = kElevator.INVERTED ? InvertedValue.Clockwise_Positive
-                : InvertedValue.CounterClockwise_Positive;
-        leaderMotor.getConfigurator().apply(motorOutputCfg);
-        if (toBrake) {
-            leaderMotor.setControl(new StaticBrake());
-        } else {
-            leaderMotor.setControl(new CoastOut());
-        }
     }
 
     @Override
@@ -165,6 +139,5 @@ public class ElevatorReal implements Elevator {
         motorAmps.refresh(); motorVolts.refresh();
 
         cachedElevatorMeters = motorRotsToMechMeters(motorRots.getValue());
-        ampWindowVal = ampWindow.calculate(motorAmps.getValue());
     }
 }

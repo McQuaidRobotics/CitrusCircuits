@@ -3,7 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.util.PIDConstants;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -67,7 +67,7 @@ public final class Constants {
             public static final double TOLERANCE = 0.5;
         }
 
-        public static final class kIntake {
+        public static final class kEndEffector {
             public static final int MOTOR_ID = 11;
 
             public static final boolean INVERTED = true;

@@ -3,9 +3,7 @@ package frc.robot;
 import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
-import frc.robot.commands.superstructure.OperatorPrefs;
 import frc.robot.commands.swerve.TeleopSwerve;
-import frc.robot.commands.swerve.TeleopSwerve2;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -15,24 +13,18 @@ import frc.robot.util.ShuffleboardApi;
 
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private static final CommandXboxController driveController = new CommandXboxController(0);
-    private static final CommandXboxController operatorController = new CommandXboxController(1);
+    private final CommandXboxController driveController = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    private static final DigitalInput brakeSwitch = new DigitalInput(Constants.kSuperStructure.BRAKE_SWITCH_PIN);
+    private final Swerve swerve = new Swerve();
+    private final SuperStructure superStructure = new SuperStructure();
 
-    public static final Swerve swerve = new Swerve();
-    public static final SuperStructure superStructure = new SuperStructure();
-
-    private static final boolean TRADITIONAL_TELEOP_CONTROLS = true;
-
-    public static void RobotContainerInit() {
+    public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         configureDriverBindings();
@@ -40,26 +32,14 @@ public class RobotContainer {
 
         configureDriverTabShuffleboard();
 
-        if (TRADITIONAL_TELEOP_CONTROLS) {
-            swerve.setDefaultCommand(
-                    new TeleopSwerve(
-                            swerve,
-                            driveController::getLeftY,
-                            driveController::getLeftX,
-                            driveController::getRightX));
-        } else {
-            swerve.setDefaultCommand(
-                    new TeleopSwerve2(
-                            swerve,
-                            driveController::getLeftY,
-                            driveController::getLeftX,
-                            driveController::getRightX,
-                            driveController::getRightY));
-        }
-
-        var brakeTrig = new Trigger(brakeSwitch::get).or(DriverStation::isEnabled);
-        brakeTrig.onTrue(new InstantCommand(superStructure::brake).ignoringDisable(true));
-        brakeTrig.onFalse(new InstantCommand(superStructure::coast).ignoringDisable(true));
+        swerve.setDefaultCommand(
+            new TeleopSwerve(
+                swerve,
+                driveController::getLeftY,
+                driveController::getLeftX,
+                driveController::getRightX
+            )
+        );
     }
 
     // [driver]
@@ -81,7 +61,7 @@ public class RobotContainer {
     // RightTrigger: set desired gamepiece to cone
     // LeftTrigger: set desired gamepiece to cube
 
-    private static void configureDriverBindings() {
+    private void configureDriverBindings() {
         // Bumpers/Triggers
         ForcibleTrigger.from(driveController.rightBumper())
                 .onTrueForce(new SuperstructureCommands.TransitionToPlace(superStructure));
@@ -98,7 +78,7 @@ public class RobotContainer {
                 .onTrueForce(new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
-    private static void configureOperatorBindings() {
+    private void configureOperatorBindings() {
         // Face buttons
         operatorController.y().onTrue(new InstantCommand(
                 () -> ScoreLevel.setCurrentLevel(ScoreLevel.HIGH)).ignoringDisable(true));
@@ -124,7 +104,7 @@ public class RobotContainer {
                 new StateManager.CmdTransitionState(superStructure, States.HOME));
     }
 
-    private static void configureDriverTabShuffleboard() {
+    private void configureDriverTabShuffleboard() {
         var driverTab = ShuffleboardApi.getTab("Driver");
         driverTab.addBoolean("High", () -> ScoreLevel.getCurrentLevel() == ScoreLevel.HIGH)
                 .withSize(2, 1)
@@ -159,10 +139,5 @@ public class RobotContainer {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
         }).withSize(2, 1);
-
-        driverTab.addBoolean("NEED TO HOME", () -> OperatorPrefs.NEED_HOME)
-                .withPosition(3, 3)
-                .withSize(2, 1)
-                .withProperties(Map.of("colorWhenTrue", "Red", "colorWhenFalse", "Black"));
     }
 }

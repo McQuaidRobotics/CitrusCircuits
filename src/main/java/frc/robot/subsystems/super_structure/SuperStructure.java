@@ -5,20 +5,18 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.super_structure.elevator.Elevator;
-import frc.robot.subsystems.super_structure.elevator.ElevatorReal;
-import frc.robot.subsystems.super_structure.elevator.ElevatorSim;
-import frc.robot.subsystems.super_structure.wrist.Wrist;
-import frc.robot.subsystems.super_structure.wrist.WristReal;
 import frc.robot.util.ShuffleboardApi;
 import frc.robot.subsystems.super_structure.States.SuperStructurePosition;
 import frc.robot.subsystems.super_structure.pivot.*;
 import frc.robot.subsystems.super_structure.wrist.*;
+import frc.robot.subsystems.super_structure.endEffector.*;
+import frc.robot.subsystems.super_structure.elevator.*;
 
 public class SuperStructure extends SubsystemBase {
     private final Wrist wrist;
     private final Elevator elevator;
     private final Pivot pivot;
+    private final EndEffector endEffector;
 
     private final Visualizer visualizer = new Visualizer();
 
@@ -31,10 +29,12 @@ public class SuperStructure extends SubsystemBase {
             this.wrist = new WristReal(setpoint.wristDegrees);
             this.pivot = new PivotReal(/* uses pigeon */);
             this.elevator = new ElevatorReal(setpoint.elevatorMeters);
+            this.endEffector = new EndEffectorReal();
         } else {
             this.wrist = new WristSim(setpoint.wristDegrees);
             this.pivot = new PivotSim(setpoint.pivotDegrees);
             this.elevator = new ElevatorSim(setpoint.elevatorMeters);
+            this.endEffector = new EndEffectorSim();
         }
         setupShuffleboard();
         visualizer.updateSetpoint(setpoint);
@@ -107,7 +107,9 @@ public class SuperStructure extends SubsystemBase {
     /**
      * Will move the mechanism to the home position,
      * they will follow the order of wrist -> elevator -> pivot
-     * @param force if true, will ignore if the mechanism is already at the home position
+     * 
+     * @param force if true, will ignore if the mechanism is already at the home
+     *              position
      * @return true if all mechanisms have reached their home position
      */
     public Boolean home(boolean force) {
@@ -124,8 +126,9 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /**
-     * @return true if the last {@link SuperStructure#home(boolean)} returned true and
-     * a {@link SuperStructure#setSetpoint} hasn't been called since.
+     * @return true if the last {@link SuperStructure#home(boolean)} returned true
+     *         and
+     *         a {@link SuperStructure#setSetpoint} hasn't been called since.
      */
     public Boolean isHomed() {
         return this.isHomed;
@@ -133,68 +136,47 @@ public class SuperStructure extends SubsystemBase {
 
     public void runEndEffector(Double volts, Double currentLimit) {
         // when outtaking this should be false
-        this.wrist.setIntakeCurrentLimits(currentLimit);
+        this.endEffector.setEndEffectorCurrentLimits(currentLimit);
         // assume max voltage is 12.0
-        this.wrist.runIntake(volts / 12.0);
+        this.endEffector.runEndEffector(volts / 12.0);
     }
 
     public void stopAll() {
         this.wrist.stopMechanism();
         this.pivot.stopMechanism();
         this.elevator.stopMechanism();
-        this.wrist.runIntake(0.0);
+        this.endEffector.runEndEffector(0.0);
     }
 
     public Boolean reachedSetpoint(Double toleranceMult) {
         return this.setpoint.reachedState(this.getPose(), toleranceMult);
     }
 
+    /**
+     * @return the current position on the superstructure
+     */
     public SuperStructurePosition getPose() {
         return new SuperStructurePosition(
                 this.wrist.getWristDegrees(),
                 this.pivot.getPivotDegrees(),
                 this.elevator.getElevatorMeters(),
-                this.wrist.getIntakeVoltage());
+                this.endEffector.getEndEffectorVoltage());
     }
 
     /**
      * To be used for debugging, not guranteed to have all
      * safety features
      * 
-     * @param wristPercent    of the wrist mechanisms motors
-     * @param pivotPercent    of the pivot mechanisms motors
-     * @param elevatorPercent of the elevator mechanisms motors
+     * @param wristPercent       of the wrist mechanisms motors
+     * @param pivotPercent       of the pivot mechanisms motors
+     * @param elevatorPercent    of the elevator mechanisms motors
+     * @param endEffectorPercent of the end-effector mechanisms motors
      */
-    public void manualControl(Double wristPercent, Double pivotPercent, Double elevatorPercent, Double intakePercent) {
+    public void manualControl(Double wristPercent, Double pivotPercent, Double elevatorPercent, Double endEffectorPercent) {
         this.wrist.manualDriveMechanism(wristPercent);
         this.pivot.manualDriveMechanism(pivotPercent);
         this.elevator.manualDriveMechanism(elevatorPercent);
-        this.wrist.runIntake(intakePercent);
-    }
-
-    /**
-     * The average current over the past .5 seconds for all components
-     * 
-     * @return Double[] of the current for [wrist, pivot, elevator]
-     */
-    public Double[] getComponentAmps() {
-        return new Double[] {
-                this.wrist.getRecentCurrent(),
-                this.pivot.getRecentCurrent(),
-                this.elevator.getRecentCurrent()
-        };
-    }
-
-    public void brake() {
-        this.wrist.brake(true);
-        this.pivot.brake(true);
-        this.elevator.brake(true);
-    }
-
-    public void coast() {
-        this.wrist.brake(false);
-        this.pivot.brake(false);
-        this.elevator.brake(false);
+        this.endEffector.manualDriveMechanism(endEffectorPercent);
     }
 
     /** once moved over to TEMPLATE this can be removed */
@@ -220,6 +202,7 @@ public class SuperStructure extends SubsystemBase {
         wrist.setupShuffleboard(tab.getLayout("Wrist"));
         pivot.setupShuffleboard(tab.getLayout("Pivot"));
         elevator.setupShuffleboard(tab.getLayout("Elevator"));
+        endEffector.setupShuffleboard(tab.getLayout("End Effector"));
 
         visualizer.setShuffleboardTab(tab);
     }
@@ -229,6 +212,7 @@ public class SuperStructure extends SubsystemBase {
         this.wrist.periodic();
         this.elevator.periodic();
         this.pivot.periodic();
+        this.endEffector.periodic();
 
         visualizer.updateCurrent(getPose());
 

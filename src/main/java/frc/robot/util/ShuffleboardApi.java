@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /** Lighter weight interface for shuffleboard widgets */
@@ -24,22 +23,10 @@ public class ShuffleboardApi {
 
     /**
      * Updates all the shuffleboard entry values
-     * This method should be called every cycle unless
-     * {@link ShuffleboardApi#registerPeriodic(TimedRobot)} is used
+     * This method should be called every cycle
      */
     public static void run() {
         tasks.values().forEach(Runnable::run);
-    }
-
-    /**
-     * Adds shuffleboard updating to the robot periodic loop,
-     * if this method is used {@link ShuffleboardApi#run()} does not need to be
-     * called
-     * 
-     * @param robot the robot to add the periodic loop to
-     */
-    public static void registerPeriodic(TimedRobot robot) {
-        robot.addPeriodic(ShuffleboardApi::run, 0.01);
     }
 
     /**

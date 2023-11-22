@@ -4,6 +4,8 @@ import frc.robot.commands.superstructure.SuperstructureCommands;
 import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.auto.AutosCmdRegister;
+import frc.robot.commands.auto.Autos;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -12,6 +14,9 @@ import frc.robot.util.ForcibleTrigger;
 import frc.robot.util.ShuffleboardApi;
 
 import java.util.Map;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,6 +31,8 @@ public class RobotContainer {
 
     public RobotContainer() {
         DriverStation.silenceJoystickConnectionWarning(true);
+
+        setupAutos();
 
         configureDriverBindings();
         configureOperatorBindings();
@@ -139,5 +146,17 @@ public class RobotContainer {
             var held = GamepieceMode.getHeldPiece();
             return held == null ? "NONE" : held.toString();
         }).withSize(2, 1);
+    }
+
+    private void setupAutos() {
+        Autos.createSubsystemInstances(swerve);
+        AutosCmdRegister.registerCommands(swerve, superStructure);
+        AutoBuilder.configureHolonomic(
+                null, 
+                null, 
+                null, 
+                null, 
+                null, 
+                swerve);
     }
 }

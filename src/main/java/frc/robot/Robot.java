@@ -31,7 +31,6 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         setupAkit();
 
-
         Autos.AutoRoutines[] autoRoutines = Autos.AutoRoutines.values();
         for (Autos.AutoRoutines autoRoutine : autoRoutines) {
             if (autoRoutine == Autos.AutoRoutines.NOTHING) {

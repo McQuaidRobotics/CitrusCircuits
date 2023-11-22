@@ -46,13 +46,13 @@ public class TeleopSwerve extends CommandBase {
 
         translationVal = MathUtil.applyDeadband(
             -translationXSup.getAsDouble(), 
-            ControllerConsts.LEFT_DEADBAND * swerveTranslationMultiplier);
+            ControllerConsts.LEFT_DEADBAND) * swerveTranslationMultiplier;
         strafeVal = MathUtil.applyDeadband(
             -translationYSup.getAsDouble(), 
-            ControllerConsts.LEFT_DEADBAND * swerveTranslationMultiplier);
+            ControllerConsts.LEFT_DEADBAND) * swerveTranslationMultiplier;
         rotationVal = MathUtil.applyDeadband(
             rotationAxisSup.getAsDouble(), 
-            ControllerConsts.RIGHT_DEADBAND * swerveRotationMultiplier);
+            ControllerConsts.RIGHT_DEADBAND) * swerveRotationMultiplier;
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal)

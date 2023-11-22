@@ -202,7 +202,7 @@ public class SwerveModule {
 
         double driveVel = (driveSim.getOutput(0) / kSwerve.METERS_PER_DRIVE_MOTOR_ROTATION);
         driveSimState.setRotorVelocity(driveVel);
-        driveSimState.addRotorPosition((driveVel * 0.02);
+        driveSimState.addRotorPosition(driveVel * 0.02);
 
         double rotationPos = rotationSim.getOutput(0);
         SmartDashboard.putNumber("Module: " + moduleNumber + " simrot", rotationPos);

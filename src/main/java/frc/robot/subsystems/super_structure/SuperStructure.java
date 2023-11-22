@@ -114,8 +114,6 @@ public class SuperStructure extends SubsystemBase {
      * @return true if all mechanisms have reached their home position
      */
     public Boolean home(boolean force) {
-        if(!checkSuperstructureEnabled()) return false;
-
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot

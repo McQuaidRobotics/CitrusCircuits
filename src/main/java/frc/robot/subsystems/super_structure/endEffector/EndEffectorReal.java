@@ -1,5 +1,7 @@
 package frc.robot.subsystems.super_structure.endEffector;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -8,6 +10,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import frc.robot.Constants.kSuperStructure;
 import frc.robot.Constants.kSuperStructure.kEndEffector;
 import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
@@ -15,16 +18,20 @@ public class EndEffectorReal implements EndEffector {
 
     private final TalonFX endEffectorMotor;
 
-    private final StatusSignal<Double> endEffectorMotorAmps, endEffectorMotorVolts;
+    private final StatusSignal<Double> motorAmps, motorVolts, motorTemp;
 
-    private Double cachedEndEffectorVolts = 0.0, endEffectorCurrentLimit;
+    private final EndEffectorInputs inputs;
 
     public EndEffectorReal() {
-        endEffectorMotor = new TalonFX(kEndEffector.MOTOR_ID);
+        endEffectorMotor = new TalonFX(kEndEffector.MOTOR_ID, kSuperStructure.CANBUS);
         endEffectorMotor.getConfigurator().apply(getEndEffectorMotorConfig());
 
-        endEffectorMotorAmps = endEffectorMotor.getStatorCurrent();
-        endEffectorMotorVolts = endEffectorMotor.getSupplyVoltage();
+        motorAmps = endEffectorMotor.getStatorCurrent();
+        motorVolts = endEffectorMotor.getSupplyVoltage();
+        motorTemp = endEffectorMotor.getDeviceTemp();
+        motorTemp.setUpdateFrequency(4);
+
+        inputs = new EndEffectorInputs();
     }
 
     /**
@@ -50,12 +57,12 @@ public class EndEffectorReal implements EndEffector {
 
     @Override
     public Double getEndEffectorVoltage() {
-        return cachedEndEffectorVolts;
+        return inputs.volts;
     }
 
     @Override
     public void setEndEffectorCurrentLimits(Double limit) {
-        if (limit != this.endEffectorCurrentLimit) {
+        if (limit != inputs.currentLimit) {
             var cfg = new CurrentLimitsConfigs();
             cfg.SupplyCurrentLimitEnable = true;
             cfg.SupplyCurrentLimit = limit;
@@ -64,19 +71,21 @@ public class EndEffectorReal implements EndEffector {
             cfg.StatorCurrentLimit = limit;
             cfg.StatorCurrentLimitEnable = true;
             endEffectorMotor.getConfigurator().apply(cfg);
-            this.endEffectorCurrentLimit = limit;
+            inputs.currentLimit = limit;
         }
     }
 
     @Override
-    public void setupShuffleboard(ShuffleEntryContainer tab) {
-        tab.addDouble("EndEffector Current", endEffectorMotorAmps::getValue);
-        tab.addDouble("EndEffector Voltage", endEffectorMotorVolts::getValue);
-    }
+    public void setupShuffleboard(ShuffleEntryContainer tab) {}
 
     @Override
     public void periodic() {
-        BaseStatusSignal.refreshAll(endEffectorMotorAmps, endEffectorMotorVolts);
-        this.cachedEndEffectorVolts = endEffectorMotorVolts.getValue();
+        BaseStatusSignal.refreshAll(motorAmps, motorVolts);
+
+        inputs.amps = motorAmps.getValue();
+        inputs.volts = motorVolts.getValue();
+        inputs.temp = motorTemp.getValue();
+
+        Logger.processInputs("/SuperStructure/EndEffector", inputs);
     }
 }

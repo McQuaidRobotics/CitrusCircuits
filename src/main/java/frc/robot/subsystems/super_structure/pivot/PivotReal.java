@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import frc.robot.Constants.kSuperStructure;
 import frc.robot.Constants.kSuperStructure.kPivot;
 import frc.robot.util.ShuffleboardApi.ShuffleEntryContainer;
 
@@ -42,11 +43,11 @@ public class PivotReal implements Pivot {
     }
 
     public PivotReal() {
-        gyro = new Pigeon2(kPivot.PIGEON_ID);
+        gyro = new Pigeon2(kPivot.PIGEON_ID, kSuperStructure.CANBUS);
         gyroPitch = gyro.getPitch();
 
-        leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID);
-        followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID);
+        leaderMotor = new TalonFX(kPivot.LEFT_MOTOR_ID, kSuperStructure.CANBUS);
+        followerMotor = new TalonFX(kPivot.RIGHT_MOTOR_ID, kSuperStructure.CANBUS);
         leaderMotor.getConfigurator().apply(getMotorConfig());
         followerMotor.getConfigurator().apply(getMotorConfig());
 

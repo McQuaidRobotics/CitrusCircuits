@@ -162,7 +162,9 @@ public class RobotContainer {
                         kAuto.AUTO_ANGULAR_PID,
                         kSwerve.MAX_SPEED,
                         kSwerve.DRIVEBASE_RADIUS,
-                        new ReplanningConfig()
+                        new ReplanningConfig(
+                                true, 
+                                true)
                 ),
                 swerve);
     }

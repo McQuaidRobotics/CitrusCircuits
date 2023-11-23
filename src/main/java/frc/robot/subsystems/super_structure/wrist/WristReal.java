@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import frc.robot.Constants.kSuperStructure;
 import frc.robot.Constants.kSuperStructure.kWrist;
 
 public class WristReal implements Wrist {
@@ -24,7 +25,7 @@ public class WristReal implements Wrist {
     private Double setPointDegrees = kWrist.HOME_DEGREES;
 
     public WristReal(Double startingDegrees) {
-        motor = new TalonFX(kWrist.MOTOR_ID);
+        motor = new TalonFX(kWrist.MOTOR_ID, kSuperStructure.CANBUS);
         motor.getConfigurator().apply(getWristMotorConfig());
 
         motorRots = motor.getRotorPosition();

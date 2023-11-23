@@ -59,7 +59,6 @@ public class WristSim implements Wrist {
 
     @Override
     public Double getWristDegrees() {
-        // return Units.radiansToDegrees(wristSim.getAngleRads());
         return inputs.degrees;
     }
 

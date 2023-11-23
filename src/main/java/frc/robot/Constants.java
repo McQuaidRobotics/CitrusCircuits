@@ -22,6 +22,7 @@ public final class Constants {
 
     public static class kSuperStructure {
         public static final int BRAKE_SWITCH_PIN = 16;
+        public static final String CANBUS = "SuperstructureBus";
 
         public static final class kWrist {
             public static final int MOTOR_ID = 12;
@@ -193,7 +194,7 @@ public final class Constants {
     public static class kSwerve {
         public static final int PIGEON_ID = 33;
         public static final boolean INVERT_GYRO = false;
-        public static final String CANBUS = "McQDriveBus";
+        public static final String CANBUS = "DriveBus";
 
         /* Drivetrain Constants */
         public static final double TRACK_WIDTH = 0.551942;

@@ -1,8 +1,37 @@
 package frc.robot.subsystems.super_structure.endEffector;
 
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
 import frc.robot.subsystems.super_structure.Component;
 
 public interface EndEffector extends Component {
+
+    public static class EndEffectorInputs implements LoggableInputs {
+        public Double amps = 0.0;
+        public Double volts = 0.0;
+        public Double temp = 0.0;
+        public Double currentLimit = 0.0;
+        public Boolean isInverted = false;
+
+        @Override
+        public void toLog(LogTable table) {
+            table.put("Amps", amps);
+            table.put("Volts", volts);
+            table.put("Temp", temp);
+            table.put("CurrentLimit", currentLimit);
+            table.put("IsInverted", isInverted);
+        }
+
+        @Override
+        public void fromLog(LogTable table) {
+            amps = table.get("Amps", amps);
+            volts = table.get("Volts", volts);
+            temp = table.get("Temp", temp);
+            currentLimit = table.get("CurrentLimit", currentLimit);
+            isInverted = table.get("IsInverted", isInverted);
+        }
+    }
 
     /**
      * Runs the end-effector at a given percent output

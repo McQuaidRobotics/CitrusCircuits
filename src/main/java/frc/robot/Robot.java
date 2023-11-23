@@ -23,26 +23,13 @@ public class Robot extends LoggedRobot {
     private Command autoCmd;
     @SuppressWarnings("unused")
     private final RobotContainer robotContainer = new RobotContainer();
-    private Autos.AutoRoutines autoRoutine;
-    private Optional<Alliance> alliance = Optional.empty();
-    private final SendableChooser<Autos.AutoRoutines> autoRoutineChooser = new SendableChooser<>();
 
     @Override
     public void robotInit() {
         setupAkit();
 
-        Autos.AutoRoutines[] autoRoutines = Autos.AutoRoutines.values();
-        for (Autos.AutoRoutines autoRoutine : autoRoutines) {
-            if (autoRoutine == Autos.AutoRoutines.NOTHING) {
-                autoRoutineChooser.setDefaultOption(autoRoutine.name(), autoRoutine);
-                continue;
-            }
-            autoRoutineChooser.addOption(autoRoutine.name(), autoRoutine);
-        }
-
-        SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
-        ShuffleboardApi.getTab("Autos")
-            .addSendable("Autonomous Routine", autoRoutineChooser);
+        Autos.createSendableChooser();
+        SmartDashboard.putString("AutoCommand", Autos.getSelectedAutoName());
     }
 
     @Override
@@ -58,16 +45,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
-        var selectedRoutine = autoRoutineChooser.getSelected();
-        var currAlliance = DriverStation.getAlliance();
-        if (currAlliance.isPresent() && alliance.isPresent()) {
-            if (selectedRoutine != autoRoutine || alliance.get() != currAlliance.get()) {
-                autoRoutine = selectedRoutine;
-                alliance = currAlliance;
-                autoCmd = autoRoutine.getCommand();
-                SmartDashboard.putString("AutoCommand", autoCmd == null ? "null" : autoCmd.getName());
-            }
-        }
+        autoCmd = Autos.getAutonomousCommand();
+        SmartDashboard.putString("AutoCommand", Autos.getSelectedAutoName());
     }
 
     @Override

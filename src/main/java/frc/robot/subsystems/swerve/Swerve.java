@@ -171,6 +171,10 @@ public class Swerve extends SubsystemBase {
         return states;
     }
 
+    public ChassisSpeeds getChassisSpeeds() {
+        return kSwerve.SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates());
+    }
+
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
     }

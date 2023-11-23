@@ -1,30 +1,27 @@
 package frc.robot.commands.auto;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.swerve.Swerve;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class Autos {
-    private static Swerve swerve;
+    public static SendableChooser<Command> autoChooser;
 
-    public static void createSubsystemInstances(Swerve swerve) {
-        Autos.swerve = swerve;
+    public static void createSendableChooser() {
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
-    public enum AutoRoutines {
-        NOTHING("NOTHING"),
-        THREE_GAME_PIECE_FLAT("THREE_GAME_PIECE_FLAT"),
-        PLACE_TAXI_WIRE("PLACE_TAXI_WIRE"),
-        PLACE_BALANCE("PLACE_BALANCE");
+    public static Command getAutonomousCommand() {
+        if (autoChooser != null) return autoChooser.getSelected();
+        return new InstantCommand().withName("Nothing -> Auto Chooser Not Created!");
+    }
 
-        final String name;
-
-        private AutoRoutines(String name) {
-            this.name = name;
-        }
-
-        public Command getCommand() {
-            return Commands.none();
-        }
+    public static String getSelectedAutoName() {
+        if (autoChooser != null) return autoChooser.getSelected().getName();
+        return "Nothing -> Auto Chooser Not Created!";
     }
 }

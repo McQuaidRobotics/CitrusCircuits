@@ -5,7 +5,8 @@ import frc.robot.commands.superstructure.OperatorPrefs.PickupMode;
 import frc.robot.commands.superstructure.OperatorPrefs.ScoreLevel;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.auto.AutosCmdRegister;
-import frc.robot.commands.auto.Autos;
+import frc.robot.Constants.kAuto;
+import frc.robot.Constants.kSwerve;
 import frc.robot.commands.superstructure.StateManager;
 import frc.robot.subsystems.super_structure.States;
 import frc.robot.subsystems.super_structure.SuperStructure;
@@ -16,7 +17,8 @@ import frc.robot.util.ShuffleboardApi;
 import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -149,14 +151,19 @@ public class RobotContainer {
     }
 
     private void setupAutos() {
-        Autos.createSubsystemInstances(swerve);
         AutosCmdRegister.registerCommands(swerve, superStructure);
         AutoBuilder.configureHolonomic(
-                null, 
-                null, 
-                null, 
-                null, 
-                null, 
+                swerve::getPose, 
+                swerve::resetOdometry, 
+                swerve::getChassisSpeeds, 
+                swerve::driveRobotRelative, 
+                new HolonomicPathFollowerConfig(
+                        kAuto.AUTO_TRANSLATION_PID,
+                        kAuto.AUTO_ANGULAR_PID,
+                        kSwerve.MAX_SPEED,
+                        kSwerve.DRIVEBASE_RADIUS,
+                        new ReplanningConfig()
+                ),
                 swerve);
     }
 }

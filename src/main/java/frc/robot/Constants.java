@@ -201,6 +201,7 @@ public final class Constants {
         public static final double WHEEL_BASE = 0.551942;
         public static final double WHEEL_DIAMETER = 0.1016;
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+        public static final double DRIVEBASE_RADIUS = Math.sqrt(Math.pow(TRACK_WIDTH, 2) + Math.pow(WHEEL_BASE, 2));
 
         /** For every {@value} rotations of the motor the wheel rolls one rotation */
         public static final double DRIVE_MECHANISM_RATIO = 1.0 / 6.75;
@@ -209,7 +210,7 @@ public final class Constants {
         public static final double METERS_PER_DRIVE_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE * DRIVE_MECHANISM_RATIO;
 
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0), // idk why this is needed?
+                new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0), // idk why this is needed? hehe java bug :)
                 Mod1.CHASSIS_OFFSET,
                 Mod2.CHASSIS_OFFSET,
                 Mod3.CHASSIS_OFFSET);

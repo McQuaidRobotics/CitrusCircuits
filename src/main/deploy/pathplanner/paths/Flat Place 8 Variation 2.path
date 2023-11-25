@@ -1,0 +1,48 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3415741581839797,
+        "y": 4.665666849165367
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8384140077837925,
+        "y": 4.940117840292742
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 1.9007064547652628,
+        "y": 4.425522231928914
+      },
+      "prevControl": {
+        "x": 2.072238324219872,
+        "y": 5.054472419929148
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 179.67326850067963
+  },
+  "reversed": false,
+  "folder": "Three Game Piece Flat Cube Paths",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 3.0
+  }
+}

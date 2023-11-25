@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3415741581839797,
+        "y": 4.642795933238086
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.224514708658518,
+        "y": 5.294617037165601
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 6.92087250080349,
+        "y": 3.384895557237619
+      },
+      "prevControl": {
+        "x": 4.542297244366243,
+        "y": 3.1104445661102447
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.1,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0
+    },
+    {
+      "waypointRelativePos": 0.4,
+      "rotationDegrees": 12.786603016022275
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "pickup ground and override hold cube",
+      "waypointRelativePos": 0.2,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "pickup_ground"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "override_hold_cube"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": 0.7161599454704252
+  },
+  "reversed": false,
+  "folder": "Three Game Piece Flat Cube Paths",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 3.0
+  }
+}

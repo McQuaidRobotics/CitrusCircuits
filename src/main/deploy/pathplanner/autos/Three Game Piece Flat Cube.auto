@@ -1,0 +1,84 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.9121419127289037,
+      "y": 4.837198718619977
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "override_hold_cone"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place_mid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Place 9 Flat"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Flat Swoop 4B"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Flat Place 8 Variation 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place_high"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Place 8 Flat"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Flat Pickup 3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Pickup 3 Flat"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Flat Place 8 Variation 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place_mid"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null
+}

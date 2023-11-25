@@ -1,0 +1,72 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.8778355388379817,
+        "y": 4.802892344729054
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.152286529965356,
+        "y": 4.860069634547257
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 3.36444507411126,
+        "y": 4.631360475274445
+      },
+      "prevControl": {
+        "x": 2.506785726838215,
+        "y": 4.608489559347165
+      },
+      "nextControl": null,
+      "isLocked": true
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "stow and desire cube",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stow"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "desire_cube"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 179.2042764472607
+  },
+  "reversed": false,
+  "folder": "Three Game Piece Flat Cube Paths",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 3.0
+  }
+}

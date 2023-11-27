@@ -8,11 +8,11 @@ import frc.robot.subsystems.super_structure.Component;
 public interface EndEffector extends Component {
 
     public static class EndEffectorInputs implements LoggableInputs {
-        public Double amps = 0.0;
-        public Double volts = 0.0;
-        public Double temp = 0.0;
-        public Double currentLimit = 0.0;
-        public Boolean isInverted = false;
+        public double amps = 0.0;
+        public double volts = 0.0;
+        public double temp = 0.0;
+        public double currentLimit = 0.0;
+        public boolean isInverted = false;
 
         @Override
         public void toLog(LogTable table) {

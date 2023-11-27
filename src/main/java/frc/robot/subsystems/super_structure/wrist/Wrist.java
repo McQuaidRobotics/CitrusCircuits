@@ -8,12 +8,12 @@ import frc.robot.subsystems.super_structure.Component;
 public interface Wrist extends Component {
 
     public static class WristInputs implements LoggableInputs {
-        public Double degrees, targetDegrees;
-        public Double degreesPerSec = 0.0;
-        public Double amps = 0.0;
-        public Double volts = 0.0;
-        public Double temp = 0.0;
-        public Boolean isHomed = false;
+        public double degrees, targetDegrees;
+        public double degreesPerSec = 0.0;
+        public double amps = 0.0;
+        public double volts = 0.0;
+        public double temp = 0.0;
+        public boolean isHomed = false;
 
         public WristInputs(Double startingDegrees) {
             degrees = startingDegrees;

@@ -10,13 +10,13 @@ import frc.robot.Constants.kSuperStructure.kElevator;
 public interface Elevator extends Component {
 
     public static class ElevatorInputs implements LoggableInputs{
-        public Double meters, targetMeters;
-        public Double metersPerSec;
-        public Double volts = 0.0;
-        public Double leftAmps = 0.0, rightAmps = 0.0;
-        public Double leftTemp = 0.0, rightTemp = 0.0;
-        public Boolean isLimitSwitchHit = false;
-        public Boolean isHomed = false;
+        public double meters, targetMeters;
+        public double metersPerSec;
+        public double volts = 0.0;
+        public double leftAmps = 0.0, rightAmps = 0.0;
+        public double leftTemp = 0.0, rightTemp = 0.0;
+        public boolean isLimitSwitchHit = false;
+        public boolean isHomed = false;
 
         public ElevatorInputs(Double startingMeters) {
             this.meters = startingMeters;

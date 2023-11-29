@@ -1,0 +1,202 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.8664000808743408,
+        "y": 4.425522231928914
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2895120255290435,
+        "y": 4.699973223056289
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 3.330138700220339,
+        "y": 4.665666849165367
+      },
+      "prevControl": {
+        "x": 2.759349346804059,
+        "y": 4.617701357281646
+      },
+      "nextControl": {
+        "x": 4.690958197893571,
+        "y": 4.780021428801773
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 5.491440255348414,
+        "y": 4.791456886765414
+      },
+      "prevControl": {
+        "x": 3.970524346184213,
+        "y": 4.619925017310805
+      },
+      "nextControl": {
+        "x": 6.614062973480998,
+        "y": 4.918068471517209
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 7.092404370258099,
+        "y": 3.3620246413103376
+      },
+      "prevControl": {
+        "x": 6.599299687612626,
+        "y": 3.6776116382034405
+      },
+      "nextControl": {
+        "x": 7.664177268440129,
+        "y": 2.996089986473838
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 4.7481354877117745,
+        "y": 4.894376008438179
+      },
+      "prevControl": {
+        "x": 6.703598799494318,
+        "y": 5.3517943269838035
+      },
+      "nextControl": {
+        "x": 3.2812870485419516,
+        "y": 4.55125356652711
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 1.8664000808743408,
+        "y": 4.425522231928914
+      },
+      "prevControl": {
+        "x": 2.884155839638354,
+        "y": 4.780021428801771
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.25,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 3.55,
+      "rotationDegrees": -50.13829355308849
+    },
+    {
+      "waypointRelativePos": 1.85,
+      "rotationDegrees": 8.27
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "ground pickup",
+      "waypointRelativePos": 1.7999999999999998,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "pickup_ground"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "override_hold_cube"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "standby",
+      "waypointRelativePos": 4.1,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "place_standby"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stow & desire cube",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stow"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "desire_cube"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "stow",
+      "waypointRelativePos": 3.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Three Game Piece Flat Cube Paths",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 0
+  }
+}

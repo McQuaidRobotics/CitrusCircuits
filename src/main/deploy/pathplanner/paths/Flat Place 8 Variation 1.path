@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3415741581839797,
-        "y": 4.665666849165367
+        "x": 3.35300961614762,
+        "y": 4.642795933238086
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8498494657474334,
-        "y": 4.53987681156532
+        "x": 2.861284923711074,
+        "y": 4.5170058956380394
       },
       "isLocked": false
     },
@@ -58,7 +58,7 @@
     "rotation": 179.67326850067963
   },
   "reversed": false,
-  "folder": "Three Game Piece Flat Cube Paths",
+  "folder": "Test Auto Paths",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0.0

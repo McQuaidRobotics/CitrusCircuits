@@ -1,0 +1,68 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3415741581839797,
+        "y": 4.677102307129007
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.3415741581839855,
+        "y": 4.177102307129007
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 6.5663733039306305,
+        "y": 5.694858065893023
+      },
+      "prevControl": {
+        "x": 6.2205232147783,
+        "y": 5.591103039147323
+      },
+      "nextControl": {
+        "x": 7.023791622476255,
+        "y": 5.83208356145671
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 7.275371697676349,
+        "y": 5.065907877892789
+      },
+      "prevControl": {
+        "x": 7.8357091378947406,
+        "y": 5.28318157920196
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6000000000000001,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 4.5,
+    "rotation": -107.81888891452287
+  },
+  "reversed": false,
+  "folder": "Test Auto Paths",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 4.5
+  }
+}

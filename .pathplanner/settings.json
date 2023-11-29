@@ -3,7 +3,8 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Three Game Piece Flat Cube Paths"
+    "Three Game Piece Flat Cube Paths",
+    "Test Auto Paths"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.5,

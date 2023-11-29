@@ -1,0 +1,30 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.8778355388379817,
+      "y": 4.802892344729054
+    },
+    "rotation": -171.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Place 9 Flat"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Flat Swoop 4B"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null
+}

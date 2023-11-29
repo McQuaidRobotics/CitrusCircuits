@@ -8,23 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9154393545875825,
-        "y": 4.633511464578856
-      },
-      "isLocked": false
-    },
-    {
-      "anchor": {
-        "x": 5.41139204960293,
-        "y": 5.683422607929381
-      },
-      "prevControl": {
-        "x": 4.873925525311821,
-        "y": 5.408971616802005
-      },
-      "nextControl": {
-        "x": 5.676819782422371,
-        "y": 5.818960173624416
+        "x": 8.201643792731238,
+        "y": 4.71140868101993
       },
       "isLocked": false
     },
@@ -73,19 +58,19 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0.45,
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 2.4,
+      "waypointRelativePos": 1.4,
       "rotationDegrees": -121.84141504677918
     }
   ],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 4.0,
-      "maxWaypointRelativePos": 4.0,
+      "minWaypointRelativePos": 3.0,
+      "maxWaypointRelativePos": 3.0,
       "constraints": {
         "maxVelocity": 0.1,
         "maxAcceleration": 0.1,
@@ -97,7 +82,7 @@
   "eventMarkers": [
     {
       "name": "pickup ground and override hold cube",
-      "waypointRelativePos": 1.1,
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -120,7 +105,7 @@
     },
     {
       "name": "place standby",
-      "waypointRelativePos": 3.0,
+      "waypointRelativePos": 2.0,
       "command": {
         "type": "parallel",
         "data": {

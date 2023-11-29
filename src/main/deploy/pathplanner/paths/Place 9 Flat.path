@@ -15,12 +15,12 @@
     },
     {
       "anchor": {
-        "x": 3.36444507411126,
+        "x": 3.0,
         "y": 4.631360475274445
       },
       "prevControl": {
-        "x": 2.506785726838215,
-        "y": 4.608489559347165
+        "x": 2.3002487562267606,
+        "y": 4.612700442107159
       },
       "nextControl": null,
       "isLocked": true
@@ -60,13 +60,10 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": 179.2042764472607
+    "velocity": 3.0,
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Three Game Piece Flat Cube Paths",
-  "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 3.0
-  }
+  "previewStartingState": null
 }

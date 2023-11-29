@@ -164,7 +164,7 @@ public class RobotContainer {
                         kSwerve.DRIVEBASE_RADIUS,
                         new ReplanningConfig(
                                 true, 
-                                true)
+                                false)
                 ),
                 swerve);
     }

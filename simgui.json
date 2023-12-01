@@ -27,6 +27,16 @@
   },
   "NetworkTables": {
     "transitory": {
+      "PathPlanner": {
+        "HotReload": {
+          "open": true
+        }
+      },
+      "Shuffleboard": {
+        "Driver": {
+          "open": true
+        }
+      },
       "SmartDashboard": {
         "open": true
       }

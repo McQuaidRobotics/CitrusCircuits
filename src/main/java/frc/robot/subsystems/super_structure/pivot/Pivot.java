@@ -8,13 +8,13 @@ import frc.robot.subsystems.super_structure.Component;
 public interface Pivot extends Component {
 
     public static class PivotInputs implements LoggableInputs {
-        public Double degrees, targetDegrees;
-        public Double degreesPerSec = 0.0;
-        public Double leftAmps = 0.0, rightAmps = 0.0;
-        public Double volts = 0.0;
-        public Double leftTemp = 0.0, rightTemp = 0.0;
-        public Double gyroPitchDegrees;
-        public Boolean isHomed = false;
+        public double degrees, targetDegrees;
+        public double degreesPerSec = 0.0;
+        public double leftAmps = 0.0, rightAmps = 0.0;
+        public double volts = 0.0;
+        public double leftTemp = 0.0, rightTemp = 0.0;
+        public double gyroPitchDegrees;
+        public boolean isHomed = false;
 
         public PivotInputs(Double startingDegrees) {
             degrees = startingDegrees;

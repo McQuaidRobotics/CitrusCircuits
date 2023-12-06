@@ -166,7 +166,7 @@ public class ElevatorReal implements Elevator {
         inputs.rightTemp = rightMotorTemp.getValue();
         inputs.isHomed = isHomed;
 
-        Logger.processInputs("SuperStructure/Pivot", inputs);
+        Logger.processInputs("SuperStructure/Elevator", inputs);
 
         isHomed = inputs.isHomed;
     }

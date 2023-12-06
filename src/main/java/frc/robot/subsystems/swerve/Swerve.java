@@ -206,14 +206,14 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
+        for (var module : swerveMods) {
+            module.simulationPeriodic();
+        }
+
         ChassisSpeeds currentSpeeds = kSwerve.SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates());
 
         gyroSim.setRawYaw(
                 getYawRot().getDegrees() + (Units.radiansToDegrees(currentSpeeds.omegaRadiansPerSecond) * 0.02));
-
-        for (var module : swerveMods) {
-            module.simulationPeriodic();
-        }
     }
 
     public static double scope0To360(double angle) {

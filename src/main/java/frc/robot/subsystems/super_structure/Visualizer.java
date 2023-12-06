@@ -72,7 +72,7 @@ public class Visualizer {
         }
 
         public void setShuffleboardTab(ShuffleTab tab) {
-                tab.addSendable("Superstructure Visualizer", mechanism);
+                tab.addSendable("SuperStructure Visualizer", mechanism);
         }
 
         public void updateCurrent(SuperStructurePosition currentForm) {

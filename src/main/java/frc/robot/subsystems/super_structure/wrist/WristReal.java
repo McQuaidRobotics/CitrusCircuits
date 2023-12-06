@@ -140,7 +140,7 @@ public class WristReal implements Wrist {
         inputs.isHomed = isHomed;
         inputs.targetDegrees = setPointDegrees;
 
-        Logger.processInputs("Superstructure/Wrist", inputs);
+        Logger.processInputs("SuperStructure/Wrist", inputs);
 
         isHomed = inputs.isHomed;
     }

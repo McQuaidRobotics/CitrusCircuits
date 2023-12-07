@@ -28,19 +28,19 @@ import frc.robot.Constants.kSwerve;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 
-public class SwerveModuleReal {
+public class SwerveModuleReal implements SwerveModule {
     private final TalonFX driveMotor;
-    private final TalonFXSimState driveSimState;
+    // private final TalonFXSimState driveSimState;
     private final StatusSignal<Double> drivePositionSignal;
     private final StatusSignal<Double> driveVelocitySignal;
 
     private final TalonFX angleMotor;
-    private final TalonFXSimState angleSimState;
+    // private final TalonFXSimState angleSimState;
     private final StatusSignal<Double> anglePositionSignal;
     private final StatusSignal<Double> angleVelocitySignal;
 
     private final CANcoder angleEncoder;
-    private final CANcoderSimState angleEncoderSimState;
+    // private final CANcoderSimState angleEncoderSimState;
     private final StatusSignal<Double> angleAbsoluteSignal;
     private final StatusSignal<Double> angleAbsoluteVeloSignal;
 
@@ -51,8 +51,8 @@ public class SwerveModuleReal {
     private Rotation2d lastAngle = new Rotation2d();
 
     // SIM
-    private final LinearSystemSim<N1, N1, N1> driveSim;
-    private final LinearSystemSim<N2, N1, N1> rotationSim;
+    // private final LinearSystemSim<N1, N1, N1> driveSim;
+    // private final LinearSystemSim<N2, N1, N1> rotationSim;
 
     public SwerveModuleReal(final SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleConstants.moduleId.num;
@@ -60,11 +60,11 @@ public class SwerveModuleReal {
         this.moduleChassisPose = moduleConstants.moduleChassisPose;
 
         driveMotor = new TalonFX(moduleConstants.driveMotorID, kSwerve.CANBUS);
-        driveSimState = driveMotor.getSimState();
+        // driveSimState = driveMotor.getSimState();
         angleMotor = new TalonFX(moduleConstants.angleMotorID, kSwerve.CANBUS);
-        angleSimState = angleMotor.getSimState();
+        // angleSimState = angleMotor.getSimState();
         angleEncoder = new CANcoder(moduleConstants.cancoderID, kSwerve.CANBUS);
-        angleEncoderSimState = angleEncoder.getSimState();
+        // angleEncoderSimState = angleEncoder.getSimState();
 
         configureDriveMotor();
         configureAngleMotor();
@@ -79,10 +79,10 @@ public class SwerveModuleReal {
         angleAbsoluteSignal = angleEncoder.getAbsolutePosition();
         angleAbsoluteVeloSignal = angleEncoder.getVelocity();
 
-        driveSim = new LinearSystemSim<>(
-                LinearSystemId.identifyVelocitySystem(kSwerve.Sim.DRIVE_KV, kSwerve.Sim.DRIVE_KA));
-        rotationSim = new LinearSystemSim<>(
-                LinearSystemId.identifyPositionSystem(kSwerve.Sim.ROTATION_KV, kSwerve.Sim.ROTATION_KA));
+        // driveSim = new LinearSystemSim<>(
+        //         LinearSystemId.identifyVelocitySystem(kSwerve.Sim.DRIVE_KV, kSwerve.Sim.DRIVE_KA));
+        // rotationSim = new LinearSystemSim<>(
+        //         LinearSystemId.identifyPositionSystem(kSwerve.Sim.ROTATION_KV, kSwerve.Sim.ROTATION_KA));
     }
 
     private void configureDriveMotor() {
@@ -122,6 +122,10 @@ public class SwerveModuleReal {
         angleEncoder.getConfigurator().apply(canCoderConfig);
     }
 
+    public int getModuleNumber() {
+        return this.moduleNumber;
+    }
+
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 driveRotationsToMeters(drivePositionSignal.getValue()),
@@ -135,11 +139,12 @@ public class SwerveModuleReal {
     }
 
     public Rotation2d getAngle() {
-        if (Robot.isSimulation()) {
-            return lastAngle;
-        } else {
-            return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
-        }
+        // if (Robot.isSimulation()) {
+        //     return lastAngle;
+        // } else {
+        //     return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
+        // }
+        return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
     }
 
     public void setAngle(SwerveModuleState desiredState) {
@@ -185,29 +190,29 @@ public class SwerveModuleReal {
         angleAbsoluteVeloSignal.refresh();
     }
 
-    public void simulationPeriodic() {
-        driveSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-        angleSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-        angleEncoderSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+    // public void simulationPeriodic() {
+        // driveSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+        // angleSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+        // angleEncoderSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-        SmartDashboard.putNumber("Module: " + moduleNumber + " simvoltDrive", driveSimState.getMotorVoltage());
-        SmartDashboard.putNumber("Module: " + moduleNumber + " simvoltAngle", angleSimState.getMotorVoltage());
-        driveSim.setInput(driveSimState.getMotorVoltage());
-        rotationSim.setInput(angleSimState.getMotorVoltage());
+        // SmartDashboard.putNumber("Module: " + moduleNumber + " simvoltDrive", driveSimState.getMotorVoltage());
+        // SmartDashboard.putNumber("Module: " + moduleNumber + " simvoltAngle", angleSimState.getMotorVoltage());
+        // driveSim.setInput(driveSimState.getMotorVoltage());
+        // rotationSim.setInput(angleSimState.getMotorVoltage());
 
-        driveSim.update(0.02);
-        rotationSim.update(0.02);
+        // driveSim.update(0.02);
+        // rotationSim.update(0.02);
 
-        double driveVel = driveSim.getOutput(0) / kSwerve.METERS_PER_DRIVE_MOTOR_ROTATION;
-        driveSimState.setRotorVelocity(driveVel);
-        driveSimState.addRotorPosition(driveVel * 0.02);
+        // double driveVel = driveSim.getOutput(0) / kSwerve.METERS_PER_DRIVE_MOTOR_ROTATION;
+        // driveSimState.setRotorVelocity(driveVel);
+        // driveSimState.addRotorPosition(driveVel * 0.02);
 
-        double rotationPos = rotationSim.getOutput(0);
-        SmartDashboard.putNumber("Module: " + moduleNumber + " simrot", rotationPos);
-        double rotationDeltaPos = rotationPos - anglePositionSignal.getValue();
-        angleSimState.addRotorPosition(rotationDeltaPos);
-        angleSimState.setRotorVelocity(rotationDeltaPos / 0.02);
-        angleEncoderSimState.setRawPosition(rotationSim.getOutput(0));
-        angleEncoderSimState.setVelocity(angleVelocitySignal.getValue());
-    }
+        // double rotationPos = rotationSim.getOutput(0);
+        // SmartDashboard.putNumber("Module: " + moduleNumber + " simrot", rotationPos);
+        // double rotationDeltaPos = rotationPos - anglePositionSignal.getValue();
+        // angleSimState.addRotorPosition(rotationDeltaPos);
+        // angleSimState.setRotorVelocity(rotationDeltaPos / 0.02);
+        // angleEncoderSimState.setRawPosition(rotationSim.getOutput(0));
+        // angleEncoderSimState.setVelocity(angleVelocitySignal.getValue());
+    // }
 }

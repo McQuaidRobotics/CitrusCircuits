@@ -24,7 +24,7 @@ import frc.robot.util.NTpreferences;
 
 public class Swerve extends SubsystemBase {
     private final SwerveDriveOdometry swerveOdometry;
-    private final SwerveModuleReal[] swerveMods;
+    private final SwerveModule[] swerveMods;
     private final Field2d field = new Field2d();
 
     private final Pigeon2 gyro;
@@ -44,11 +44,17 @@ public class Swerve extends SubsystemBase {
         gyroPitchSignal = gyro.getPitch();
         gyroYawSignal = gyro.getYaw();
 
-        swerveMods = new SwerveModuleReal[] {
+        swerveMods = Robot.isReal() ? new SwerveModule[] {
                 new SwerveModuleReal(Constants.kSwerve.Mod0.CONSTANTS),
                 new SwerveModuleReal(Constants.kSwerve.Mod1.CONSTANTS),
                 new SwerveModuleReal(Constants.kSwerve.Mod2.CONSTANTS),
                 new SwerveModuleReal(Constants.kSwerve.Mod3.CONSTANTS)
+        } : 
+        new SwerveModule[] {
+                new SwerveModuleSim(Constants.kSwerve.Mod0.CONSTANTS),
+                new SwerveModuleSim(Constants.kSwerve.Mod1.CONSTANTS),
+                new SwerveModuleSim(Constants.kSwerve.Mod2.CONSTANTS),
+                new SwerveModuleSim(Constants.kSwerve.Mod3.CONSTANTS)
         };
 
         swerveOdometry = new SwerveDriveOdometry(
@@ -74,8 +80,8 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(mSwerveModuleStates, Constants.kSwerve.MAX_SPEED);
 
-        for (SwerveModuleReal module : swerveMods) {
-            module.setDesiredState(mSwerveModuleStates[module.moduleNumber], isOpenLoop);
+        for (SwerveModule module : swerveMods) {
+            module.setDesiredState(mSwerveModuleStates[module.getModuleNumber()], isOpenLoop);
         }
     }
 
@@ -105,8 +111,8 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(mSwerveModuleStates, Constants.kSwerve.MAX_SPEED);
 
-        for (SwerveModuleReal module : swerveMods) {
-            module.setDesiredState(mSwerveModuleStates[module.moduleNumber], isOpenLoop);
+        for (SwerveModule module : swerveMods) {
+            module.setDesiredState(mSwerveModuleStates[module.getModuleNumber()], isOpenLoop);
         }
     }
 
@@ -145,8 +151,8 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-        for (SwerveModuleReal module : swerveMods) {
-            modulePositions[module.moduleNumber] = module.getPosition();
+        for (SwerveModule module : swerveMods) {
+            modulePositions[module.getModuleNumber()] = module.getPosition();
         }
         return modulePositions;
     }
@@ -154,8 +160,8 @@ public class Swerve extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.kSwerve.MAX_SPEED);
 
-        for (SwerveModuleReal module : swerveMods) {
-            module.setDesiredState(desiredStates[module.moduleNumber], false);
+        for (SwerveModule module : swerveMods) {
+            module.setDesiredState(desiredStates[module.getModuleNumber()], false);
         }
     }
 
@@ -165,8 +171,8 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for (SwerveModuleReal module : swerveMods) {
-            states[module.moduleNumber] = module.getState();
+        for (SwerveModule module : swerveMods) {
+            states[module.getModuleNumber()] = module.getState();
         }
         return states;
     }
@@ -184,7 +190,7 @@ public class Swerve extends SubsystemBase {
         gyroPitchSignal.refresh();
         gyroRollSignal.refresh();
         gyroYawSignal.refresh();
-        for (SwerveModuleReal module : swerveMods) {
+        for (SwerveModule module : swerveMods) {
             module.periodic();
         }
 

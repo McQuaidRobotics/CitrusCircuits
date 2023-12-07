@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
+  "robotWidth": 0.752475,
+  "robotLength": 0.752475,
   "holonomicMode": true,
   "pathFolders": [
     "Three Game Piece Flat Cube Paths",

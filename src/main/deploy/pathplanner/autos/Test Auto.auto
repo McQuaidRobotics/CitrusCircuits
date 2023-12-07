@@ -22,36 +22,6 @@
           "data": {
             "pathName": "Flat Swoop 4"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Flat Place 8 Variation 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Place 8 Flat"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Flat Pickup 3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Pickup 3 Flat"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Flat Place 8 Variation 2"
-          }
         }
       ]
     }

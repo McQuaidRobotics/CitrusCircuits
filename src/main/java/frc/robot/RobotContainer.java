@@ -44,9 +44,11 @@ public class RobotContainer {
                         soloController::getLeftX,
                         soloController::getRightX));
 
-        new Trigger(() -> superStructure.checkSuperstructureEnabled()).onTrue(
+        var ss_trigger = new Trigger(() -> superStructure.checkSuperstructureEnabled());
+        ss_trigger.onTrue(
                 new InstantCommand(() -> {}, superStructure)
-        ).or(() -> superStructure.checkSuperstructureEnabled()).onFalse(
+        );
+        ss_trigger.onFalse(
                 new InstantCommand(() -> superStructure.stopAll(), superStructure)
         );
     }

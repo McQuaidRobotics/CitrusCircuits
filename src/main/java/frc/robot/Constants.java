@@ -249,8 +249,6 @@ public final class Constants {
             public static final double ROTATION_KV = 12.0 / 2.5;
             // Volts to deg/sec^2
             public static final double ROTATION_KA = 0.00004;
-
-            public static final double MAX_VOLTAGE = 12.0;
         }
 
         public static final class Mod0 {

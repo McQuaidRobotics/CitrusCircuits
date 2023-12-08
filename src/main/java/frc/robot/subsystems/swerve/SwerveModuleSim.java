@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 
 import edu.wpi.first.math.MathUtil;
@@ -8,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.kSwerve;
@@ -33,6 +36,7 @@ public class SwerveModuleSim implements SwerveModule{
 
     public SwerveModuleSim(final SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleConstants.moduleId.num;
+        angleFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -65,24 +69,32 @@ public class SwerveModuleSim implements SwerveModule{
 
         angleAppliedVolts = MathUtil.clamp(
             angleFeedback.calculate(getAngle().getRadians(), angle.getRadians()), 
-            -1.0 * Sim.MAX_VOLTAGE, 
-            Sim.MAX_VOLTAGE);
+            -1.0 * RobotController.getBatteryVoltage(), 
+            RobotController.getBatteryVoltage());
         angleSim.setInputVoltage(angleAppliedVolts);
 
         lastAngle = angle;
     }
 
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        
+        if (isOpenLoop) {
+            Logger.recordOutput("Module: " + moduleNumber + " velo", desiredState.speedMetersPerSecond);
+
+            driveSim.setInputVoltage((desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED) * Sim.MAX_VOLTAGE);
+        }
+        else {
+            desiredState.speedMetersPerSecond *= Math.cos(angleFeedback.getPositionError());
+
+            SmartDashboard.putNumber("Module: " + moduleNumber + " velo", desiredState.speedMetersPerSecond);
+
+            double velocityRadPerSec = desiredState.speedMetersPerSecond / (kSwerve.WHEEL_DIAMETER / 2);
+            driveAppliedVolts = MathUtil.clamp(
+                driveFeedback.calculate(driveSim.getAngularVelocityRadPerSec(), velocityRadPerSec),
+                -1.0 * RobotController.getBatteryVoltage(),
+                RobotController.getBatteryVoltage());
+            driveSim.setInputVoltage(driveAppliedVolts);
+        }
     }
-
-    // private double metersPerSecondToVolts(double metersPerSecond) {
-    //     return (metersPerSecond / kSwerve.MAX_SPEED) * Sim.MAX_VOLTAGE;
-    // }
-
-    // private double radiansPerSecondToVolts(double radiansPerSecond) {
-        
-    // }
 
     @Override
     public void simulationPeriodic() {

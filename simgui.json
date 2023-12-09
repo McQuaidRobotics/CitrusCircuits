@@ -19,5 +19,15 @@
         }
       }
     }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "AdvantageKit": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    }
   }
 }

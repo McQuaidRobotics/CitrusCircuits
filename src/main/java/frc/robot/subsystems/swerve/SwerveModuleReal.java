@@ -7,8 +7,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.sim.CANcoderSimState;
-import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,13 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
 import frc.robot.Constants.kSwerve;
 import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
@@ -126,39 +121,22 @@ public class SwerveModuleReal implements SwerveModule {
         return this.moduleNumber;
     }
 
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
-                driveRotationsToMeters(drivePositionSignal.getValue()),
-                getAngle());
-    }
-
+    @Override
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = SwerveModuleState.optimize(desiredState, getAngle());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
 
-    public Rotation2d getAngle() {
-        // if (Robot.isSimulation()) {
-        //     return lastAngle;
-        // } else {
-        //     return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
-        // }
-        return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
-    }
-
-    public void setAngle(SwerveModuleState desiredState) {
+    private void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (kSwerve.MAX_SPEED * 0.01)) ? lastAngle
                 : desiredState.angle;
-
-        SmartDashboard.putNumber("Module: " + moduleNumber + " angle", angle.getDegrees() + 180);
 
         angleMotor.setControl(new PositionDutyCycle(angle.getRotations()));
         lastAngle = angle;
     }
 
-    public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        SmartDashboard.putNumber("Module: " + moduleNumber + " velo", desiredState.speedMetersPerSecond);
+    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
             double percentOutput = desiredState.speedMetersPerSecond / kSwerve.MAX_SPEED;
             var controlRequest = new DutyCycleOut(percentOutput);
@@ -171,14 +149,24 @@ public class SwerveModuleReal implements SwerveModule {
         }
     }
 
+    public SwerveModuleState getCurrentState() {
+        return new SwerveModuleState(
+                driveRotationsToMeters(driveVelocitySignal.getValue()),
+                getAngle());
+    }
+
+    public SwerveModulePosition getCurrentPosition() {
+        return new SwerveModulePosition(
+                driveRotationsToMeters(drivePositionSignal.getValue()),
+                getAngle());
+    }
+
     private double driveRotationsToMeters(double rotations) {
         return rotations * kSwerve.METERS_PER_DRIVE_MOTOR_ROTATION;
     }
 
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(
-                driveRotationsToMeters(driveVelocitySignal.getValue()),
-                getAngle());
+    private Rotation2d getAngle() {
+        return Rotation2d.fromRotations(angleAbsoluteSignal.getValue());
     }
 
     public void periodic() {

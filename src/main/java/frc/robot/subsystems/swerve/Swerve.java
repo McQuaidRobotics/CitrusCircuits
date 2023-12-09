@@ -152,7 +152,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
         for (SwerveModule module : swerveMods) {
-            modulePositions[module.getModuleNumber()] = module.getPosition();
+            modulePositions[module.getModuleNumber()] = module.getCurrentPosition();
         }
         return modulePositions;
     }
@@ -172,7 +172,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (SwerveModule module : swerveMods) {
-            states[module.getModuleNumber()] = module.getState();
+            states[module.getModuleNumber()] = module.getCurrentState();
         }
         return states;
     }
@@ -212,9 +212,6 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        for (var module : swerveMods) {
-            module.simulationPeriodic();
-        }
 
         ChassisSpeeds currentSpeeds = kSwerve.SWERVE_KINEMATICS.toChassisSpeeds(getModuleStates());
 

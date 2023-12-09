@@ -32,7 +32,7 @@ public class PivotReal implements Pivot {
 
     private final PivotInputs inputs;
 
-    private Boolean isHomed = false;
+    private boolean isHomed = false;
 
     private Double mechDegreesToMotorRots(Double mechanismDegrees) {
         return (mechanismDegrees / 360.0) / kPivot.MOTOR_TO_MECHANISM_RATIO;
@@ -90,7 +90,7 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Boolean setPivotDegrees(Double degrees) {
+    public boolean setPivotDegrees(Double degrees) {
         isHomed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
         this.leaderMotor.setControl(posControlRequest);
@@ -124,7 +124,7 @@ public class PivotReal implements Pivot {
     }
 
     @Override
-    public Boolean homeMechanism(boolean force) {
+    public boolean homeMechanism(boolean force) {
         if (force) {
             isHomed = false;
         }

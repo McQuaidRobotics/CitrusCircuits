@@ -55,7 +55,7 @@ public interface Pivot extends Component {
      * 
      * @return true if degrees has been reached
      */
-    public Boolean setPivotDegrees(Double degrees);
+    public boolean setPivotDegrees(Double degrees);
 
     /**
      * @return the current angle of the mechanism

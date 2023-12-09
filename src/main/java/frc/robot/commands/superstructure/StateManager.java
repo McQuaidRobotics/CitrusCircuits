@@ -127,7 +127,7 @@ public class StateManager {
      *                gamepiece variable
      * @return The wanted voltage of the end-effector
      */
-    private static Double endEffectorVoltage(EERequest req, Boolean useHeld) {
+    private static Double endEffectorVoltage(EERequest req, boolean useHeld) {
         if (useHeld) {
             var held = GamepieceMode.getHeldPiece();
             if (held == null) {
@@ -159,7 +159,7 @@ public class StateManager {
         private final States to;
         private States from;
         private Command innerCmd;
-        private Boolean canFinish = false;
+        private boolean canFinish = false;
 
         /**
          * Can only be set in initialize, will skip x many cycles,
@@ -168,10 +168,10 @@ public class StateManager {
         private Integer deadCycles = 0;
 
         // inner cmd tracking
-        private Boolean innerInit = false;
-        private Boolean innerFinish = false;
+        private boolean innerInit = false;
+        private boolean innerFinish = false;
 
-        private Boolean reachedSetpoint;
+        private boolean reachedSetpoint;
 
         public CmdTransitionState(final SuperStructure superStructure, final States to) {
             this.superStructure = superStructure;

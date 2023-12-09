@@ -19,7 +19,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.NTpreferences;
 import frc.robot.util.SwerveModuleConstants;
 
 public class SwerveModuleReal implements SwerveModule {
@@ -47,7 +46,7 @@ public class SwerveModuleReal implements SwerveModule {
 
     public SwerveModuleReal(final SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleConstants.moduleId.num;
-        this.rotationOffset = NTpreferences.getRotationOffset(moduleConstants.moduleId);
+        this.rotationOffset = moduleConstants.getRotationOffset(moduleConstants.moduleId);
         this.moduleChassisPose = moduleConstants.moduleChassisPose;
 
         driveMotor = new TalonFX(moduleConstants.driveMotorID, kSwerve.CANBUS);

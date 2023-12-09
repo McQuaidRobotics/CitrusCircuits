@@ -29,7 +29,7 @@ public class ElevatorReal implements Elevator {
 
     private final ElevatorInputs inputs;
 
-    private Boolean isHomed = false;
+    private boolean isHomed = false;
 
     private Double mechMetersToMotorRots(Double meters) {
         return ((meters - kElevator.HOME_METERS)
@@ -92,7 +92,7 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Boolean setElevatorMeters(Double meters) {
+    public boolean setElevatorMeters(Double meters) {
         this.isHomed = false;
         var posControlRequest = new MotionMagicDutyCycle(mechMetersToMotorRots(meters));
         this.leaderMotor.setControl(posControlRequest);
@@ -106,7 +106,7 @@ public class ElevatorReal implements Elevator {
 
     @Override
     public void manualDriveMechanism(Double percentOut) {
-        var percentControlRequest = new DutyCycleOut(percentOut, true, false);
+        var percentControlRequest = new DutyCycleOut(percentOut, true, false, false, false);
         this.leaderMotor.setControl(percentControlRequest);
         this.isHomed = false;
     }
@@ -117,12 +117,12 @@ public class ElevatorReal implements Elevator {
     }
 
     @Override
-    public Boolean isLimitSwitchHit() {
+    public boolean isLimitSwitchHit() {
         return inputs.isLimitSwitchHit;
     }
 
     @Override
-    public Boolean homeMechanism(boolean force) {
+    public boolean homeMechanism(boolean force) {
         if (force) {
             isHomed = false;
         }

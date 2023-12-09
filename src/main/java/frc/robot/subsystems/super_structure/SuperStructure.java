@@ -22,7 +22,7 @@ public class SuperStructure extends SubsystemBase {
 
     private SuperStructurePosition setpoint = SuperStructurePosition.fromState(States.HOME);
 
-    private Boolean isHomed = false;
+    private boolean isHomed = false;
 
     public SuperStructure() {
         if (Robot.isReal()) {
@@ -49,7 +49,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /** @returns true of the setpoint has been reached */
-    public Boolean setSetpoint(SuperStructurePosition to, SuperStructureMoveOrder order) {
+    public boolean setSetpoint(SuperStructurePosition to, SuperStructureMoveOrder order) {
         this.visualizer.updateSetpoint(to);
         this.setpoint = to;
         this.isHomed = false;
@@ -100,7 +100,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /** @returns true of the setpoint has been reached */
-    public Boolean setSetpoint(SuperStructurePosition to) {
+    public boolean setSetpoint(SuperStructurePosition to) {
         return setSetpoint(to, SuperStructureMoveOrder.SELF_RESOLVE);
     }
 
@@ -112,7 +112,7 @@ public class SuperStructure extends SubsystemBase {
      *              position
      * @return true if all mechanisms have reached their home position
      */
-    public Boolean home(boolean force) {
+    public boolean home(boolean force) {
         this.setpoint = SuperStructurePosition.fromState(States.HOME);
         this.visualizer.updateSetpoint(this.setpoint);
         // this will do wrist -> elevator -> pivot
@@ -130,7 +130,7 @@ public class SuperStructure extends SubsystemBase {
      *         and
      *         a {@link SuperStructure#setSetpoint} hasn't been called since.
      */
-    public Boolean isHomed() {
+    public boolean isHomed() {
         return this.isHomed;
     }
 
@@ -148,7 +148,7 @@ public class SuperStructure extends SubsystemBase {
         this.endEffector.runEndEffector(0.0);
     }
 
-    public Boolean reachedSetpoint(Double toleranceMult) {
+    public boolean reachedSetpoint(Double toleranceMult) {
         return this.setpoint.reachedState(this.getPose(), toleranceMult);
     }
 

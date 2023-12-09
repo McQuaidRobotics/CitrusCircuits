@@ -14,7 +14,7 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Boolean setPivotDegrees(Double degrees) {
+    public boolean setPivotDegrees(Double degrees) {
         pivotDegrees.setTargetPosition(degrees);
         return Math.abs(pivotDegrees.getPose() - degrees) < 0.1;
     }
@@ -35,7 +35,7 @@ public class PivotSim implements Pivot {
     }
 
     @Override
-    public Boolean homeMechanism(boolean force) {
+    public boolean homeMechanism(boolean force) {
         pivotDegrees.setTargetPosition(kPivot.HOME_DEGREES);
         return Math.abs(pivotDegrees.getPose() - kPivot.HOME_DEGREES) < 0.1;
     }

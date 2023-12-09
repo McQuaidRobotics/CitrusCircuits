@@ -56,7 +56,7 @@ public interface EndEffector extends Component {
     }
 
     @Override
-    default public Boolean homeMechanism(boolean force) {
+    default public boolean homeMechanism(boolean force) {
         return true;
     }
 

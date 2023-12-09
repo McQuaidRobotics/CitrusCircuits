@@ -28,5 +28,5 @@ public interface Component {
      * @param force if true, will ignore if the mechanism is already at the home position
      * @return true if the mechanism has reached home
      */
-    public Boolean homeMechanism(boolean force);
+    public boolean homeMechanism(boolean force);
 }

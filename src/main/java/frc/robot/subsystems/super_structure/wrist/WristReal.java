@@ -21,7 +21,7 @@ public class WristReal implements Wrist {
     private final StatusSignal<Double> motorRots, motorVelo, motorAmps, motorVolts, motorTemp;
 
     private final WristInputs inputs;
-    private Boolean isHomed = false;
+    private boolean isHomed = false;
     private Double setPointDegrees = kWrist.HOME_DEGREES;
 
     public WristReal(Double startingDegrees) {
@@ -76,7 +76,7 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public Boolean setWristDegrees(Double degrees) {
+    public boolean setWristDegrees(Double degrees) {
         isHomed = false;
         setPointDegrees = degrees;
         var posControlRequest = new MotionMagicDutyCycle(mechDegreesToMotorRots(degrees));
@@ -102,7 +102,7 @@ public class WristReal implements Wrist {
     }
 
     @Override
-    public Boolean homeMechanism(boolean force) {
+    public boolean homeMechanism(boolean force) {
         if (force) {
             isHomed = false;
         }

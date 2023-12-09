@@ -53,7 +53,7 @@ public class ShuffleboardApi {
             return paths.length;
         }
 
-        public Boolean isValid() {
+        public boolean isValid() {
             // len has to be more than 2 but less than 5
             // all paths have to be non-empty
             // first path has to be "Shuffleboard"

@@ -49,7 +49,7 @@ public interface Wrist extends Component {
      * 
      * @return true if degrees has been reached
      */
-    public Boolean setWristDegrees(Double degrees);
+    public boolean setWristDegrees(Double degrees);
 
     /**
      * @return the current angle of the mechanism

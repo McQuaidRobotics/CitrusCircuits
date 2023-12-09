@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.NTpreferences;
 
 public class Swerve extends SubsystemBase {
     private final SwerveDriveOdometry swerveOdometry;
@@ -34,8 +33,6 @@ public class Swerve extends SubsystemBase {
     private final StatusSignal<Double> gyroYawSignal;
 
     public Swerve() {
-        NTpreferences.loadPreferences();
-
         gyro = new Pigeon2(Constants.kSwerve.PIGEON_ID, Constants.kSwerve.CANBUS);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyroSim = gyro.getSimState();

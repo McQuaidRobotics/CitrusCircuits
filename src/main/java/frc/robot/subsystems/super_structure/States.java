@@ -26,13 +26,13 @@ public enum States {
     public final Double elevatorMeters;
     public final EERequest eeRequest;
     public final EEBehavior eeBehavior;
-    public final Boolean useHeldGamepiece;
+    public final boolean useHeldGamepiece;
     public final Double toleranceMult;
 
     States(
             Double pivotDegrees, Double wristDegrees, Double elevatorMeters,
             EERequest eeRequest, EEBehavior eeBehavior,
-            Boolean useHeldGamepiece) {
+            boolean useHeldGamepiece) {
         this.pivotDegrees = pivotDegrees;
         this.wristDegrees = wristDegrees;
         this.elevatorMeters = elevatorMeters;
@@ -44,7 +44,7 @@ public enum States {
 
     States(
             Double pivotDegrees, Double wristDegrees, Double elevatorMeters,
-            EERequest eeRequest, EEBehavior eeBehavior, Boolean useHeldGamepiece,
+            EERequest eeRequest, EEBehavior eeBehavior, boolean useHeldGamepiece,
             Double toleranceMult) {
         this.pivotDegrees = pivotDegrees;
         this.wristDegrees = wristDegrees;

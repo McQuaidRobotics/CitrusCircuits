@@ -16,7 +16,7 @@ public class WristSim implements Wrist {
         kWrist.MOTOR_kP, kWrist.MOTOR_kI, kWrist.MOTOR_kD, 0.2
     );
     private Double setDegrees = kWrist.HOME_DEGREES, AppliedVolts = 0.0;
-    private Boolean isHomed = false;
+    private boolean isHomed = false;
 
     private final WristInputs inputs;
 
@@ -36,7 +36,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Boolean setWristDegrees(Double degrees) {
+    public boolean setWristDegrees(Double degrees) {
         isHomed = false;
         setDegrees = degrees;
         Double wristVoltageFeedback = pidController.calculate(
@@ -63,7 +63,7 @@ public class WristSim implements Wrist {
     }
 
     @Override
-    public Boolean homeMechanism(boolean force) {
+    public boolean homeMechanism(boolean force) {
         isHomed = true;
         sim.setState(Units.degreesToRadians(kWrist.HOME_DEGREES), 0);
         return true;

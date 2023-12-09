@@ -60,12 +60,12 @@ public interface Elevator extends Component {
      *               max: {@link kElevator#ELEVATOR_MAX_METERS})
      * @return true if meters has been reached
      */
-    public Boolean setElevatorMeters(Double meters);
+    public boolean setElevatorMeters(Double meters);
 
     public Double getElevatorMeters();
 
     /**
      * @return if the reverse limit switch is activated
      */
-    public Boolean isLimitSwitchHit();
+    public boolean isLimitSwitchHit();
 }

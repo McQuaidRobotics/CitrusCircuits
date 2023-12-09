@@ -45,7 +45,7 @@ public class SuperstructureCommands {
     public static class TransitionToPlace extends Command {
         private final SuperStructure superStructure;
         private CmdTransitionState placeCmd;
-        private Boolean canFinish = false;
+        private boolean canFinish = false;
 
         public TransitionToPlace(final SuperStructure superStructure) {
             this.superStructure = superStructure;

@@ -54,8 +54,8 @@ public class PivotReal implements Pivot {
         followerMotor.setControl(
                 new Follower(kPivot.LEFT_MOTOR_ID, true));
 
+        inputs = new PivotInputs(gyroPitch.getValue() - kPivot.PIGEON_OFFSET);
         leaderMotor.setPosition(mechDegreesToMotorRots(getPivotDegreesPigeon()));
-        inputs = new PivotInputs(getPivotDegreesPigeon());
 
         motorRots = leaderMotor.getRotorPosition();
         motorVelo = leaderMotor.getRotorVelocity();
